@@ -83,7 +83,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
-- Acceptance: purpose, `OP-N` entry format, agent protocol, `## Open` seeded with OP-1 (GitHub auth), empty `## Done`. (PRD §15.4)
+- Acceptance: purpose, `OP-N` entry format, agent protocol, `## Open` and `## Resolved` sections; OP-1 (GitHub remote/auth) recorded. (PRD §15.4)
 - Notes: done by this plan.
 
 ### T-007 — CI workflow + PR template
