@@ -1,0 +1,219 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compute_expected — ±2 bps tolerance > exact match (0 delta) → withinTolerance:true — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "compute",
+  "value": {
+    "deltaBps": 0,
+    "expectedBps": 34,
+    "observedBps": 34,
+    "withinTolerance": true,
+  },
+}
+`;
+
+exports[`compute_expected — ±2 bps tolerance > large delta → withinTolerance:false — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "compute",
+  "value": {
+    "deltaBps": 5000,
+    "expectedBps": 50000,
+    "observedBps": 45000,
+    "withinTolerance": false,
+  },
+}
+`;
+
+exports[`cross_check_history — mock history injected via ToolDeps > empty history → snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "attestation-history",
+  "value": {
+    "claimRef": "claim-D",
+    "priorAttestations": [],
+  },
+}
+`;
+
+exports[`cross_check_history — mock history injected via ToolDeps > returns injected attestation history — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "attestation-history",
+  "value": {
+    "claimRef": "claim-A",
+    "priorAttestations": [
+      {
+        "agent": "reflector",
+        "confidenceBps": 9000,
+        "decision": "VALID",
+      },
+      {
+        "agent": "rotor",
+        "confidenceBps": 8500,
+        "decision": "VALID",
+      },
+    ],
+  },
+}
+`;
+
+exports[`fetch_chainlink_price > returns USDY snapshot — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "chainlink",
+  "value": {
+    "asset": "USDY",
+    "period": "30d",
+    "priceBps": 525,
+    "stale": false,
+  },
+}
+`;
+
+exports[`fetch_chainlink_price > returns mETH 30d-fresh snapshot — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "chainlink",
+  "value": {
+    "asset": "mETH",
+    "period": "30d-fresh",
+    "priceBps": 34,
+    "stale": false,
+  },
+}
+`;
+
+exports[`fetch_meth_yield > fresh period → full snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "chainlink",
+  "value": {
+    "asset": "mETH",
+    "period": "30d-fresh",
+    "stale": false,
+    "yieldBps": 34,
+  },
+}
+`;
+
+exports[`fetch_meth_yield > stale period → full snapshot 1`] = `
+{
+  "confidence": 2000,
+  "fetchedAt": 1748822400000,
+  "source": "chainlink",
+  "value": {
+    "asset": "mETH",
+    "period": "30d-stale",
+    "stale": true,
+    "yieldBps": 34,
+  },
+}
+`;
+
+exports[`fetch_usdy_yield > returns USDY 30d snapshot — snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "chainlink",
+  "value": {
+    "asset": "USDY",
+    "period": "30d",
+    "stale": false,
+    "yieldBps": 525,
+  },
+}
+`;
+
+exports[`query_chain_state — balanceOf > known account+token → snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "mock-chain",
+  "value": {
+    "account": "0xTREASURY_mETH",
+    "balance": "1000000000000000000000",
+    "found": true,
+    "op": "balanceOf",
+    "token": "mETH",
+  },
+}
+`;
+
+exports[`query_chain_state — eventOccurred > known claimRef → snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "mock-chain",
+  "value": {
+    "blockNumber": 7890123,
+    "claimRef": "DIST-2026-05",
+    "found": true,
+    "occurred": true,
+    "op": "eventOccurred",
+    "txHash": "0xabc123def456000000000000000000000000000000000000000000000000001",
+  },
+}
+`;
+
+exports[`read_document — bank statement > bank statement → snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "fixture:v1/pc-pool-1-statement",
+  "value": {
+    "docRef": "pc-pool-1-statement",
+    "docType": "bank-statement",
+    "docVersion": "v1",
+    "fields": {
+      "currency": "USD",
+      "lineItems": [
+        {
+          "amount": 30000,
+          "description": "Principal repayment",
+        },
+        {
+          "amount": 12000,
+          "description": "Interest received",
+        },
+        {
+          "amount": 3000,
+          "description": "Fee income",
+        },
+      ],
+      "lineItemsTotal": 45000,
+      "period": "2026-05",
+      "poolId": "PC-POOL-1",
+      "statementDate": "2026-05-31",
+    },
+  },
+}
+`;
+
+exports[`read_document — servicer report > servicer report → snapshot 1`] = `
+{
+  "confidence": 9500,
+  "fetchedAt": 1748822400000,
+  "source": "fixture:v1/pc-pool-1-servicer",
+  "value": {
+    "docRef": "pc-pool-1-servicer",
+    "docType": "servicer-report",
+    "docVersion": "v1",
+    "fields": {
+      "cashflowTotal": 50000,
+      "currency": "USD",
+      "period": "2026-05",
+      "poolId": "PC-POOL-1",
+      "reportDate": "2026-05-31",
+    },
+  },
+}
+`;

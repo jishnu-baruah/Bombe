@@ -83,3 +83,13 @@ export type { ToolError, ToolErrorRow } from "./tool-recovery.js";
 // Deterministic task router (PRD §6.3.2, T-209)
 export { TOOL_MAP, allowedTools, isToolAllowed, refusalObservation } from "./router.js";
 export type { ToolName } from "./router.js";
+
+// Tool implementations (PRD §6.3, T-210/T-211/T-212)
+export { TOOLS, getTool, ToolResultSchema, MockHistorySource } from "./tools/index.js";
+export type {
+  Tool,
+  ToolResult,
+  ToolDeps,
+  HistorySource,
+  PriorAttestation,
+} from "./tools/index.js";
