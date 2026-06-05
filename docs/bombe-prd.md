@@ -365,7 +365,7 @@ Mock mode requires none of the live vars. Missing live var in live mode → fail
 - Contracts: NatSpec, custom errors, events on all mutations, `forge fmt`, zero warnings.
 - Determinism: mock mode fully deterministic (seeded clock, scripted models, pinned skill) — identical demo every run.
 - No silent failures: every tool/loop/runner error lands in the `errors` table and the JSON test reports.
-- `pnpm ci` = lint + typecheck + forge test + vitest + `pnpm test:demo`. Must exit 0.
+- `pnpm run ci` = lint + typecheck + forge test + vitest + `pnpm test:demo`. Must exit 0.
 
 ## 9. Security notes (testnet-appropriate, mandatory)
 
@@ -390,7 +390,7 @@ Latency = ms from observed `ClaimPosted` to attestation tx sent (mock: simulated
 5. **M5 Web** — five routes + operator API + health view + guided demo, responsive. ✓ demo sequence A→D plays in the browser exactly per §6.7; verify-hash button matches.
 6. **M6 Autonomous testing** — JSON reporters on every suite, `scripts/test-agent.ts` aggregator, `scripts/test-demo.ts` golden path, `scripts/seed-bug.ts` drill fixtures. ✓ `pnpm test:agent` outputs one parseable summary; `pnpm test:demo` validates A→D headless in <30s; the §15.3 drill passes.
 7. **M7 STRETCH (only after §14 criteria 1–17 all pass)** — Telegram bot (`/race`, `/leaderboard`, `/subscribe` push on `agent-done`), Discord bot (same commands, all replies in threads, channel whitelist via `DISCORD_CHANNEL_IDS`), `/turing` blind mode. All bot logic unit-tested against mocked platform clients; no real tokens needed for tests; bots consume `/api/stream`. Nothing in M7 may modify packages that earlier milestones depend on.
-8. **M8 Live seams + ship** — live implementations (compile/typecheck correctness required; live-service behavior best-effort), deploy script, README, DEMO.md, DECISIONS.md. ✓ `pnpm ci` green; `pnpm demo` cold-start < 60s.
+8. **M8 Live seams + ship** — live implementations (compile/typecheck correctness required; live-service behavior best-effort), deploy script, README, DEMO.md, DECISIONS.md. ✓ `pnpm run ci` green; `pnpm demo` cold-start < 60s.
 
 ## 12. Deliverables
 
@@ -405,7 +405,7 @@ Monorepo building/testing clean; `README.md` (10-line quickstart, architecture d
 
 ## 14. Acceptance criteria (done when ALL are true; M7 stretch items are intentionally absent)
 
-1. `pnpm ci` exits 0 from a fresh clone with submodules, no credentials.
+1. `pnpm run ci` exits 0 from a fresh clone with submodules, no credentials.
 2. `forge test` ≥13 passing including `testFuzz_SlashConservation`.
 3. `pnpm demo` on a clean machine serves the app; the A→D sequence produces exactly the §6.7 outcomes, deterministically, twice in a row.
 4. `/claim/[id]` verify-hash matches for all agents on claim A, including Plugboard's replayed trace.

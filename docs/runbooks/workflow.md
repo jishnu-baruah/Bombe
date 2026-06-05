@@ -24,7 +24,7 @@ This is a scoped exception to PRD §15.4 ("main requires human approval") — se
 1. **Pick** a `pending` task whose dependencies are all `done` → set it `in-progress YYYY-MM-DD`, cut branch `feat/T-XXX-slug` (or the matching prefix).
 2. **Build** via the §15.3 fix-loop (below).
 3. **Gate:** `pnpm test:demo` must pass before the task can be marked done (once the relevant subsystem exists).
-4. **Ship:** open PR `T-XXX — <title>`. `pnpm ci` is the CI gate. The merge commit flips the task to `done YYYY-MM-DD` in `TODO.md`.
+4. **Ship:** open PR `T-XXX — <title>`. `pnpm run ci` is the CI gate. The merge commit flips the task to `done YYYY-MM-DD` in `TODO.md`.
 5. **Checkpoint** (§15.4): commit before each fix session; branches only, never direct to main.
 
 ## The fix-loop (PRD §15.3) — in brief

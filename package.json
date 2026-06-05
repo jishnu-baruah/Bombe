@@ -1,0 +1,25 @@
+{
+  "name": "bombe",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "//ci": "D7: the ci script (invoke as `pnpm run ci`) is incremental. It runs only the gates implemented so far (lint + typecheck). forge test, vitest, and `pnpm run test:demo` are appended to ci as the milestones that introduce them land.",
+    "ci": "pnpm lint && pnpm typecheck",
+    "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
+    "test:agent": "echo \"T-702: test:agent aggregator not implemented yet\" && exit 1",
+    "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",
+    "demo": "echo \"M3+: demo boot not implemented yet\" && exit 1",
+    "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
+  }
+}

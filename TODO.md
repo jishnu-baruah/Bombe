@@ -90,7 +90,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Status: done 2026-06-05
 - Depends-on: —
 - Scope: ops
-- Acceptance: `.github/workflows/ci.yml` runs `pnpm ci` on PRs + non-main pushes (Foundry + pnpm + Node 22); `.github/pull_request_template.md` enforces task-ID + acceptance checklist; YAML valid. (PRD §8)
+- Acceptance: `.github/workflows/ci.yml` runs `pnpm run ci` on PRs + non-main pushes (Foundry + pnpm + Node 22); `.github/pull_request_template.md` enforces task-ID + acceptance checklist; YAML valid. (PRD §8)
 - Notes: done by this plan.
 
 ### T-008 — GitHub remote create + push
@@ -101,7 +101,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: OP-1 resolved — `origin` = https://github.com/jishnu-baruah/Bombe.git, `main` pushed. CI runs on the next branch/PR push.
 
 ### T-009 — pnpm workspace bootstrap
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-008
 - Scope: ops
 - Acceptance: root `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.env.example` (every PRD §7 var, no values), Biome (lint+format) config, vitest config; root scripts `test`/`test:agent`/`test:demo`/`demo`/`ci`/`deploy:testnet` exist as wired stubs that exit non-zero with a "not implemented" message; `pnpm install` succeeds. (PRD §5, §8)
@@ -542,7 +542,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Status: pending
 - Depends-on: all above
 - Scope: ops
-- Acceptance: `pnpm ci` exits 0 from fresh clone w/ submodules, no creds; `pnpm demo` cold-start <60s; A→D deterministic twice. (PRD §14.1, §14.3, §11 M8)
+- Acceptance: `pnpm run ci` exits 0 from fresh clone w/ submodules, no creds; `pnpm demo` cold-start <60s; A→D deterministic twice. (PRD §14.1, §14.3, §11 M8)
 - Notes: —
 
 ---
