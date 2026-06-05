@@ -1,6 +1,12 @@
 import { defineConfig } from "vitest/config";
 
-// Minimal root Vitest config. No tests exist yet (the harness lands in M6,
-// see T-7xx). Per-package configs / a workspace will extend this as suites
-// are added. `pnpm test` / `test:agent` / `test:demo` are stubbed until then.
-export default defineConfig({});
+// Root Vitest config. Uses vitest's default include glob (**/*.{test,spec}.ts)
+// which discovers tests in packages/* automatically (node_modules excluded).
+// Per-package `pnpm --filter <pkg> test` also works via each package's own
+// `vitest run` script. The formal harness (T-7xx) will add reporters/workspace
+// config when it lands in M6.
+export default defineConfig({
+  test: {
+    include: ["packages/**/*.test.ts", "apps/**/*.test.ts"],
+  },
+});
