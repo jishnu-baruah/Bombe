@@ -35,3 +35,6 @@ pglite-data/
 .idea/
 .vscode/
 *.log
+
+# Agent worktrees (background subagents)
+.claude/worktrees/
