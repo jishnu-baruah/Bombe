@@ -168,11 +168,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: contracts/src/AgentSlashing.sol; co-delivered with T-105. Burn = ETH retained forever in contract (totalBurned). Reputation applied by Leaderboard (D12), not here. Conservation seized==burn+distributed asserted; full fuzz deferred to T-108.
 
 ### T-107 — AgentSlashing Tier 2 disputes
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-106
 - Scope: contracts
 - Acceptance: `openDispute` (0.05e bond) / `vote` (one per attestor, weight=bond, window) / `resolveDispute` (stake-weighted; agent-wrong vs agent-right economics); tests: both verdicts, withdrawal blocked during dispute. (PRD §6.2)
-- Notes: when wiring DISPUTE_ROLE to this module, add `NotRegistered` guards to `AgentRegistry.adjustReputation`/`setDisputePending` (T-102 review: currently writable for unregistered addrs — role-gated, low risk). Consider a zero-value guard on `topUpBond`.
+- Notes: AgentSlashing constructor gains `disputeWindowSeconds` immutable param; AgentRegistry.adjustReputation/setDisputePending now guard NotRegistered; D13 in DECISIONS.md; 17 new tests pass (66 total). Settlement.t.sol constructor call updated to pass 4 args.
 
 ### T-108 — Fuzz + deep-test wiring
 - Status: pending
