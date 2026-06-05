@@ -263,25 +263,25 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: TOOL_MAP + allowedTools/isToolAllowed/refusalObservation in packages/agent-sdk/src/router.ts; 29 tests pass; FAIR_VALUE=[] enforced at compile time.
 
 ### T-210 — tools: price/yield feeds + snapshots
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-204, T-209
 - Scope: agent-sdk
 - Acceptance: `fetch_chainlink_price`/`fetch_meth_yield`(stale fixture)/`fetch_usdy_yield`; zod I/O `{value,source,fetchedAt,confidence}`; deterministic snapshot tests. (PRD §6.3)
-- Notes: —
+- Notes: tools/feeds.ts; stale→confidence 2000 bps+value.stale:true; 85 tool tests + 9 snapshots written; all 332 tests pass; pnpm run ci exit 0.
 
 ### T-211 — tools: chain-state + compute
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-204
 - Scope: agent-sdk
 - Acceptance: `query_chain_state` DSL (`balanceOf`,`eventOccurred`) + `compute_expected` (pure, ±2bps); snapshot tests. (PRD §6.3)
-- Notes: —
+- Notes: tools/chain-compute.ts; DSL backed by fixtures/chain/state.json; compute_expected ±2bps tolerance validated with boundary tests.
 
 ### T-212 — tools: document + history
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-204
 - Scope: agent-sdk
 - Acceptance: `read_document` (servicer report + statement, mismatched pair for C) + `cross_check_history` (Postgres); snapshot tests. (PRD §6.3)
-- Notes: —
+- Notes: tools/doc-history.ts; cashflow mismatch 50000 vs 45000 exposed; HistorySource seam + MockHistorySource for tests; real DB wired in T-403.
 
 ### T-213 — loop.ts ReAct + hard rules
 - Status: pending

@@ -1,0 +1,28 @@
+{
+  "balanceOf": {
+    "0xTREASURY_mETH:mETH": {
+      "balance": "1000000000000000000000",
+      "token": "mETH",
+      "account": "0xTREASURY_mETH"
+    },
+    "0xTREASURY_USDY:USDY": {
+      "balance": "500000000000000000000",
+      "token": "USDY",
+      "account": "0xTREASURY_USDY"
+    }
+  },
+  "eventOccurred": {
+    "DIST-2026-05": {
+      "occurred": true,
+      "claimRef": "DIST-2026-05",
+      "txHash": "0xabc123def456000000000000000000000000000000000000000000000000001",
+      "blockNumber": 7890123
+    },
+    "DIST-2026-04": {
+      "occurred": true,
+      "claimRef": "DIST-2026-04",
+      "txHash": "0xabc123def456000000000000000000000000000000000000000000000000002",
+      "blockNumber": 7800000
+    }
+  }
+}
