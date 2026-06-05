@@ -207,11 +207,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: packages/shared/src/canonical.ts; canonicalJson + hashCanonical + reasoningHash/sourcesHash convenience wrappers; viem keccak256/toBytes; 22 tests all pass.
 
 ### T-203 — test-report.ts + events.ts schemas
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-201
 - Scope: shared
 - Acceptance: `TestReport` interface (PRD §15.1) and all SSE event zod schemas (claim/agent-step/agent-done/human-queue/epoch/dispute). (PRD §6.5, §15.1, §14.17)
-- Notes: —
+- Notes: TestReportSchema + FailureCategory in test-report.ts; SseEventSchema discriminated union in events.ts; 75 tests all pass; biome + tsc clean.
 
 ### T-204 — fixtures loader + fixtures tree
 - Status: pending
