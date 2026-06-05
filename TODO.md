@@ -28,11 +28,11 @@ The file is the board; every status change is a visible commit.
 ## Task block format
 
 ```
-### T-104 — AgentAttestation.attest + tier-3 revert
+### T-XXX — <task title>
 - Status: pending
-- Depends-on: T-101, T-103
-- Scope: contracts
-- Acceptance: <criteria, ending with (PRD §refs)>
+- Depends-on: T-AAA, T-BBB        # or — for none
+- Scope: contracts               # contracts | shared | agent-sdk | runner | web | ops | docs | ...
+- Acceptance: <checkable criteria, ending with (PRD §refs)>
 - Notes: —
 ```
 
