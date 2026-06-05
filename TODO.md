@@ -288,14 +288,14 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Depends-on: T-206, T-207, T-208, T-209, T-210, T-211, T-212
 - Scope: agent-sdk
 - Acceptance: model proposes thought+action; SDK executes to finalize/maxSteps; hard rules tier3→ABSTAIN(overridden), BELOW_THRESHOLD, STALE_SINGLE_SOURCE, STEP_BUDGET; trace v1.0 shape; tests for each ABSTAIN path. (PRD §6.3, §14.6)
-- Notes: —
+- Notes: T-214 cleanup nits applied: staleSourceCount dead var removed, MODEL_ABSTAIN added to AbstainReason, import fixed to `import type`.
 
 ### T-214 — attest.ts builder
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-213, T-202
 - Scope: agent-sdk
 - Acceptance: assembles `{claimId,tier,decision,confidenceBps,sourcesHash,reasoningHash,traceURI}`, signs via WalletSeam, writes `agent_runs`/`attestations` row w/ latency+cost; payload-shape test. (PRD §6.3)
-- Notes: —
+- Notes: M2 SDK core complete. Source sort key: (name ASC, source ASC). Decision enum: VALID=0, REJECTED=1, ABSTAIN=2. InMemoryAttestationRepository for tests. 268 agent-sdk tests pass; 364 total; pnpm run ci exit 0.
 
 ---
 
