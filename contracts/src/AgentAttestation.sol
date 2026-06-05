@@ -24,6 +24,11 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     ///         Granted to the operator address passed to the constructor.
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
+    /// @notice Role that permits the settlement layer to move locked stake out of this contract.
+    ///         Granted to TuringLeaderboard (T-105) and, transitively through it, the slash
+    ///         economics in AgentSlashing (T-106). Holders may call `seizeStake`.
+    bytes32 public constant SETTLER_ROLE = keccak256("SETTLER_ROLE");
+
     // -------------------------------------------------------------------------
     // Constants
     // -------------------------------------------------------------------------
@@ -110,6 +115,13 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     /// @param claimId The closed claim identifier.
     event ClaimClosed(bytes32 indexed claimId);
 
+    /// @notice Emitted when a SETTLER_ROLE holder seizes an attestation's locked stake.
+    /// @param claimId  The claim whose attestation stake was seized.
+    /// @param attestor The attestor whose locked stake was moved.
+    /// @param amount   The ETH amount transferred out (the prior `lockedStake`).
+    /// @param to       The settlement contract that received the stake (`msg.sender`).
+    event StakeSeized(bytes32 indexed claimId, address indexed attestor, uint256 amount, address indexed to);
+
     // -------------------------------------------------------------------------
     // Custom errors
     // -------------------------------------------------------------------------
@@ -145,6 +157,15 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     /// @notice VALID or REJECTED decisions must be sent with msg.value == ATTEST_LOCK (0.02 ether).
     error IncorrectStake();
 
+    /// @notice The registry address supplied to the constructor was the zero address.
+    error ZeroRegistry();
+
+    /// @notice `seizeStake` was called for an attestation that holds no locked stake.
+    error NoStakeToSeize();
+
+    /// @notice ETH transfer of the seized stake to the settlement contract failed.
+    error SeizeTransferFailed();
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -158,7 +179,7 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
         address admin,
         address operator
     ) {
-        require(registryAddress != address(0), "AgentAttestation: zero registry");
+        if (registryAddress == address(0)) revert ZeroRegistry();
         REGISTRY = AgentRegistry(registryAddress);
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(OPERATOR_ROLE, operator);
@@ -267,6 +288,41 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
         claim.attestorCount += 1;
 
         emit Attested(claimId, msg.sender, decision, confidenceBps, lockedStake);
+    }
+
+    // -------------------------------------------------------------------------
+    // Settlement hook (role-gated stake movement)
+    // -------------------------------------------------------------------------
+
+    /// @notice Move an attestation's locked stake out of this contract to the caller.
+    ///         Callable only by the settlement layer (SETTLER_ROLE — TuringLeaderboard).
+    ///         Used both to release a correct attestor's own stake (the Leaderboard then
+    ///         credits it back as a pull payment) and to fund the slash economics for a
+    ///         wrong attestor (the Leaderboard forwards the seized ETH to AgentSlashing).
+    ///
+    ///         Checks-effects-interactions: the stored `lockedStake` is zeroed *before*
+    ///         the ETH transfer, so a re-entrant call sees no stake and reverts.
+    ///         ABSTAIN attestations hold zero stake and therefore always revert here,
+    ///         which keeps ABSTAIN out of every slash/settlement money path (PRD §14.6).
+    /// @param claimId  The claim whose attestation stake is being seized.
+    /// @param attestor The attestor whose locked stake to move.
+    /// @return amount  The ETH amount transferred to `msg.sender`.
+    function seizeStake(
+        bytes32 claimId,
+        address attestor
+    ) external onlyRole(SETTLER_ROLE) nonReentrant returns (uint256 amount) {
+        Attestation storage a = _attestations[claimId][attestor];
+        amount = a.lockedStake;
+        if (amount == 0) revert NoStakeToSeize();
+
+        // effects: zero stake before the external transfer (CEI).
+        a.lockedStake = 0;
+
+        emit StakeSeized(claimId, attestor, amount, msg.sender);
+
+        // interactions: forward the seized stake to the settlement contract.
+        (bool success,) = msg.sender.call{ value: amount }("");
+        if (!success) revert SeizeTransferFailed();
     }
 
     // -------------------------------------------------------------------------

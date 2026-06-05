@@ -154,18 +154,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: Combined delivery with T-103. ClaimClosed renamed ClaimAlreadyClosed to avoid identifier collision with the ClaimClosed event (Solidity 0.8.24 does not allow an error and event to share a name).
 
 ### T-105 — TuringLeaderboard.settleTier1 + stats/views
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-104
 - Scope: contracts
 - Acceptance: updates epoch stats, releases/forwards locked stake; `epochStats`/`lifetimeStats` views; tests: settle correct. (PRD §6.2, §14.7)
-- Notes: —
+- Notes: contracts/src/TuringLeaderboard.sol + contracts/test/Settlement.t.sol; co-delivered with T-106; 15 settlement tests pass (49 total forge). D12 in DECISIONS.md. Added SETTLER_ROLE + seizeStake to AgentAttestation (Part A) and fixed ZeroRegistry nit.
 
 ### T-106 — AgentSlashing Tier 1
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-105
 - Scope: contracts
 - Acceptance: wrong → burn 50% / redistribute 50% pro-rata via pull payments; reputation wrong −10 / correct +1 / abstain ±0; reentrancy guards; tests: settle-wrong slash math, pro-rata across 2 correct, reputation deltas, no ABSTAIN in any slash. (PRD §6.2, §9, §14.6)
-- Notes: —
+- Notes: contracts/src/AgentSlashing.sol; co-delivered with T-105. Burn = ETH retained forever in contract (totalBurned). Reputation applied by Leaderboard (D12), not here. Conservation seized==burn+distributed asserted; full fuzz deferred to T-108.
 
 ### T-107 — AgentSlashing Tier 2 disputes
 - Status: pending
