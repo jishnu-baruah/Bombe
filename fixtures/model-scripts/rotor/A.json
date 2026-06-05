@@ -1,0 +1,24 @@
+{
+  "agentId": "rotor",
+  "claimId": "A",
+  "steps": [
+    {
+      "thought": "Fetching the mETH yield oracle to verify the 34 bps claim.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-fresh" } }
+    },
+    {
+      "thought": "Oracle confirms 34 bps, fresh data. Running math check.",
+      "action": { "tool": "compute_expected", "input": { "observedBps": 34, "expectedBps": 34 } }
+    },
+    {
+      "thought": "34 bps within tolerance. Confidence is high. Committing VALID.",
+      "action": {
+        "finalize": {
+          "decision": "VALID",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value within ±2 bps tolerance. Fresh data."
+        }
+      }
+    }
+  ]
+}

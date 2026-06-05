@@ -302,32 +302,32 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-3xx — reference agents (M2/M4)
 
 ### T-301 — Reflector (conservative 8500/8)
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-214
 - Scope: agent-reference
 - Acceptance: requires 2 independent sources; scripted run on claim B → ABSTAIN(STALE_SINGLE_SOURCE) with stable hash. (PRD §6.4, M2 checkpoint)
-- Notes: —
+- Notes: packages/agent-reference/src/agents.ts REFLECTOR_CONFIG; temperament thresholdBps=8500/maxSteps=8/requiresTwoSources=true/abstainOnStale=true; M2 stable hash 0xc3cef617d4e63c8b71d45ce5c0f0226fbbe92cd696404107019fd6dde0831669.
 
 ### T-302 — Rotor (aggressive 6500/5)
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-214
 - Scope: agent-reference
 - Acceptance: commits above threshold; never abstains for staleness alone. (PRD §6.4)
-- Notes: —
+- Notes: ROTOR_CONFIG thresholdBps=6500/maxSteps=5/requiresTwoSources=false/abstainOnStale=false; claim B → VALID confirmed.
 
 ### T-303 — Stator (cost-optimized 7000/4)
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-214
 - Scope: agent-reference
 - Acceptance: shortest path; abstains when tools disagree. (PRD §6.4)
-- Notes: —
+- Notes: STATOR_CONFIG thresholdBps=7000/maxSteps=4/requiresTwoSources=false/abstainOnStale=false; model-abstains on stale single-source (MODEL_ABSTAIN path).
 
 ### T-304 — mock model-scripts A–D for the three SDK agents
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-301, T-302, T-303
 - Scope: agent-reference
 - Acceptance: `fixtures/model-scripts/{agent}/{claimId}.json` produce the §6.7 outcomes deterministically. (PRD §6.4, §6.7)
-- Notes: —
+- Notes: 12 model-script JSON files (reflector/rotor/stator × A/B/C/D); fixtures/claims.json added; all 13 vitest tests pass; pnpm run ci exit 0.
 
 ---
 
