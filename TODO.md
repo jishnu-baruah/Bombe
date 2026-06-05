@@ -284,7 +284,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: tools/doc-history.ts; cashflow mismatch 50000 vs 45000 exposed; HistorySource seam + MockHistorySource for tests; real DB wired in T-403.
 
 ### T-213 — loop.ts ReAct + hard rules
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-206, T-207, T-208, T-209, T-210, T-211, T-212
 - Scope: agent-sdk
 - Acceptance: model proposes thought+action; SDK executes to finalize/maxSteps; hard rules tier3→ABSTAIN(overridden), BELOW_THRESHOLD, STALE_SINGLE_SOURCE, STEP_BUDGET; trace v1.0 shape; tests for each ABSTAIN path. (PRD §6.3, §14.6)

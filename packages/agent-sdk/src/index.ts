@@ -93,3 +93,13 @@ export type {
   HistorySource,
   PriorAttestation,
 } from "./tools/index.js";
+
+// ReAct loop with hard rules (PRD §6.3, T-213)
+export { runLoop, TraceSchema } from "./loop.js";
+export type {
+  Trace,
+  Temperament,
+  LoopDeps,
+  Action,
+  StepProposal,
+} from "./loop.js";
