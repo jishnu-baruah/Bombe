@@ -10,7 +10,7 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 |----------|-----------|
 | **D1 — Lightweight solo workflow.** Keep klink's `TODO.md` T-XXX board, branch-per-task, task-ID commits, and PR-to-main; **drop** the two-phase claim PRs, auto-merge, and stale-claim rules. | Traceable history without multi-person coordination overhead. |
 | **D2 — This pass = workflow + task board only.** No package scaffolding, no implementation. | Clean separation between "set up how we work" and "build the product." |
-| **D3 — GitHub remote + real PRs**, with GitHub Actions running `pnpm ci`. | Hackathon submission benefits from a self-review + CI gate on every task. |
+| **D3 — GitHub remote + real PRs**, with GitHub Actions running `pnpm run ci`. | Hackathon submission benefits from a self-review + CI gate on every task. |
 | **D4 — No Telegram workflow notifications.** The M7 Telegram *bot* feature remains a stretch task on the board. | "Skip the tg update of the workflow" = no TG process notifications. |
 | **D5 — Operator TODO queue** (`OPERATOR_TODO.md`) for anything needing the human (credentials, live-service verification, owner-only decisions). | Enables long autonomous sessions: park human-needed items, keep working unblocked tasks. |
 | **D6 — Hybrid auto-merge.** PRs on `docs/` and `chore/` branches auto-merge when CI is green + no conflict; `feat/` and `fix/` PRs (logic-bearing) wait for the operator's manual merge. | Velocity on low-risk changes; keeps the operator as the gate on logic, honoring the spirit of PRD §15.4 (recorded as a scoped exception here). |

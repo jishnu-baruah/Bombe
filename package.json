@@ -9,7 +9,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "//ci": "D7: pnpm ci is incremental. It runs only the gates implemented so far (lint + typecheck). forge test, vitest, and pnpm test:demo are appended to ci as the milestones that introduce them land.",
+    "//ci": "D7: the ci script (invoke as `pnpm run ci`) is incremental. It runs only the gates implemented so far (lint + typecheck). forge test, vitest, and `pnpm run test:demo` are appended to ci as the milestones that introduce them land.",
     "ci": "pnpm lint && pnpm typecheck",
     "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
     "test:agent": "echo \"T-702: test:agent aggregator not implemented yet\" && exit 1",

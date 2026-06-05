@@ -8,7 +8,7 @@
 - [ ] <criterion 2>
 
 ### Checklist
-- [ ] `pnpm ci` green locally
+- [ ] `pnpm run ci` green locally
 - [ ] `pnpm test:demo` passes (if the subsystem exists)
 - [ ] TODO.md status flipped to `done` in this PR
 - [ ] No new `OPERATOR_TODO` blockers left unrecorded
