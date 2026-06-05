@@ -18,6 +18,19 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@25.9.1)
 
+  packages/agent-sdk:
+    dependencies:
+      '@bombe/shared':
+        specifier: workspace:*
+        version: link:../shared
+      viem:
+        specifier: ^2.52.2
+        version: 2.52.2(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.1
+        version: 25.9.1
+
   packages/shared:
     dependencies:
       viem:
