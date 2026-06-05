@@ -108,7 +108,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-010 — Foundry init in contracts/
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-009
 - Scope: ops
 - Acceptance: `foundry.toml`, `remappings.txt`, OZ v5 dep, YieldProof git submodule under `contracts/lib/yieldproof` with the vendored `IYieldProofAttestor.sol` fallback recorded in DECISIONS.md; `forge build` succeeds on an empty src. (PRD §5, §6.2)
