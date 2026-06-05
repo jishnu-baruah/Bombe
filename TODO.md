@@ -235,11 +235,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: packages/agent-sdk created; config.ts is the sole process.env reader (PRD §15.4); live seams are skeletons (T-801/802); 53 tests pass; pnpm run ci green.
 
 ### T-206 — ModelRouter
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-205
 - Scope: agent-sdk
 - Acceptance: primary→FALLBACK_MODEL→mock; 429/5xx/timeout triggers in-step fallback; trace records `{modelSwitched,from,to,reason}`; test: stubbed 429 → fallback → `modelSwitched:true`. (PRD §6.3.1, §14.14)
-- Notes: —
+- Notes: ModelError class + ModelRouter + createModelRouter factory in packages/agent-sdk/src/model-router.ts; 29 tests pass; switch records exposed via router.switches array + onSwitch callback.
 
 ### T-207 — cost circuit breaker
 - Status: pending
