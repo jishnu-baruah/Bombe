@@ -200,11 +200,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-202 — canonicalJson() + hashing
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-201
 - Scope: shared
 - Acceptance: recursively sorted keys; `reasoningHash=keccak256(canonicalJson(x))`; tests: two identical traces → identical hash. (PRD §6.3, §14.4)
-- Notes: —
+- Notes: packages/shared/src/canonical.ts; canonicalJson + hashCanonical + reasoningHash/sourcesHash convenience wrappers; viem keccak256/toBytes; 22 tests all pass.
 
 ### T-203 — test-report.ts + events.ts schemas
 - Status: pending
