@@ -55,7 +55,7 @@ contract SettlementTest is Test {
     function setUp() public {
         registry = new AgentRegistry(admin);
         attestation = new AgentAttestation(address(registry), admin, operator);
-        slashing = new AgentSlashing(address(registry), address(attestation), admin);
+        slashing = new AgentSlashing(address(registry), address(attestation), admin, 600);
         leaderboard = new TuringLeaderboard(
             address(registry), address(attestation), address(slashing), admin, operator, EPOCH_SECONDS
         );

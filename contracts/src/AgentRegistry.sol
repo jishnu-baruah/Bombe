@@ -220,12 +220,14 @@ contract AgentRegistry is AccessControl, ReentrancyGuard {
     /// @notice Adjust an agent's reputation by `delta`.
     ///         Only callable by accounts holding REPUTATION_ROLE
     ///         (TuringLeaderboard, AgentSlashing).
+    ///         Reverts if the target agent has never been registered (zero address record).
     /// @param agent Address of the agent whose reputation changes.
     /// @param delta Signed integer change to apply (positive = reward, negative = penalty).
     function adjustReputation(
         address agent,
         int256 delta
     ) external onlyRole(REPUTATION_ROLE) {
+        if (_agents[agent].addr == address(0)) revert NotRegistered();
         _agents[agent].reputation += delta;
         emit ReputationAdjusted(agent, delta, _agents[agent].reputation);
     }
@@ -237,12 +239,14 @@ contract AgentRegistry is AccessControl, ReentrancyGuard {
     /// @notice Increment or decrement the pending-dispute counter for an agent.
     ///         Called by AgentSlashing when a dispute is opened or resolved.
     ///         Withdrawals are blocked while `pendingDisputes[agent] > 0`.
+    ///         Reverts if the target agent has never been registered (zero address record).
     /// @param agent   Address of the agent involved in the dispute.
     /// @param pending True to increment (dispute opened), false to decrement (dispute closed).
     function setDisputePending(
         address agent,
         bool pending
     ) external onlyRole(DISPUTE_ROLE) {
+        if (_agents[agent].addr == address(0)) revert NotRegistered();
         if (pending) {
             pendingDisputes[agent] += 1;
         } else {
