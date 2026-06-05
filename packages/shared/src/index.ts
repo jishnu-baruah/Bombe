@@ -1,6 +1,23 @@
 export { ClaimSchema, tierOf } from "./taxonomy.js";
 export type { Claim, ClaimTier, ClaimType } from "./taxonomy.js";
 
+export {
+  FixtureNotFound,
+  OracleSnapshotSchema,
+  DocumentFixtureSchema,
+  HumanDecisionSchema,
+  loadOracleSnapshot,
+  loadDocument,
+  loadModelScript,
+  loadHumanDecision,
+  loadModelCosts,
+} from "./fixtures.js";
+export type {
+  OracleSnapshot,
+  DocumentFixture,
+  HumanDecision,
+} from "./fixtures.js";
+
 export { canonicalJson, hashCanonical, reasoningHash, sourcesHash } from "./canonical.js";
 
 export {

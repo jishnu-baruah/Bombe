@@ -1,0 +1,6 @@
+{
+  "A": { "decision": "VALID", "confidenceBps": 9000 },
+  "B": { "decision": "ABSTAIN", "confidenceBps": 0 },
+  "C": { "decision": "REJECTED", "confidenceBps": 8500 },
+  "D": { "decision": "ABSTAIN", "confidenceBps": 0 }
+}

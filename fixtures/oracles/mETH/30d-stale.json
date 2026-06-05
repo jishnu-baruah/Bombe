@@ -1,0 +1,8 @@
+{
+  "asset": "mETH",
+  "period": "30d-stale",
+  "value": 34,
+  "fetchedAt": "2026-04-01T00:00:00.000Z",
+  "stale": true,
+  "source": "chainlink"
+}
