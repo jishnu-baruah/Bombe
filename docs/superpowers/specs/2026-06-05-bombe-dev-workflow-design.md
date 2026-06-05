@@ -15,6 +15,7 @@
 | D3 | **GitHub remote + real PRs**, with GitHub Actions running `pnpm ci`. | Hackathon submission benefits from a self-review + CI gate on every task. |
 | D4 | **No Telegram workflow notifications.** The M7 Telegram *bot* feature remains a stretch task on the board. | "Skip the tg update of the workflow" = no TG process notifications. |
 | D5 | **Operator TODO queue** (`OPERATOR_TODO.md`) for anything needing the human (credentials, live-service verification, owner-only decisions). | Enables long autonomous sessions: park human-needed items, keep working unblocked tasks. |
+| D6 | **Hybrid auto-merge.** PRs on `docs/` and `chore/` branches auto-merge when CI is green + no conflict; `feat/` and `fix/` PRs (logic-bearing) wait for the operator's manual merge. | Velocity on low-risk changes; keeps the operator as the gate on logic, honoring the spirit of PRD §15.4 (recorded as a scoped exception in DECISIONS.md). |
 
 These are mirrored into `docs/DECISIONS.md` as the project's first dated entry.
 
@@ -32,6 +33,7 @@ These are mirrored into `docs/DECISIONS.md` as the project's first dated entry.
 - **One task = one PR.** If a task balloons, split it and create a new T-XXX entry.
 - **PR title:** `T-XXX — <task title>`. The merge commit also flips the task to Done in `TODO.md`.
 - No `claim:`/`unclaim:`/`override:` PRs; no stale-claim rule (solo).
+- **Merge gating (D6):** both "no conflict" and "CI green" are required. On `docs/`/`chore/` PRs the agent enables GitHub auto-merge (`gh pr merge --auto --squash`) so they land themselves once green. On `feat/`/`fix/` PRs the agent opens the PR, leaves it in a mergeable state, and the operator clicks merge — so finished logic queues up for review during unattended sessions.
 
 ## 4. Claude Code context files
 
@@ -114,6 +116,7 @@ Rules:
 
 - `.github/workflows/ci.yml`: on PR + push to non-main branches, run `pnpm ci` (= lint + typecheck + `forge test` + vitest + `pnpm test:demo`, per PRD §8). Foundry + pnpm + Node 22 setup.
 - Activates the moment the remote exists; the same `pnpm ci` runs locally as the pre-merge gate.
+- A green CI run is what releases auto-merge on `docs/`/`chore/` PRs (D6); `feat/`/`fix/` PRs still wait for the operator.
 
 ## 10. Out of scope for this pass
 
