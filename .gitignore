@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Test reports (regenerated each run)
+.test-reports/
+
+# Local databases (pglite)
+*.pglite
+*.db
+pglite-data/
+
+# Blob storage temp (mock)
+.blob-store/
+
+# Env & secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.log
