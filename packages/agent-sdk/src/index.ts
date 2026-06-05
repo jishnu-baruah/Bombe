@@ -64,3 +64,7 @@ export {
   LiveClockSeam,
   LiveHumanQueueSeam,
 } from "./seams/live.js";
+
+// ModelRouter — resilience layer (PRD §6.3.1, T-206)
+export { ModelError, ModelRouter, createModelRouter } from "./model-router.js";
+export type { ModelSwitchRecord, ModelRouterOptions } from "./model-router.js";
