@@ -121,6 +121,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: `.github/workflows/ci.yml` no longer double-specifies the pnpm version (reads it from `package.json` `packageManager`); `main` branch protection requires the `ci` status check so auto-merge actually gates on green CI (D6 enforceable, not just declared). (PRD §8, §15.4)
 - Notes: fixes a bug where PR #1 auto-merged before CI passed because `main` had no required-check protection. See D8.
 
+### T-012 — README progress dashboard + YieldProof reference submodule
+- Status: done 2026-06-06
+- Depends-on: —
+- Scope: ops
+- Acceptance: progress generator (`scripts/update-progress.mjs`) + `pnpm progress` script; dashboard in `README.md` between `<!-- PROGRESS:START/END -->`; YieldProof submodule wired as reference at `contracts/lib/yieldproof` (or documented as removed if incompatible); `IYieldProofAttestor.sol` NatSpec note added; OP-2 resolved; D15 in DECISIONS.md. (PRD §5, §12)
+- Notes: resolves OP-2. Submodule kept — forge build unaffected (Hardhat project, nothing imported). Vendored interface retained per PRD §6.2 fallback. T-805 will expand the README with architecture diagram, env table, etc.
+
 ---
 
 ## T-1xx — Contracts (M1)

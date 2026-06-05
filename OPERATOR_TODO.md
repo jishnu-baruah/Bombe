@@ -17,14 +17,12 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 ## Open
 
-## OP-2 — YieldProof submodule URL   [open]
-- Date: 2026-06-05
-- Blocks: optional real-submodule wiring (T-101 uses the vendored interface meanwhile, so nothing is truly blocked)
-- Need: operator to provide the correct YieldProof git repo URL to add as a submodule under `contracts/lib/yieldproof` (no URL has been provided yet)
-- Half-done state: vendored `IYieldProofAttestor.sol` fallback in place and building under `contracts/src/interfaces/`; `forge build` succeeds; all downstream contract tasks (T-101+) proceed against the vendored interface, so nothing is truly blocked
-- To resolve: provide the URL, then the agent runs `git submodule add <url> contracts/lib/yieldproof` and reconciles the vendored interface against the real one
-
 ## Resolved
+
+## OP-2 — YieldProof submodule URL   [done]
+- Date: 2026-06-05 (resolved 2026-06-06)
+- Blocks: optional real-submodule wiring (resolved in T-012)
+- Outcome: repo `https://github.com/imanishbarnwal/YieldProof` exists and was wired as a reference submodule at `contracts/lib/yieldproof`. The interface is **incompatible** with PRD §6.2: it uses `uint256` claimIds, a fee-based `attestToClaim`, and `struct Attestor{bool isRegistered; uint256 stake}` — no `{attestor,claimId,decision,timestamp}` record. The submodule is Hardhat-based and does NOT break Foundry's build (forge builds only what's imported, and nothing imports the submodule's contracts). The vendored `IYieldProofAttestor.sol` in `contracts/src/interfaces/` is retained as the canonical build interface per PRD §6.2 fallback; our contracts do not consume YieldProof's registry.
 
 ## OP-1 — GitHub remote & auth   [done]
 - Date: 2026-06-05
