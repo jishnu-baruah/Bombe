@@ -11,6 +11,7 @@
  *   COST_CAPPED         — cumulative token cost exceeded MAX_COST_USD_PER_RUN.
  *   TOOL_FAILURE        — a tool threw an unrecoverable error (or retry also failed).
  *   TIER3_OVERRIDE      — claim is Tier 3 (FAIR_VALUE); attestation is forbidden.
+ *   MODEL_ABSTAIN       — model voluntarily chose to abstain (no hard rule triggered).
  */
 export type AbstainReason =
   | "BELOW_THRESHOLD"
@@ -18,4 +19,5 @@ export type AbstainReason =
   | "STEP_BUDGET"
   | "COST_CAPPED"
   | "TOOL_FAILURE"
-  | "TIER3_OVERRIDE";
+  | "TIER3_OVERRIDE"
+  | "MODEL_ABSTAIN";

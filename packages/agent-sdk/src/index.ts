@@ -103,3 +103,16 @@ export type {
   Action,
   StepProposal,
 } from "./loop.js";
+
+// Attestation builder (PRD §6.3, T-214)
+export {
+  buildAndSubmitAttestation,
+  InMemoryAttestationRepository,
+  PLACEHOLDER_ATTESTATION_ADDRESS,
+} from "./attest.js";
+export type {
+  Source,
+  AttestationPayload,
+  AttestationRow,
+  AttestationRepository,
+} from "./attest.js";

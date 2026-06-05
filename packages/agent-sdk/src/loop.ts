@@ -309,11 +309,9 @@ export async function runLoop(args: {
   ];
 
   // Track tool result observations for stale-source detection.
-  // staleSourceCount: number of steps where the ONLY source was stale.
-  let staleSourceCount = 0;
   // distinctSources: set of source identifiers seen across all tool results.
   const distinctSources = new Set<string>();
-  // staleObservationInCurrentRun: whether any stale result was seen.
+  // anyStaleResult: whether any stale result was seen in this run.
   let anyStaleResult = false;
 
   // ---- Main ReAct loop ----
@@ -532,7 +530,6 @@ export async function runLoop(args: {
     distinctSources.add(toolValue.source);
     if (isStaleResult(toolValue)) {
       anyStaleResult = true;
-      staleSourceCount++;
     }
 
     const observation: unknown = toolValue;
@@ -579,7 +576,7 @@ function buildTrace(opts: {
   decision: "VALID" | "REJECTED" | "ABSTAIN";
   confidenceBps: number;
   rationaleSummary: string;
-  reasons: string[];
+  reasons: AbstainReason[] | string[];
 }): Trace {
   return {
     traceVersion: "1.0",
