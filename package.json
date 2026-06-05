@@ -20,7 +20,8 @@
     "test:agent": "echo \"T-702: test:agent aggregator not implemented yet\" && exit 1",
     "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",
     "demo": "echo \"M3+: demo boot not implemented yet\" && exit 1",
-    "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1"
+    "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1",
+    "progress": "node scripts/update-progress.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

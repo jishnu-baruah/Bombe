@@ -37,6 +37,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-06 — YieldProof submodule + README
+
+| Decision | Rationale |
+|----------|-----------|
+| **D15 — YieldProof submodule wired for reference; vendored interface retained.** `https://github.com/imanishbarnwal/YieldProof` wired as a reference submodule at `contracts/lib/yieldproof`. Its interface is incompatible with PRD §6.2 `IYieldProofAttestor`: it uses `uint256` claimIds, a fee-based `attestToClaim`, and `struct Attestor{bool isRegistered; uint256 stake}` — no `{attestor,claimId,decision,timestamp}` record. The submodule is Hardhat-based and does not break Foundry's build (forge compiles only imported files; nothing imports the submodule's contracts). Vendored `IYieldProofAttestor.sol` at `contracts/src/interfaces/` is retained as the canonical build interface. Our contracts do not consume YieldProof's registry. | PRD §6.2 explicitly allows the vendored fallback; integrating the incompatible Hardhat model would require a shim layer with no functional benefit. The reference submodule satisfies the "wire it for visibility" intent of OP-2 without destabilising the build. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:
