@@ -114,6 +114,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: `foundry.toml`, `remappings.txt`, OZ v5 dep, YieldProof git submodule under `contracts/lib/yieldproof` with the vendored `IYieldProofAttestor.sol` fallback recorded in DECISIONS.md; `forge build` succeeds on an empty src. (PRD §5, §6.2)
 - Notes: —
 
+### T-011 — CI gate hardening
+- Status: done 2026-06-05
+- Depends-on: T-009
+- Scope: ops
+- Acceptance: `.github/workflows/ci.yml` no longer double-specifies the pnpm version (reads it from `package.json` `packageManager`); `main` branch protection requires the `ci` status check so auto-merge actually gates on green CI (D6 enforceable, not just declared). (PRD §8, §15.4)
+- Notes: fixes a bug where PR #1 auto-merged before CI passed because `main` had no required-check protection. See D8.
+
 ---
 
 ## T-1xx — Contracts (M1)
