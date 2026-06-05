@@ -193,7 +193,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-2xx — shared + agent-sdk (M2)
 
 ### T-201 — packages/shared taxonomy
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-009
 - Scope: shared
 - Acceptance: `ClaimSchema`, `ClaimTier`, pure `tierOf(claimType)`; zod; never trusts submitter tier. (PRD §6.1)
