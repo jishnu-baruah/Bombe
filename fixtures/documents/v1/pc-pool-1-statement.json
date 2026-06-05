@@ -1,0 +1,17 @@
+{
+  "docRef": "pc-pool-1-statement",
+  "docType": "bank-statement",
+  "version": "v1",
+  "fields": {
+    "poolId": "PC-POOL-1",
+    "statementDate": "2026-05-31",
+    "currency": "USD",
+    "period": "2026-05",
+    "lineItems": [
+      { "description": "Principal repayment", "amount": 30000 },
+      { "description": "Interest received", "amount": 12000 },
+      { "description": "Fee income", "amount": 3000 }
+    ],
+    "lineItemsTotal": 45000
+  }
+}

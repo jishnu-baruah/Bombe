@@ -1,0 +1,13 @@
+{
+  "agentId": "reflector",
+  "claimId": "_sample",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "Fetching oracle snapshot to verify yield.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d" } },
+      "observation": { "value": 34, "source": "chainlink", "stale": false }
+    }
+  ],
+  "expectedDecision": "VALID"
+}

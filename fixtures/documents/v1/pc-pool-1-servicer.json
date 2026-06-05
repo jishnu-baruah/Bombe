@@ -1,0 +1,12 @@
+{
+  "docRef": "pc-pool-1-servicer",
+  "docType": "servicer-report",
+  "version": "v1",
+  "fields": {
+    "poolId": "PC-POOL-1",
+    "reportDate": "2026-05-31",
+    "cashflowTotal": 50000,
+    "currency": "USD",
+    "period": "2026-05"
+  }
+}

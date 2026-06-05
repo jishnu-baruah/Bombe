@@ -214,7 +214,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: TestReportSchema + FailureCategory in test-report.ts; SseEventSchema discriminated union in events.ts; 75 tests all pass; biome + tsc clean.
 
 ### T-204 — fixtures loader + fixtures tree
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-201
 - Scope: shared
 - Acceptance: `loadOracleSnapshot`/`loadDocument`/`loadModelScript`/`loadHumanDecision` pure fns; `fixtures/` tree incl. stale meth (claim B) and mismatched docs (claim C), `documents/v1/`, `model-costs.json`, `human-decisions.json`. (PRD §5, §6.3)
