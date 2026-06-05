@@ -1,0 +1,20 @@
+{
+  "agentId": "stator",
+  "claimId": "B",
+  "steps": [
+    {
+      "thought": "Fetching mETH yield for the stale period.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-stale" } }
+    },
+    {
+      "thought": "The oracle data is marked stale and returned low confidence. As a cost-optimised agent I abstain when the available evidence is insufficient — a single stale source is not reliable enough to commit.",
+      "action": {
+        "finalize": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 2000,
+          "rationaleSummary": "Single stale oracle source returned low confidence. Insufficient evidence to commit. Abstaining."
+        }
+      }
+    }
+  ]
+}
