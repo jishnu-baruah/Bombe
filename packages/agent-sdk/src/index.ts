@@ -68,3 +68,18 @@ export {
 // ModelRouter — resilience layer (PRD §6.3.1, T-206)
 export { ModelError, ModelRouter, createModelRouter } from "./model-router.js";
 export type { ModelSwitchRecord, ModelRouterOptions } from "./model-router.js";
+
+// AbstainReason — shared union for all ABSTAIN paths (T-207/T-208/T-209)
+export type { AbstainReason } from "./reasons.js";
+
+// CostBreaker — cost circuit breaker (PRD §6.3.1, T-207)
+export { CostBreaker } from "./cost-breaker.js";
+export type { CostBreakerOptions } from "./cost-breaker.js";
+
+// Tool error recovery (PRD §6.3.1, T-208)
+export { runToolWithRecovery } from "./tool-recovery.js";
+export type { ToolError, ToolErrorRow } from "./tool-recovery.js";
+
+// Deterministic task router (PRD §6.3.2, T-209)
+export { TOOL_MAP, allowedTools, isToolAllowed, refusalObservation } from "./router.js";
+export type { ToolName } from "./router.js";

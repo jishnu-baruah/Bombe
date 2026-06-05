@@ -242,25 +242,25 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: ModelError class + ModelRouter + createModelRouter factory in packages/agent-sdk/src/model-router.ts; 29 tests pass; switch records exposed via router.switches array + onSwitch callback.
 
 ### T-207 — cost circuit breaker
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-206
 - Scope: agent-sdk
 - Acceptance: cumulative tokens×model-costs > `MAX_COST_USD_PER_RUN` (0.05) forces ABSTAIN(COST_CAPPED); test with burning stub. (PRD §6.3.1, §14.15)
-- Notes: —
+- Notes: CostBreaker class in packages/agent-sdk/src/cost-breaker.ts; AbstainReason union in reasons.ts; 17 tests pass; unknown model cost treated as 0 (flagged in unknownModels set).
 
 ### T-208 — tool error recovery
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-205
 - Scope: agent-sdk
 - Acceptance: throw → `{error,recoverable}`; recoverable → 1 retry; else ABSTAIN(TOOL_FAILURE) + `errors` row; loop never crashes; test with throwing stub. (PRD §6.3.1, §14.15)
-- Notes: —
+- Notes: runToolWithRecovery in packages/agent-sdk/src/tool-recovery.ts; never throws; ToolErrorRow emitted for every failure; 23 tests pass.
 
 ### T-209 — router.ts TOOL_MAP
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-201
 - Scope: agent-sdk
 - Acceptance: per-claimType tool map; unmapped tool request → structured refusal observation; FAIR_VALUE → no tools. (PRD §6.3.2)
-- Notes: —
+- Notes: TOOL_MAP + allowedTools/isToolAllowed/refusalObservation in packages/agent-sdk/src/router.ts; 29 tests pass; FAIR_VALUE=[] enforced at compile time.
 
 ### T-210 — tools: price/yield feeds + snapshots
 - Status: pending
