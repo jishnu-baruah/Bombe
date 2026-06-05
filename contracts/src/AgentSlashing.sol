@@ -103,6 +103,10 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
     /// @notice Per-dispute voting guard: disputeId => voter => voted.
     mapping(uint256 => mapping(address => bool)) public hasVoted;
 
+    /// @notice Tracks whether a dispute is currently active for a (claimId, accused) pair.
+    ///         Prevents concurrent duplicate disputes on the same pair (FIX 1).
+    mapping(bytes32 => mapping(address => bool)) public activeDispute;
+
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
@@ -197,6 +201,12 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
     /// @notice `resolveDispute` (or `vote`) called on an already-resolved dispute.
     error DisputeAlreadyResolved();
 
+    /// @notice `openDispute` called when an active dispute already exists for this (claimId, accused) pair.
+    error DisputeAlreadyActive();
+
+    /// @notice `vote` called by the accused on their own dispute.
+    error CannotVoteOnOwnDispute();
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -259,7 +269,10 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
     ///
     ///         Requirements:
     ///         - `msg.value == DISPUTE_BOND` (0.05 ether).
-    ///         - The accused must have attested the claim with a non-ABSTAIN decision.
+    ///         - The accused must have attested the claim with a non-ABSTAIN decision and still
+    ///           have `lockedStake > 0` (FIX 3: prevents disputing an already-seized attestation).
+    ///         - No active dispute may already exist for this (claimId, accused) pair
+    ///           (FIX 1: prevents concurrent duplicates that could freeze challenger bonds).
     ///         - The challenger must be a registered attestor.
     ///
     ///         Increments the accused's pending-dispute counter in the registry
@@ -275,9 +288,15 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
         if (msg.value != DISPUTE_BOND) revert IncorrectDisputeBond();
         if (!REGISTRY.isRegistered(msg.sender)) revert NotRegistered();
 
-        // Accused must have a non-abstain attestation.
+        // Accused must have a non-abstain attestation with stake still locked (FIX 1 + FIX 3).
         AgentAttestation.Attestation memory att = ATTESTATION.getAttestation(claimId, accused);
-        if (!att.exists || att.decision == AgentAttestation.Decision.ABSTAIN) revert NotDisputable();
+        if (!att.exists || att.decision == AgentAttestation.Decision.ABSTAIN || att.lockedStake == 0) {
+            revert NotDisputable();
+        }
+
+        // Prevent concurrent duplicate disputes on the same (claimId, accused) pair (FIX 1).
+        if (activeDispute[claimId][accused]) revert DisputeAlreadyActive();
+        activeDispute[claimId][accused] = true;
 
         disputeId = disputeCount++;
         disputes[disputeId] = Dispute({
@@ -303,6 +322,7 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
     ///         - Dispute exists and is not resolved.
     ///         - Voting window has not elapsed (`block.timestamp <= openedAt + DISPUTE_WINDOW_SECONDS`).
     ///         - Voter must be a registered attestor.
+    ///         - Voter must not be the accused of this dispute (FIX 2).
     ///         - One vote per address per dispute.
     ///
     ///         Vote weight equals the voter's current bond in the registry at vote time.
@@ -318,6 +338,7 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
         if (d.resolved) revert DisputeAlreadyResolved();
         if (block.timestamp > d.openedAt + DISPUTE_WINDOW_SECONDS) revert VotingClosed();
         if (!REGISTRY.isRegistered(msg.sender)) revert NotRegistered();
+        if (msg.sender == d.accused) revert CannotVoteOnOwnDispute(); // FIX 2
         if (hasVoted[disputeId][msg.sender]) revert AlreadyVoted();
 
         uint256 weight = REGISTRY.getAgent(msg.sender).bond;
@@ -368,8 +389,9 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
         bytes32 claimId = d.claimId;
         uint256 bond = d.bond;
 
-        // Unlock the accused's bond withdrawal.
+        // Unlock the accused's bond withdrawal and clear the active-dispute guard (FIX 1).
         REGISTRY.setDisputePending(accused, false);
+        activeDispute[claimId][accused] = false;
 
         bool agentWrong = d.votesWrong > d.votesRight;
         uint256 slashAmount;

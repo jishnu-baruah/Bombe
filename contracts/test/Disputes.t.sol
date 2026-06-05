@@ -581,4 +581,97 @@ contract DisputesTest is Test {
         vm.expectRevert(AgentRegistry.NotRegistered.selector);
         registry.setDisputePending(stranger, true);
     }
+
+    // =========================================================================
+    // 11. test_RevertWhen_DuplicateDispute — FIX 1
+    // =========================================================================
+
+    function test_RevertWhen_DuplicateDispute() public {
+        _postClaim();
+        _attest(accused);
+
+        // First dispute opens successfully.
+        vm.prank(challenger);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+
+        // Second dispute on the same (claimId, accused) must revert DisputeAlreadyActive.
+        vm.expectRevert(AgentSlashing.DisputeAlreadyActive.selector);
+        vm.prank(voter1);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+    }
+
+    // =========================================================================
+    // 12. test_RevertWhen_AccusedSelfVotes — FIX 2
+    // =========================================================================
+
+    function test_RevertWhen_AccusedSelfVotes() public {
+        _postClaim();
+        _attest(accused);
+
+        vm.prank(challenger);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+
+        // Accused voting on their own dispute must revert CannotVoteOnOwnDispute.
+        vm.expectRevert(AgentSlashing.CannotVoteOnOwnDispute.selector);
+        vm.prank(accused);
+        slashing.vote(0, false);
+    }
+
+    // =========================================================================
+    // 13. test_RevertWhen_DisputeOnSeizedAttestation — FIX 3
+    // =========================================================================
+    //
+    // After an agent-wrong resolution the accused's lockedStake is 0 (seized).
+    // Opening a new dispute on the same attestation must revert NotDisputable.
+
+    function test_RevertWhen_DisputeOnSeizedAttestation() public {
+        _postClaim();
+        _attest(accused);
+        _attest(peer);
+        _closeClaim();
+
+        // Open and resolve a dispute with an agent-wrong verdict.
+        vm.prank(challenger);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+
+        vm.prank(voter1);
+        slashing.vote(0, true); // agent wrong
+        vm.warp(block.timestamp + DISPUTE_WINDOW + 1);
+        slashing.resolveDispute(0);
+
+        // Stake is now seized; lockedStake == 0. A fresh dispute must revert NotDisputable.
+        vm.expectRevert(AgentSlashing.NotDisputable.selector);
+        vm.prank(challenger);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+    }
+
+    // =========================================================================
+    // 14. test_DisputeAgainAfterAgentRight — FIX 1 clear-on-resolve
+    // =========================================================================
+    //
+    // After an agent-right verdict the stake is intact and activeDispute is cleared,
+    // so a fresh dispute on the same (claimId, accused) pair must succeed.
+
+    function test_DisputeAgainAfterAgentRight() public {
+        _postClaim();
+        _attest(accused);
+        _closeClaim();
+
+        // First dispute — agent right (voter1 votes right, no one votes wrong).
+        vm.prank(challenger);
+        slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+
+        vm.prank(voter1);
+        slashing.vote(0, false); // agent was right
+        vm.warp(block.timestamp + DISPUTE_WINDOW + 1);
+        slashing.resolveDispute(0);
+
+        // activeDispute is cleared; stake is intact (lockedStake > 0).
+        // A second dispute on the same pair must succeed (not revert DisputeAlreadyActive
+        // or NotDisputable).
+        vm.prank(challenger);
+        uint256 id = slashing.openDispute{ value: DISPUTE_BOND }(CLAIM_ID, accused);
+        assertEq(id, 1, "second dispute id should be 1");
+        assertTrue(slashing.activeDispute(CLAIM_ID, accused), "activeDispute set for second dispute");
+    }
 }
