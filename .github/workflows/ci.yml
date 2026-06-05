@@ -19,4 +19,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm ci
+      # `pnpm run ci` (not `pnpm ci`): pnpm reserves the bare `ci` command as a
+      # built-in stub (ERR_PNPM_CI_NOT_IMPLEMENTED), so the package script must
+      # be invoked via `run`. See DECISIONS.md D7.
+      - run: pnpm run ci

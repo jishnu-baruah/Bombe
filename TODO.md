@@ -101,7 +101,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: OP-1 resolved — `origin` = https://github.com/jishnu-baruah/Bombe.git, `main` pushed. CI runs on the next branch/PR push.
 
 ### T-009 — pnpm workspace bootstrap
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-008
 - Scope: ops
 - Acceptance: root `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.env.example` (every PRD §7 var, no values), Biome (lint+format) config, vitest config; root scripts `test`/`test:agent`/`test:demo`/`demo`/`ci`/`deploy:testnet` exist as wired stubs that exit non-zero with a "not implemented" message; `pnpm install` succeeds. (PRD §5, §8)
