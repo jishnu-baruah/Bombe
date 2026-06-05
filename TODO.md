@@ -129,7 +129,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Status: pending
 - Depends-on: T-010
 - Scope: contracts
-- Acceptance: check https://github.com/imanishbarnwal/YieldProof for , interface compiles; fallback path documented. (PRD §6.2)
+- Acceptance: check https://github.com/imanishbarnwal/YieldProof for context see if anything usable, interface compiles; fallback path documented. (PRD §6.2)
 - Notes: —
 
 ### T-102 — AgentRegistry
