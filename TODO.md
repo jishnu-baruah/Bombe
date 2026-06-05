@@ -140,18 +140,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: contracts/src/AgentRegistry.sol + contracts/test/AgentRegistry.t.sol; 13/13 tests pass; forge fmt clean; contracts:test added to CI gate.
 
 ### T-103 — AgentAttestation storage + postClaim
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-010, T-101
 - Scope: contracts
 - Acceptance: `postClaim` emits `ClaimPosted`; `Decision{VALID,REJECTED,ABSTAIN}` enum. (PRD §6.2)
-- Notes: —
+- Notes: contracts/src/AgentAttestation.sol + contracts/test/AgentAttestation.t.sol; 21/21 tests pass; forge fmt clean; D11 in DECISIONS.md.
 
 ### T-104 — AgentAttestation.attest + tier-3 revert
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-103
 - Scope: contracts
-- Acceptance: happy path; reverts `NotRegistered`/`AlreadyAttested`/`ClaimClosed`/`JudgmentTierRequiresAbstain` (tier 3 + non-ABSTAIN); ABSTAIN locks 0 + never slashable; VALID/REJECTED locks 0.02e; cap 16; `forge fmt` clean. (PRD §6.2, §14.5, §14.6)
-- Notes: —
+- Acceptance: happy path; reverts `NotRegistered`/`AlreadyAttested`/`ClaimAlreadyClosed`/`JudgmentTierRequiresAbstain` (tier 3 + non-ABSTAIN); ABSTAIN locks 0 + never slashable; VALID/REJECTED locks 0.02e; cap 16; `forge fmt` clean. (PRD §6.2, §14.5, §14.6)
+- Notes: Combined delivery with T-103. ClaimClosed renamed ClaimAlreadyClosed to avoid identifier collision with the ClaimClosed event (Solidity 0.8.24 does not allow an error and event to share a name).
 
 ### T-105 — TuringLeaderboard.settleTier1 + stats/views
 - Status: pending
