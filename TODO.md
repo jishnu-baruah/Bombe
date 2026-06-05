@@ -334,7 +334,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-4xx — runner + indexer + gateway + DB (M3)
 
 ### T-401 — DB schema + migrations + pglite
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-009
 - Scope: runner
 - Acceptance: drizzle tables claims/attestations/agents/epoch_stats/events/errors; committed migrations; pglite boots zero-dep. (PRD §6.5)
