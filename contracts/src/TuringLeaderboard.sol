@@ -119,6 +119,9 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
     /// @notice The claim has already been settled.
     error AlreadySettled();
 
+    /// @notice Direct ETH transfers are rejected; ETH may only arrive from `AgentAttestation` during settlement.
+    error UnexpectedEther();
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -311,5 +314,8 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
     ///         attestor's released own-stake to this contract via a low-level call before
     ///         it is re-credited to AgentSlashing.creditClaimable in the same transaction.
     ///         ETH only ever transits this contract within `settleTier1`; no balance accrues.
-    receive() external payable { }
+    ///         Only `AgentAttestation` may send ETH here, so accidental/griefing direct sends cannot be locked.
+    receive() external payable {
+        if (msg.sender != address(ATTESTATION)) revert UnexpectedEther();
+    }
 }
