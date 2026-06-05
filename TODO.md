@@ -126,18 +126,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-1xx — Contracts (M1)
 
 ### T-101 — IYieldProofAttestor interface + vendored fallback
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-010
 - Scope: contracts
 - Acceptance: interface compiles; fallback path documented. (PRD §6.2)
-- Notes: —
+- Notes: interface delivered in T-010 (contracts/src/interfaces/IYieldProofAttestor.sol); compiles, fallback documented in D10.
 
 ### T-102 — AgentRegistry
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-010
 - Scope: contracts
 - Acceptance: `registerAgent`/`registerHuman` (MIN_BOND 0.1e), `topUpBond`/`withdrawBond` (blocked during pending dispute, stays ≥MIN_BOND or full exit), reputation int256 role-gated; tests: min-bond revert, human registration, withdraw-blocked-during-dispute. (PRD §6.2, §14.2)
-- Notes: —
+- Notes: contracts/src/AgentRegistry.sol + contracts/test/AgentRegistry.t.sol; 13/13 tests pass; forge fmt clean; contracts:test added to CI gate.
 
 ### T-103 — AgentAttestation storage + postClaim
 - Status: pending
@@ -172,7 +172,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Depends-on: T-106
 - Scope: contracts
 - Acceptance: `openDispute` (0.05e bond) / `vote` (one per attestor, weight=bond, window) / `resolveDispute` (stake-weighted; agent-wrong vs agent-right economics); tests: both verdicts, withdrawal blocked during dispute. (PRD §6.2)
-- Notes: —
+- Notes: when wiring DISPUTE_ROLE to this module, add `NotRegistered` guards to `AgentRegistry.adjustReputation`/`setDisputePending` (T-102 review: currently writable for unregistered addrs — role-gated, low risk). Consider a zero-value guard on `topUpBond`.
 
 ### T-108 — Fuzz + deep-test wiring
 - Status: pending
