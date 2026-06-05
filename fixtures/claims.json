@@ -1,0 +1,43 @@
+{
+  "A": {
+    "id": "A",
+    "tier": 1,
+    "asset": "mETH",
+    "claimType": "YIELD_BPS",
+    "payload": { "period": "30d-fresh", "expectedBps": 34 },
+    "submitter": "0x000000000000000000000000000000000000dEaD",
+    "postedAt": 1748736000
+  },
+  "B": {
+    "id": "B",
+    "tier": 1,
+    "asset": "mETH",
+    "claimType": "YIELD_BPS",
+    "payload": { "period": "30d-stale", "expectedBps": 34 },
+    "submitter": "0x000000000000000000000000000000000000dEaD",
+    "postedAt": 1748736001
+  },
+  "C": {
+    "id": "C",
+    "tier": 2,
+    "asset": "PC-POOL-1",
+    "claimType": "CASHFLOW_MATCH",
+    "payload": {
+      "poolId": "PC-POOL-1",
+      "period": "2026-05",
+      "servicerDocRef": "pc-pool-1-servicer",
+      "statementDocRef": "pc-pool-1-statement"
+    },
+    "submitter": "0x000000000000000000000000000000000000dEaD",
+    "postedAt": 1748736002
+  },
+  "D": {
+    "id": "D",
+    "tier": 3,
+    "asset": "PC-POOL-1",
+    "claimType": "FAIR_VALUE",
+    "payload": { "estimatedValue": 4200000, "currency": "USD" },
+    "submitter": "0x000000000000000000000000000000000000dEaD",
+    "postedAt": 1748736003
+  }
+}

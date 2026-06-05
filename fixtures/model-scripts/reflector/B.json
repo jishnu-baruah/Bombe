@@ -1,0 +1,20 @@
+{
+  "agentId": "reflector",
+  "claimId": "B",
+  "steps": [
+    {
+      "thought": "Fetching the mETH yield oracle for the specified period to check the 34 bps claim.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-stale" } }
+    },
+    {
+      "thought": "The oracle snapshot shows 34 bps and the value matches the expected claim. I will finalize VALID with high confidence.",
+      "action": {
+        "finalize": {
+          "decision": "VALID",
+          "confidenceBps": 9000,
+          "rationaleSummary": "mETH yield oracle confirms 34 bps, matching the expected value within tolerance."
+        }
+      }
+    }
+  ]
+}

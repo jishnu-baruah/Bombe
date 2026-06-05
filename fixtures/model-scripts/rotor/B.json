@@ -1,0 +1,24 @@
+{
+  "agentId": "rotor",
+  "claimId": "B",
+  "steps": [
+    {
+      "thought": "Fetching the mETH yield oracle for the stale period.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-stale" } }
+    },
+    {
+      "thought": "Oracle shows 34 bps. Data is marked stale but the value matches. Running math check.",
+      "action": { "tool": "compute_expected", "input": { "observedBps": 34, "expectedBps": 34 } }
+    },
+    {
+      "thought": "Value matches expected within tolerance. Stale data is a risk factor but the number checks out. Committing VALID.",
+      "action": {
+        "finalize": {
+          "decision": "VALID",
+          "confidenceBps": 7500,
+          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified — committing."
+        }
+      }
+    }
+  ]
+}

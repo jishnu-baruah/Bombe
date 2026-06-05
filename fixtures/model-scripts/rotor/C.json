@@ -1,0 +1,30 @@
+{
+  "agentId": "rotor",
+  "claimId": "C",
+  "steps": [
+    {
+      "thought": "Reading servicer report for PC-POOL-1 cashflow match.",
+      "action": {
+        "tool": "read_document",
+        "input": { "docRef": "pc-pool-1-servicer", "version": "v1" }
+      }
+    },
+    {
+      "thought": "Servicer shows 50,000. Reading bank statement to cross-check.",
+      "action": {
+        "tool": "read_document",
+        "input": { "docRef": "pc-pool-1-statement", "version": "v1" }
+      }
+    },
+    {
+      "thought": "Bank statement shows 45,000 — mismatch of 5,000. Rejecting immediately.",
+      "action": {
+        "finalize": {
+          "decision": "REJECTED",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Servicer report (50,000 USD) does not match bank statement (45,000 USD). Cashflow claim REJECTED."
+        }
+      }
+    }
+  ]
+}
