@@ -19,6 +19,8 @@ single_line_statement_blocks = "preserve"
 
 # Deep-fuzz profile — used by `pnpm test:contracts:deep` (wired in T-108).
 # Runs substantially more fuzz iterations to surface conservation bugs that
-# the default 256-run budget misses.
+# the default 256-run budget misses. NOT in the fast loop (ci script).
 [profile.deep]
-# fuzz.runs = 100_000  # uncomment when T-108 lands
+
+[profile.deep.fuzz]
+runs = 10_000

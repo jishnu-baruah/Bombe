@@ -13,6 +13,8 @@
     "ci": "pnpm lint && pnpm typecheck && pnpm contracts:build && pnpm contracts:test",
     "contracts:build": "forge build --root contracts",
     "contracts:test": "forge test --root contracts",
+    "contracts:test:deep": "forge test --root contracts --profile deep",
+    "test:contracts:deep": "pnpm contracts:test:deep",
     "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
     "test:agent": "echo \"T-702: test:agent aggregator not implemented yet\" && exit 1",
     "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",

@@ -29,6 +29,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-06 — Contracts M1 completion
+
+| Decision | Rationale |
+|----------|-----------|
+| **D14 — Canonical deployment topology (T-109).** The six role grants wired by `Deploy.s.sol` are the required minimum for settlement and disputes to function: `registry.REPUTATION_ROLE → leaderboard`; `registry.DISPUTE_ROLE → slashing`; `registry.REPUTATION_ROLE → slashing` (so `resolveDispute` can apply the −10 penalty to a losing accused — without it tier-2 agent-wrong resolutions revert); `attestation.SETTLER_ROLE → leaderboard`; `attestation.SETTLER_ROLE → slashing`; `slashing.LEADERBOARD_ROLE → leaderboard`. `OPERATOR_ROLE` on both `AgentAttestation` and `TuringLeaderboard` is granted to the deployer in their respective constructors (operator == admin at deploy time), so no extra `grantRole` calls are needed. Demo timing defaults are `epochSeconds = 300` and `disputeWindowSeconds = 60`, read from env vars `DEMO_EPOCH_SECONDS` / `DEMO_DISPUTE_WINDOW_SECONDS` with those defaults, per PRD §6.2 §7. For production / Mantle Sepolia `epochSeconds = 3600` and `disputeWindowSeconds = 600` are the PRD defaults and should be supplied via env. | The deploy script must be the single canonical source of truth for role wiring so that live deploys replicate the exact topology verified in tests. Recording the topology here satisfies the T-109 Acceptance criterion and provides an audit trail. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

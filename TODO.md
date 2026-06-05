@@ -175,18 +175,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: AgentSlashing constructor gains `disputeWindowSeconds` immutable param; AgentRegistry.adjustReputation/setDisputePending now guard NotRegistered; D13 in DECISIONS.md; 17 new tests pass (66 total). Settlement.t.sol constructor call updated to pass 4 args.
 
 ### T-108 — Fuzz + deep-test wiring
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-106
 - Scope: contracts
 - Acceptance: `testFuzz_SlashConservation(uint96,uint8)` asserts distributed+burned==locked; `pnpm test:contracts:deep` runs long fuzz outside the fast loop. (PRD §6.2, §14.2)
-- Notes: —
+- Notes: contracts/test/SlashConservation.t.sol; fuzz passes 256 runs default / 10 000 runs deep profile; `[profile.deep.fuzz] runs = 10_000` in foundry.toml; `test:contracts:deep` + `contracts:test:deep` added to root package.json.
 
 ### T-109 — Deploy.s.sol
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-107
 - Scope: contracts
 - Acceptance: env-driven `epochSeconds`/`disputeWindowSeconds` (demo 300/60), deploys all four contracts wired with roles; anvil deploy succeeds. (PRD §6.2)
-- Notes: —
+- Notes: contracts/script/Deploy.s.sol; dry-run `forge script script/Deploy.s.sol` logs all 4 addresses and runs successfully; D14 in DECISIONS.md documents canonical role topology. M1 complete: 4 contracts + 71 tests (incl. fuzz) all pass.
 
 ---
 
