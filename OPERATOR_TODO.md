@@ -17,7 +17,12 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 ## Open
 
-_(none)_
+## OP-2 — YieldProof submodule URL   [open]
+- Date: 2026-06-05
+- Blocks: optional real-submodule wiring (T-101 uses the vendored interface meanwhile, so nothing is truly blocked)
+- Need: the YieldProof git repo URL to add as a submodule under `contracts/lib/yieldproof`
+- Half-done state: vendored `IYieldProofAttestor.sol` fallback in place and building under `contracts/src/interfaces/`; `forge build` succeeds; all downstream contract tasks (T-101+) can proceed against the vendored interface
+- To resolve: provide the URL, then the agent runs `git submodule add <url> contracts/lib/yieldproof`
 
 ## Resolved
 
