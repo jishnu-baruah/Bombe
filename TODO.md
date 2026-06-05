@@ -221,11 +221,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-205 — agent-sdk seams
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-203
 - Scope: agent-sdk
 - Acceptance: `ModelSeam`/`BlobSeam`/`WalletSeam`/`ClockSeam`/`HumanQueueSeam` interfaces with `live`/`mock`/`stub` impls selected by `MODE`/`TEST_MODE`. (PRD §6.3)
-- Notes: —
+- Notes: packages/agent-sdk created; config.ts is the sole process.env reader (PRD §15.4); live seams are skeletons (T-801/802); 53 tests pass; pnpm run ci green.
 
 ### T-206 — ModelRouter
 - Status: pending
