@@ -45,60 +45,60 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-0xx — Ops
 
 ### T-001 — .gitattributes line-ending normalization
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: ops
 - Acceptance: `* text=auto eol=lf`, binary rules for images, lockfile marked `-diff linguist-generated`; git stops warning about CRLF. (PRD §5)
 - Notes: done by this plan.
 
 ### T-002 — docs restructure (PRD→docs/, DECISIONS, DEMO, runbook)
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
 - Acceptance: PRD relocated to `docs/bombe-prd.md`; `docs/DECISIONS.md` (D1–D6 + ESCALATIONS), `docs/DEMO.md` (A→D stub), `docs/runbooks/workflow.md` created. (PRD §5, §15.3)
 - Notes: done by this plan.
 
 ### T-003 — CLAUDE.md agent operating manual
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
 - Acceptance: auto-loaded manual with the 8 required sections (one-liner, start-of-session checklist, conventions, merge policy D6, fix-loop, OPERATOR_TODO protocol, guardrails, definition of done). (PRD §15.3, §15.4)
 - Notes: done by this plan.
 
 ### T-004 — CONTEXT.md strategic framing
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
 - Acceptance: locked framing with the 6 required sections (thesis, claim taxonomy, the four attestors, non-goals, definition of done, determinism contract). (PRD §2, §14)
 - Notes: done by this plan.
 
 ### T-005 — TODO.md board
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
 - Acceptance: header (legend + numbering table + block template) plus every task block T-0xx…T-9xx, each with Status/Depends-on/Scope/Acceptance/Notes; board parses. (PRD §5)
 - Notes: done by this plan.
 
 ### T-006 — OPERATOR_TODO.md human-in-the-loop queue
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: docs
 - Acceptance: purpose, `OP-N` entry format, agent protocol, `## Open` seeded with OP-1 (GitHub auth), empty `## Done`. (PRD §15.4)
 - Notes: done by this plan.
 
 ### T-007 — CI workflow + PR template
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: —
 - Scope: ops
 - Acceptance: `.github/workflows/ci.yml` runs `pnpm ci` on PRs + non-main pushes (Foundry + pnpm + Node 22); `.github/pull_request_template.md` enforces task-ID + acceptance checklist; YAML valid. (PRD §8)
 - Notes: done by this plan.
 
 ### T-008 — GitHub remote create + push
-- Status: pending
+- Status: done 2026-06-05
 - Depends-on: T-007
 - Scope: ops
 - Acceptance: `origin` set, `main` pushed, Actions tab shows CI. (PRD §8)
-- Notes: operator-gated (gh auth) — see OP-1.
+- Notes: OP-1 resolved — `origin` = https://github.com/jishnu-baruah/Bombe.git, `main` pushed. CI runs on the next branch/PR push.
 
 ### T-009 — pnpm workspace bootstrap
 - Status: pending
