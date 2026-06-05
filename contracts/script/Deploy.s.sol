@@ -76,6 +76,10 @@ contract Deploy is Script {
         // Slashing sets dispute-pending flags on the registry.
         registry.grantRole(registry.DISPUTE_ROLE(), address(slashing));
 
+        // Slashing applies the −10 reputation penalty to a losing accused in resolveDispute
+        // (agent-wrong path). Without this grant, tier-2 agent-wrong resolutions revert.
+        registry.grantRole(registry.REPUTATION_ROLE(), address(slashing));
+
         // Leaderboard may seize stake from AgentAttestation (for correct + wrong paths).
         attestation.grantRole(attestation.SETTLER_ROLE(), address(leaderboard));
 
