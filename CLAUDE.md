@@ -5,7 +5,11 @@ Auto-loads each session. Read it, then follow it. The PRD is the source of truth
 ## Project one-liner
 
 Bombe is an autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sepolia (chain id 5003)**. Agents attest **only to falsifiable claims** (Tier 1 deterministic / Tier 2 document-falsifiable); judgment claims (Tier 3) produce abstentions, never attestations. **Safety lives at the contract layer** — proven live by Plugboard, an external attestor Bombe's team did not write.
-- Thesis & non-goals: `CONTEXT.md`. Full spec: `docs/bombe-prd.md`.
+- Thesis & non-goals: `CONTEXT.md`. Full spec: `docs/bombe-prd.md`. Submission spec: `HACKATHON.md`. Web design system: `DESIGN.md`.
+
+## Shipping target (D16)
+
+The submission runs **LIVE**: real LLM (AI gateway), real Mantle Sepolia transactions (explorer-visible), real blob trace storage + on-chain `reasoningHash` + verify-hash. **Mock is for deterministic tests and the offline fallback (Plugboard replay T-504) only — never the submission demo.** See `HACKATHON.md` (what judges require) and D16 in `docs/DECISIONS.md`. Live seams T-801–T-804 are critical path; each is OP-gated (OP-3..OP-6, see `OPERATOR_TODO.md`).
 
 ## Start-of-session checklist
 

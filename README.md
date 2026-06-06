@@ -48,6 +48,12 @@ Refresh the dashboard with `pnpm progress`.
 
 ---
 
+## Shipping target
+
+Bombe ships **live on Mantle Sepolia**: real LLM inference, real on-chain `attest()` transactions (explorer-visible at https://explorer.sepolia.mantle.xyz), and real blob-backed trace traceability. See [`HACKATHON.md`](HACKATHON.md) for the submission spec and judging rubric. Four operator-provided credentials gate the live path — see [`OPERATOR_TODO.md`](OPERATOR_TODO.md) OP-3 (AI gateway key), OP-4 (RPC + funded wallets), OP-5 (blob token), OP-6 (Neon Postgres URL).
+
+---
+
 ## Workflow at a Glance
 
 ### Branch naming

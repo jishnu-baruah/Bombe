@@ -45,6 +45,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-06 — Live-ship mandate (D16)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D16 — LIVE submission, mock is test/fallback only.** The shipped product runs in `MODE=live`: real LLM via the AI gateway, real Mantle Sepolia transactions (explorer-visible), real blob trace storage + on-chain `reasoningHash` + verify-hash. Mock mode is retained ONLY for deterministic tests and the offline fallback (Plugboard replay T-504), never the submission demo. `HACKATHON.md` = submission spec; `DESIGN.md` = web design system; PRD = build spec. | Operator mandate 2026-06-06 (see `HACKATHON.md`) — judges must interact with a live on-chain product. This re-prioritizes the live seams (T-801–804) and real deployment to critical path. This is a scoped reframing of PRD §13 (whose "demo must not depend on network" now applies to the OFFLINE FALLBACK, not the live submission demo). |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

@@ -79,6 +79,20 @@ headless, advances the demo A→D, and asserts the exact §6.7 outcome matrix pl
 stability, in under 30s. It is the single source of truth for "can we submit" and is run
 before every commit that touches fixtures, taxonomy, the loop, contracts, or transcripts.
 
+## Submission target (LIVE)
+
+Per operator mandate 2026-06-06 (D16, `docs/DECISIONS.md`), the submission runs in **`MODE=live`**:
+
+- **Real LLM** — inference via the AI gateway (OpenAI-compatible, e.g. OpenRouter); models `anthropic/claude-sonnet-4.6`, `openai/gpt-5`, `meta/llama-3.3-70b`.
+- **Real on-chain txs** — all `attest()` calls land on Mantle Sepolia (chain 5003) and are explorer-visible.
+- **Real trace traceability** — `reasoningHash` written on-chain; blob URL stored; `/claim/[id]` verify-hash button recomputes client-side.
+
+**Mock mode is retained ONLY for deterministic tests and the offline fallback (Plugboard replay, T-504).** It never runs in the submission demo.
+
+Reference docs: `HACKATHON.md` (submission spec — what judges require, judging rubric, prize tracks, deployment checklist) and `DESIGN.md` (web design system — Revolut-style tokens: colors, typography, components — governs all T-6xx web work). The PRD (`docs/bombe-prd.md`) remains the build spec. Where HACKATHON.md and the PRD differ on the live demo, D16 and `HACKATHON.md` win.
+
+The live seams T-801–T-804 are critical path for the submission and are OP-gated (OP-3..OP-6 in `OPERATOR_TODO.md`).
+
 ## Determinism contract
 
 **Mock mode is fully deterministic** (PRD §8, §6.8): seeded clock, scripted models, a pinned

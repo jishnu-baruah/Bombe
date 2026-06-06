@@ -132,6 +132,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: progress generator (`scripts/update-progress.mjs`) + `pnpm progress` script; dashboard in `README.md` between `<!-- PROGRESS:START/END -->`; YieldProof submodule wired as reference at `contracts/lib/yieldproof` (or documented as removed if incompatible); `IYieldProofAttestor.sol` NatSpec note added; OP-2 resolved; D15 in DECISIONS.md. (PRD §5, §12)
 - Notes: resolves OP-2. Submodule kept — forge build unaffected (Hardhat project, nothing imported). Vendored interface retained per PRD §6.2 fallback. T-805 will expand the README with architecture diagram, env table, etc.
 
+### T-013 — integrate live-ship mandate + reference docs into workflow
+- Status: done 2026-06-06
+- Depends-on: —
+- Scope: docs
+- Acceptance: D16 recorded in `docs/DECISIONS.md`; `CLAUDE.md` and `CONTEXT.md` reference `HACKATHON.md` (submission spec) + `DESIGN.md` (web design system) and state the live-ship mandate; `README.md` has a "Shipping target" section referencing `HACKATHON.md` and OP-3..OP-6; OP-3, OP-4, OP-5, OP-6 raised in `OPERATOR_TODO.md`.
+- Notes: operator mandate 2026-06-06 (Jishnu Baruah). D16 is a scoped reframing of PRD §13 — "demo must not depend on network" now applies to the offline fallback, not the live submission demo.
+
 ---
 
 ## T-1xx — Contracts (M1)
@@ -513,6 +520,8 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ---
 
 ## T-8xx — live seams + ship (M8)
+
+> **CRITICAL PATH for live submission (D16).** T-801–T-804 are elevated above their original M8 ordering and are required for the hackathon submission demo. Each is OP-gated: T-801 → OP-3; T-802 → OP-5 + OP-4; T-803 → OP-6; T-804 → OP-4.
 
 ### T-801 — live ModelSeam (AI gateway)
 - Status: pending
