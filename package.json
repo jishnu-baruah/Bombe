@@ -18,7 +18,7 @@
     "test:contracts:deep": "pnpm contracts:test:deep",
     "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
     "test:agent": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/test-agent.ts",
-    "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",
+    "test:demo": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/test-demo.ts",
     "demo": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/demo.ts",
     "gen:abis": "node scripts/gen-abis.mjs",
     "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1",
