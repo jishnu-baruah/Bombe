@@ -19,8 +19,10 @@
     "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
     "test:agent": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/test-agent.ts",
     "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",
-    "demo": "echo \"M3+: demo boot not implemented yet\" && exit 1",
+    "demo": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/demo.ts",
+    "gen:abis": "node scripts/gen-abis.mjs",
     "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1",
+    "test:integration": "vitest run scripts/test/demo-integration.test.ts --config vitest.integration.config.ts",
     "progress": "node scripts/update-progress.mjs"
   },
   "devDependencies": {

@@ -14,6 +14,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     include: ["packages/**/*.test.ts", "apps/**/*.test.ts", "scripts/**/*.test.ts"],
+    // T-406: demo-integration.test.ts requires a live anvil — excluded from the
+    // fast `pnpm run ci` suite. Run separately with `pnpm test:integration`.
+    exclude: ["**/node_modules/**", "**/dist/**", "scripts/test/demo-integration.test.ts"],
     testTimeout: 30_000,
   },
   resolve: {

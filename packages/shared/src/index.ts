@@ -53,3 +53,12 @@ export type {
   ContractClaimPostedEvent,
   ContractAttestedEvent,
 } from "./event-bus.js";
+
+// ABI bridge (T-406)
+export {
+  AgentRegistryAbi,
+  AgentAttestationAbi,
+  AgentSlashingAbi,
+  TuringLeaderboardAbi,
+} from "./abis/index.js";
+export type { DeploymentAddresses } from "./abis/index.js";
