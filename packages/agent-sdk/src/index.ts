@@ -56,13 +56,14 @@ export {
 } from "./seams/stub.js";
 export type { ModelHandler, BlobPutHandler, WalletSendHandler } from "./seams/stub.js";
 
-// Live skeletons (compile-only; real behavior in T-801/T-802)
+// Live seams (T-801/T-802)
 export {
   LiveModelSeam,
   LiveBlobSeam,
   LiveWalletSeam,
   LiveClockSeam,
   LiveHumanQueueSeam,
+  createLiveModelSeam,
 } from "./seams/live.js";
 
 // ModelRouter — resilience layer (PRD §6.3.1, T-206)

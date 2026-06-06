@@ -9,7 +9,8 @@
  * Config comes exclusively from the SDK config module (PRD §15.4 guardrail —
  * no direct process.env reads in this file).
  *
- * LiveModelSeam and LiveBlobSeam are skeleton stubs (T-801 / T-802).
+ * LiveModelSeam is fully implemented (T-801): OpenAI-compatible chat-completions.
+ * LiveBlobSeam is a skeleton stub (T-802).
  * LiveClockSeam is fully implemented (Date.now()).
  * LiveHumanQueueSeam is a skeleton stub (T-404).
  */
@@ -26,6 +27,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { mantle, mantleSepoliaTestnet } from "viem/chains";
 import type { Config } from "../config.js";
+import { ModelError } from "../model-router.js";
 import type {
   BlobSeam,
   ClockSeam,
@@ -39,18 +41,154 @@ import type {
 } from "./types.js";
 
 // ---------------------------------------------------------------------------
-// LiveModelSeam — skeleton (T-801)
+// LiveModelSeam — OpenAI-compatible chat-completions (T-801)
 // ---------------------------------------------------------------------------
 
+/** Default timeout for live model calls (30 seconds). */
+const LIVE_MODEL_TIMEOUT_MS = 30_000;
+
 /**
- * LiveModelSeam — skeleton for live AI-gateway model calls.
- * Implemented in T-801.
+ * Raw shape of an OpenAI-compatible chat-completions response.
+ * Only the fields we actually consume are typed.
+ */
+interface ChatCompletionResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+  usage: {
+    prompt_tokens: number;
+    completion_tokens: number;
+  };
+  model: string;
+}
+
+/**
+ * LiveModelSeam — live AI-gateway model calls via OpenAI-compatible
+ * chat-completions endpoint. (PRD §6.3, T-801)
+ *
+ * Config (baseUrl, key, model) comes from the SDK config module — no direct
+ * process.env reads here (PRD §15.4 guardrail).
+ *
+ * Error mapping:
+ *   429         → ModelError("rate_limit")    — failover-worthy
+ *   500–599     → ModelError("server")        — failover-worthy
+ *   fetch abort → ModelError("timeout")       — failover-worthy
+ *   400/other   → ModelError("other")         — not failover-worthy
  */
 export class LiveModelSeam implements ModelSeam {
-  async complete(_req: ModelRequest): Promise<ModelResponse> {
-    // live: implemented in T-801
-    throw new Error("live ModelSeam not implemented (T-801)");
+  private readonly baseUrl: string;
+  private readonly apiKey: string;
+  private readonly modelName: string;
+  private readonly timeoutMs: number;
+
+  constructor(config: {
+    baseUrl: string;
+    apiKey: string;
+    modelName: string;
+    timeoutMs?: number;
+  }) {
+    this.baseUrl = config.baseUrl.replace(/\/$/, "");
+    this.apiKey = config.apiKey;
+    this.modelName = config.modelName;
+    this.timeoutMs = config.timeoutMs ?? LIVE_MODEL_TIMEOUT_MS;
   }
+
+  async complete(req: ModelRequest): Promise<ModelResponse> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    let res: Response;
+    try {
+      res = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: this.modelName,
+          messages: req.messages,
+          max_tokens: req.maxTokens,
+        }),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      clearTimeout(timer);
+      // AbortController fires a DOMException with name "AbortError".
+      const isAbort =
+        err instanceof Error &&
+        (err.name === "AbortError" || err.message.toLowerCase().includes("abort"));
+      if (isAbort) {
+        throw new ModelError(
+          `Live model call timed out after ${this.timeoutMs.toString()}ms`,
+          undefined,
+          "timeout",
+        );
+      }
+      throw new ModelError(
+        `Live model fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+        undefined,
+        "other",
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      if (res.status === 429) {
+        throw new ModelError(`Rate limited (429): ${body}`, 429, "rate_limit");
+      }
+      if (res.status >= 500 && res.status <= 599) {
+        throw new ModelError(
+          `Server error (${res.status.toString()}): ${body}`,
+          res.status,
+          "server",
+        );
+      }
+      // Non-retryable (400, etc.)
+      throw new ModelError(
+        `Live model request failed (${res.status.toString()}): ${body}`,
+        res.status,
+        "other",
+      );
+    }
+
+    const data = (await res.json()) as ChatCompletionResponse;
+    const choice = data.choices[0];
+    if (choice === undefined) {
+      throw new ModelError("Live model returned no choices", undefined, "other");
+    }
+
+    return {
+      text: choice.message.content,
+      tokensIn: data.usage.prompt_tokens,
+      tokensOut: data.usage.completion_tokens,
+      modelUsed: data.model ?? this.modelName,
+    };
+  }
+}
+
+/**
+ * createLiveModelSeam — build a LiveModelSeam from the SDK Config.
+ *
+ * Reads AI_GATEWAY_BASE_URL, AI_GATEWAY_KEY, AI_GATEWAY_MODELS from config.
+ * Called by createSeams() when MODE=live.
+ */
+export function createLiveModelSeam(
+  config: Pick<Config, "aiGatewayKey"> & {
+    aiGatewayBaseUrl?: string;
+    aiGatewayModels?: string;
+  },
+): LiveModelSeam {
+  const baseUrl = config.aiGatewayBaseUrl ?? "https://ollama.com/v1";
+  const apiKey = config.aiGatewayKey ?? "";
+  // First model in the comma-separated list, or the default.
+  const rawModels = config.aiGatewayModels ?? "";
+  const modelName = rawModels.split(",")[0]?.trim() || "gpt-oss:20b";
+  return new LiveModelSeam({ baseUrl, apiKey, modelName });
 }
 
 // ---------------------------------------------------------------------------
