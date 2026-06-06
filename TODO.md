@@ -687,11 +687,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 - Notes: follows the exact click-path documented in T-806/`docs/DEMO.md`.
 
 ### T-J06, DoraHacks submission package
-- Status: pending
+- Status: review 2026-06-07
 - Depends-on: T-J01, T-J02, T-J03, T-J04, T-J05, T-805
 - Scope: docs
 - Acceptance: DoraHacks submission filled, track nomination (AI & RWA + Grand Champion eligibility), one-line pitch, the three "Tell us" answers (RWA type / AI role / Mantle realization, HACKATHON.md §3), all 4 deployed addresses, Mantle Explorer verified links, the live attest tx hash (T-J03), public frontend URL, demo-video link, open-source repo URL. Final submission checklist (HACKATHON.md §8) fully checked. (Grand Champion + AI & RWA requirements)
-- Notes: **OP:** the actual submit action + confirming the deadline are operator-owned.
+- Notes: Package drafted at `docs/SUBMISSION.md` (pitch + three "Tell us" answers + 4 addresses + live attest tx + public URL + repo; no task IDs / no em-dashes per public-copy rules). Remaining before final submit are operator-owned or in other tasks: explorer verification (T-J02), demo video (T-J05), confirm deadline + hit submit on DoraHacks.
 
 ### T-J07, Community Voting asset (X thread + shareable demo)
 - Status: pending
