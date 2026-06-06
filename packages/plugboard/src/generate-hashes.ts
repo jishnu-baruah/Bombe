@@ -22,8 +22,7 @@ import { hashCanonical } from "@bombe/shared";
 const stepsA = [
   {
     step: 1,
-    thought:
-      "Claim A: mETH 30-day yield 34bps. Fetching primary oracle snapshot.",
+    thought: "Claim A: mETH 30-day yield 34bps. Fetching primary oracle snapshot.",
     action: { tool: "fetch_meth_yield", input: { period: "30d-fresh" } },
     observation: {
       value: 34,
@@ -51,8 +50,7 @@ const stepsA = [
   },
   {
     step: 3,
-    thought:
-      "Two fresh independent sources confirm 34 bps. Finalizing VALID.",
+    thought: "Two fresh independent sources confirm 34 bps. Finalizing VALID.",
     action: {
       finalize: {
         decision: "VALID",
@@ -68,8 +66,7 @@ const stepsA = [
 const stepsB = [
   {
     step: 1,
-    thought:
-      "Claim B: mETH 30-day yield 34bps. Fetching oracle — expecting possible staleness.",
+    thought: "Claim B: mETH 30-day yield 34bps. Fetching oracle — expecting possible staleness.",
     action: { tool: "fetch_meth_yield", input: { period: "30d-stale" } },
     observation: {
       value: 34,
@@ -98,8 +95,7 @@ const stepsB = [
 const stepsC = [
   {
     step: 1,
-    thought:
-      "Claim C: PC-POOL-1 cashflow match. Reading servicer report.",
+    thought: "Claim C: PC-POOL-1 cashflow match. Reading servicer report.",
     action: {
       tool: "read_document",
       input: { docRef: "pc-pool-1-servicer", version: "v1" },
@@ -114,8 +110,7 @@ const stepsC = [
   },
   {
     step: 2,
-    thought:
-      "Servicer report shows cashflowTotal 50,000 USD. Now reading bank statement.",
+    thought: "Servicer report shows cashflowTotal 50,000 USD. Now reading bank statement.",
     action: {
       tool: "read_document",
       input: { docRef: "pc-pool-1-statement", version: "v1" },
@@ -183,8 +178,7 @@ const stepsD = [
       finalize: {
         decision: "VALID",
         confidenceBps: 8200,
-        rationaleSummary:
-          "Cashflow data supports a $4.2M valuation. Attempting attestation.",
+        rationaleSummary: "Cashflow data supports a $4.2M valuation. Attempting attestation.",
       },
     },
     contractRevert: "JudgmentTierRequiresAbstain",
@@ -217,5 +211,7 @@ const transcripts = [
 
 for (const { claimId, steps, expectedOnChainDecision } of transcripts) {
   const traceHash = hashCanonical(steps);
-  console.log(`Claim ${claimId}: traceHash=${traceHash} expectedOnChainDecision=${expectedOnChainDecision}`);
+  console.log(
+    `Claim ${claimId}: traceHash=${traceHash} expectedOnChainDecision=${expectedOnChainDecision}`,
+  );
 }

@@ -25,8 +25,7 @@
  */
 
 /** Badge text shown in `/live` when Hermes is offline and replay is active. */
-export const RUNTIME_OFFLINE_BADGE =
-  "RUNTIME OFFLINE — replaying recorded behavior" as const;
+export const RUNTIME_OFFLINE_BADGE = "RUNTIME OFFLINE — replaying recorded behavior" as const;
 
 /**
  * PlugboardStatus — the current operational status of the Plugboard attestor.

@@ -28,10 +28,7 @@ import type { GatewayClient, RevertingWalletSeam } from "./types.js";
 export class MockGatewayClient implements GatewayClient {
   private readonly _calls: Array<{ name: string; input: Record<string, unknown> }> = [];
 
-  async callTool(
-    name: string,
-    input: Record<string, unknown>,
-  ): Promise<Record<string, unknown>> {
+  async callTool(name: string, input: Record<string, unknown>): Promise<Record<string, unknown>> {
     this._calls.push({ name, input });
     // Return deterministic fixture observations keyed by tool name.
     return MOCK_OBSERVATIONS[name] ?? {};
@@ -116,9 +113,7 @@ export class MockRevertingWalletSeam implements RevertingWalletSeam {
    * @param revertOn — if provided, a `sendFinalizeTx` call with this
    *   `expectedRevert` will throw `ContractRevertError(revertOn)`.
    */
-  constructor(
-    opts: { address?: string; revertOn?: string } = {},
-  ) {
+  constructor(opts: { address?: string; revertOn?: string } = {}) {
     this._addr = opts.address ?? "0xplugboard0000000000000000000000000000001";
     this.revertOn = opts.revertOn;
   }

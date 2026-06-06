@@ -32,10 +32,7 @@ const PlugboardFinalizeActionSchema = z.object({
   }),
 });
 
-const PlugboardActionSchema = z.union([
-  PlugboardToolActionSchema,
-  PlugboardFinalizeActionSchema,
-]);
+const PlugboardActionSchema = z.union([PlugboardToolActionSchema, PlugboardFinalizeActionSchema]);
 
 /**
  * A single step in a Plugboard transcript.

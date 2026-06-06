@@ -35,7 +35,12 @@ import type { PlugboardTranscript, ReplayDeps } from "../src/index.js";
 /** Resolve a path relative to the repo root (works from packages/plugboard). */
 function repoRoot(...parts: string[]): string {
   // packages/plugboard/test → up 3 levels to repo root
-  return resolve(new URL("..", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1"), "..", "..", ...parts);
+  return resolve(
+    new URL("..", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1"),
+    "..",
+    "..",
+    ...parts,
+  );
 }
 
 /** Load and parse a plugboard transcript JSON fixture. */
@@ -239,7 +244,7 @@ describe("skill snapshotting (T-503)", () => {
   it("skillHash differs for different content", () => {
     const content = loadEpoch0Skill();
     const h1 = skillHash(content);
-    const h2 = skillHash(content + " modified");
+    const h2 = skillHash(`${content} modified`);
     expect(h1).not.toBe(h2);
   });
 
@@ -279,7 +284,10 @@ describe("skill snapshotting (T-503)", () => {
       // For D, use the revert wallet so blockedByProtocol fires correctly.
       const localDeps =
         claimId === "D"
-          ? { ...deps, wallet: new MockRevertingWalletSeam({ revertOn: "JudgmentTierRequiresAbstain" }) }
+          ? {
+              ...deps,
+              wallet: new MockRevertingWalletSeam({ revertOn: "JudgmentTierRequiresAbstain" }),
+            }
           : deps;
       const result = await replayTranscript(transcript, localDeps);
       expect(result.skillHash).toBe(expectedHash);

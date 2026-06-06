@@ -42,9 +42,7 @@ function isToolAction(
 }
 
 /** Type-guard: does the action contain a `finalize` property? */
-function isFinalizeAction(
-  action: PlugboardStep["action"],
-): action is {
+function isFinalizeAction(action: PlugboardStep["action"]): action is {
   finalize: {
     decision: "VALID" | "REJECTED" | "ABSTAIN";
     confidenceBps: number;
