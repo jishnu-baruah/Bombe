@@ -63,6 +63,7 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
   - Jun 9: Mantlescan API key to verify the 4 contracts.
 - Half-done state: the deployer key and v1 agent keys exist in `.env.local` from the v1 deploy, but the v2 constitution forbids using the deployer key and wants a separated posting/attestor key model. Until the operator sets up the v2 key classes, the agent will not post live transactions (it must not use the deployer key).
 - To resolve: complete the Jun 7 setup, add the keys/token/env to `.env.local` and GitHub secrets, then tell the agent which gates are unblocked.
+- Progress (2026-06-07): the full decisive pipeline is built and proven in mock. `MODE=mock pnpm v2:attest` runs end-to-end (DataSource -> deterministic reconciler -> hashable trace -> attestation builder -> mock receipt) and prints decision VALID with reasoningHash recompute MATCH. Everything except the keyed on-chain post works. Once POSTING_KEY + ATTESTOR_KEY are set, the live post path in scripts/v2-attest.ts is enabled and `MODE=live pnpm v2:attest` captures the real Gate 1a transaction.
 
 ## Resolved
 
