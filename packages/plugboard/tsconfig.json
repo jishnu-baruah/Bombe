@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "paths": {
+      "@bombe/shared": ["../shared/src/index.ts"],
+      "@bombe/agent-sdk": ["../agent-sdk/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

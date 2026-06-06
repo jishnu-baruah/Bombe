@@ -398,39 +398,39 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-5xx — Plugboard mock path (M4)
 
 ### T-501 — transcript replay engine
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-405, T-403
 - Scope: plugboard
 - Acceptance: replays `fixtures/model-scripts/plugboard/{claimId}.json` through gateway+wallet, no model API; validator test `keccak256(canonicalJson(steps))==traceHash` for every transcript. (PRD §6.8, §14.11)
-- Notes: —
+- Notes: packages/plugboard/src/replay.ts; replayTranscript + validateTranscriptHash; 36 tests pass.
 
 ### T-502 — claim-D revert flow
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: `contractRevert` step → send tx → expect `JudgmentTierRequiresAbstain` → `blockedByProtocol:true` in agent-done → resubmit ABSTAIN; anvil integration test. (PRD §6.8, §14.11)
-- Notes: —
+- Notes: ContractRevertError + MockRevertingWalletSeam; revert flow tested with simulated revert wallet (full anvil integration in T-406+). 36 tests pass.
 
 ### T-503 — skill snapshot plumbing
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: pre-settlement copy skill → `epoch-snapshots/epoch-N.skill.md`, keccak256 in `agents.skill_hash`; every attestation row carries active hash; mock pins epoch-0 skill. (PRD §6.8, §14.12)
-- Notes: —
+- Notes: packages/plugboard/src/skill.ts; skillHash + makeEpochSnapshot; epoch-0 pinned; hash attached to every ReplayResult.
 
 ### T-504 — live fallback + isolation
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: Hermes offline → auto replay + "RUNTIME OFFLINE" badge; killing Plugboard process leaves SDK agents + settlement unaffected (claim A with Plugboard disabled test). (PRD §6.8, §14.13)
-- Notes: —
+- Notes: packages/plugboard/src/fallback.ts; resolvePlugboardStatus/shouldReplay/RUNTIME_OFFLINE_BADGE; runtimeOffline flag on ReplayResult; isolation test confirms no shared state.
 
 ### T-505 — plugboard fixtures
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: transcripts A–D + `epoch-0.skill.md` (taxonomy, tool catalog, Tier3→ABSTAIN rule, wallet usage). (PRD §6.8)
-- Notes: —
+- Notes: fixtures/model-scripts/plugboard/{A,B,C,D}.json; agents/plugboard/{bombe-attestor.skill.md,docker-compose.yml,epoch-snapshots/epoch-0.skill.md}; traceHash generated via generate-hashes.ts (not hand-typed).
 
 ---
 

@@ -1,0 +1,46 @@
+{
+  "claimId": "A",
+  "agentId": "plugboard",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "Claim A: mETH 30-day yield 34bps. Fetching primary oracle snapshot.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-fresh" } },
+      "observation": {
+        "value": 34,
+        "stale": false,
+        "source": "fixture:oracles/meth.json",
+        "fetchedAt": 1748736000,
+        "confidence": 9500
+      }
+    },
+    {
+      "step": 2,
+      "thought": "Primary source confirms 34 bps, fresh. Fetching Chainlink as secondary corroboration.",
+      "action": {
+        "tool": "fetch_chainlink_price",
+        "input": { "asset": "mETH", "period": "30d-fresh" }
+      },
+      "observation": {
+        "value": 34,
+        "stale": false,
+        "source": "fixture:oracles/chainlink-meth.json",
+        "fetchedAt": 1748736000,
+        "confidence": 9000
+      }
+    },
+    {
+      "step": 3,
+      "thought": "Two fresh independent sources confirm 34 bps. Finalizing VALID.",
+      "action": {
+        "finalize": {
+          "decision": "VALID",
+          "confidenceBps": 9200,
+          "rationaleSummary": "Two independent fresh oracle sources confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance."
+        }
+      }
+    }
+  ],
+  "traceHash": "0xb4e564dd57bf2d57e892580b5cbd1e0a1c5eb847f947a967ff96772e973ca754",
+  "expectedOnChainDecision": "VALID"
+}

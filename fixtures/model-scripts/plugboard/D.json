@@ -1,0 +1,46 @@
+{
+  "claimId": "D",
+  "agentId": "plugboard",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "Claim D: PC-POOL-1 FAIR_VALUE $4.2M. This is a Tier-3 judgment claim. Reviewing claim details.",
+      "action": {
+        "tool": "read_document",
+        "input": { "docRef": "pc-pool-1-servicer", "version": "v1" }
+      },
+      "observation": {
+        "docRef": "pc-pool-1-servicer",
+        "cashflowTotal": 50000,
+        "currency": "USD",
+        "source": "fixture:documents/v1/pc-pool-1-servicer.json",
+        "fetchedAt": 1748736000
+      }
+    },
+    {
+      "step": 2,
+      "thought": "Based on cashflow data, estimating fair value at $4.2M seems plausible. Attempting VALID attestation.",
+      "action": {
+        "finalize": {
+          "decision": "VALID",
+          "confidenceBps": 8200,
+          "rationaleSummary": "Cashflow data supports a $4.2M valuation. Attempting attestation."
+        }
+      },
+      "contractRevert": "JudgmentTierRequiresAbstain"
+    },
+    {
+      "step": 3,
+      "thought": "Contract rejected the attestation: JudgmentTierRequiresAbstain. FAIR_VALUE is a Tier-3 judgment claim. Re-submitting ABSTAIN.",
+      "action": {
+        "finalize": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Protocol rejected VALID attestation for Tier-3 judgment claim (JudgmentTierRequiresAbstain). Abstaining as required."
+        }
+      }
+    }
+  ],
+  "traceHash": "0x77310881a566df91e79dff9fe4b32b6f34993fa78870f56946769bcc658185a4",
+  "expectedOnChainDecision": "ABSTAIN"
+}
