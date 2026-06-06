@@ -1,0 +1,63 @@
+name: v2 daily streak
+
+# Daily unattended decisive attestation of the flagship assets (BOMBE-V2-PRD WS3).
+# Inert until OP-8 secrets exist: the posting step is gated on POSTING_KEY, so a
+# scheduled run with no secrets logs that it is inert and exits cleanly.
+# Public logs are the point. Misses and abstains are product, not embarrassment.
+
+on:
+  schedule:
+    # 09:00 UTC daily. Wall-clock cadence; the streak cannot be backfilled.
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+
+# Never run two at once (idempotency at the workflow level).
+concurrency:
+  group: v2-streak
+  cancel-in-progress: false
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    env:
+      POSTING_KEY: ${{ secrets.POSTING_KEY }}
+      ATTESTOR_KEY: ${{ secrets.ATTESTOR_KEY }}
+      RPC_URL: ${{ secrets.RPC_URL }}
+      ATTESTATION_ADDRESS: ${{ secrets.ATTESTATION_ADDRESS }}
+      AI_GATEWAY_BASE_URL: ${{ secrets.AI_GATEWAY_BASE_URL }}
+      AI_GATEWAY_KEY: ${{ secrets.AI_GATEWAY_KEY }}
+      AI_GATEWAY_MODELS: ${{ secrets.AI_GATEWAY_MODELS }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Gate: is the posting key present? (OP-8). Inert if not.
+      - id: gate
+        run: |
+          if [ -n "$POSTING_KEY" ] && [ -n "$ATTESTOR_KEY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Inert (no OP-8 secrets)
+        if: steps.gate.outputs.ready != 'true'
+        run: echo "OP-8 secrets (POSTING_KEY / ATTESTOR_KEY) not set; daily streak is inert. No post attempted."
+
+      # Live decisive attestation. One retry window. Dedupe + streak persistence
+      # are wired in WS3-full; this step performs the keyed run once enabled.
+      - name: Daily attest (mETH)
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          MODE=live pnpm v2:attest || (echo "retrying once..." && sleep 30 && MODE=live pnpm v2:attest)
+
+      - name: Alert operator on failure
+        if: failure() && steps.gate.outputs.ready == 'true'
+        run: echo "::error::v2 daily streak run failed. Operator review needed (check key balances and RPC)."
