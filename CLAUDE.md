@@ -64,3 +64,26 @@ When blocked on a credential, a need-to-verify-against-a-live-service, or an own
 ## Definition of done
 
 A task is done when **its `TODO.md` Acceptance criteria pass AND the relevant PRD §14 acceptance criterion holds**. `pnpm test:demo` is the single source of truth for "can we submit."
+
+## v2 execution constitution (active through 2026-06-15, from BOMBE-V2-PRD.md Sec 9)
+
+These rules override conflicting defaults for the duration of the v2 run.
+
+- No contract changes or redeploys before 2026-06-15. The deployed addresses and their attestation history are the product. Exception: a demo-blocking bug, only with explicit operator approval in the session.
+- Non-demo-blocking contract bugs: document in `docs/KNOWN-ISSUES.md`, fix in a branch, deploy to NEW Sepolia addresses only after June 15. Existing addresses and history untouched.
+- Tier-1 verdicts are computed by the deterministic reconciler, never by a model. Models gather evidence and write rationale; consensus is over evidence values.
+- Decisive-path data semantics are like-for-like cross-check (all legs, same window, reconcile within documented tolerance, or ABSTAIN). Fallback/retry semantics only inside a single source's availability layer.
+- Never use the word "independent" for the mETH or USDY source pairs. mETH = "one ground truth, two computation paths." USDY = "partial independence" or the D4a single-source label.
+- A short-window claim is never rendered or described as "30-day yield." `windowDays` is always displayed.
+- Asset order: mETH, then USDY. No third asset. Queue order is BOMBE-V2-PRD.md Section 8 exactly; WS3-thin precedes WS2.
+- Models: the three existing gateway models only. If fewer than three genuinely different models are confirmed, label the mechanism "single-model triple-run redundancy" and never "multi-model consensus."
+- Key classes: posting key (`OPERATOR_ROLE`, claim posting only), attestor keys (minimum bond + stake headroom), and the scoped repo-write token (contents:write, this repo only) are the ONLY credentials in this environment. Never access, request, or reference the deployer/admin key. Any operational key below 0.1 MNT: pause the scheduler and alert the operator; never improvise funding.
+- Dedupe is fail-closed: if both the chain read and the committed marker are unreachable, skip the run. Never risk a double-post.
+- Self-test claims are always flagged `selfTest` in trace and payload and visually distinguished on the streak surface. Never let a self-test render as a real issuer claim.
+- Every merge requires `pnpm run ci` green. No exceptions.
+- Never write a claim in README, docs, site copy, or pitch that the code does not substantiate. "Live" requires real data end-to-end. When unsure, understate.
+- Never post to X, DoraHacks, Telegram, Discord, or any external service. Drafts only; the operator posts.
+- Never touch, rebase, or delete the `demo-stable` tag.
+- Work the Section 8 queue top-down; record each gate's evidence (tx hash, test output, screenshot path) in `OPERATOR_TODO.md` before starting the next workstream.
+- New feature ideas are appended to `docs/V3-BACKLOG.md`, not implemented.
+- Repo docs use no em-dashes.

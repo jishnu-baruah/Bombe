@@ -54,6 +54,16 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Half-done state: drizzle schema + live client skeleton ready; pglite used in mock and tests.
 - To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
 
+## OP-8, v2 run prerequisites (keys, env, confirmations)   [open]
+- Date: 2026-06-07
+- Blocks: every live-post gate in the v2 run. The build (DataSource seam, sources, reconciler, scheduler code) proceeds without these, but no real Sepolia attestation (Gate 1a/1b/2a/3) can be captured until they are set.
+- Need (from BOMBE-V2-PRD.md Sec 7):
+  - Jun 7: create a posting key granted `OPERATOR_ROLE` (fund ~0.5 MNT); create attestor keys (min bond 0.1 MNT + stake headroom); REMOVE the deployer/admin key from the agent environment; create a fine-grained repo-write token (contents:write, this repo only) for the scheduler's committed sample/marker; set the live env vars. The `demo-stable` tag is already created at the current main.
+  - Jun 8: confirm three genuinely different models respond through the existing gateway (currently `AI_GATEWAY_MODELS=gpt-oss:20b`, only one is wired, so today the consensus mechanism would be labeled "single-model triple-run redundancy" per D6); confirm the DoraHacks deadline TIMEZONE and exact BUIDL form fields; confirm Ollama Cloud rate limits on a daily path.
+  - Jun 9: Mantlescan API key to verify the 4 contracts.
+- Half-done state: the deployer key and v1 agent keys exist in `.env.local` from the v1 deploy, but the v2 constitution forbids using the deployer key and wants a separated posting/attestor key model. Until the operator sets up the v2 key classes, the agent will not post live transactions (it must not use the deployer key).
+- To resolve: complete the Jun 7 setup, add the keys/token/env to `.env.local` and GitHub secrets, then tell the agent which gates are unblocked.
+
 ## Resolved
 
 ## OP-4, Mantle Sepolia RPC + funded wallets   [done]
