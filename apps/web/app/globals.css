@@ -61,7 +61,10 @@
   --radius-xl: 28px;
   --radius-full: 9999px;
 
-  /* ── Spacing (DESIGN.md spacing.*) ── */
+  /* ── Spacing (DESIGN.md spacing.*) ──
+     ⚠ Tailwind v4 shares the --spacing-* namespace with the size scale, so these
+     named keys (sm/md/lg/xl/…) HIJACK max-w-xl / w-lg / etc. (e.g. max-w-xl → 24px).
+     For max-widths use explicit values: max-w-[36rem], not max-w-xl. */
   --spacing-xxs: 4px;
   --spacing-xs: 6px;
   --spacing-sm: 8px;

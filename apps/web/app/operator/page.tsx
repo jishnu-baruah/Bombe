@@ -488,7 +488,7 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-[28rem]">
         <p className="text-[#8d969e] text-[13px] font-mono mb-4 text-center">
           /operator — access control
         </p>

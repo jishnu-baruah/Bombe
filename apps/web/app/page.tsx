@@ -96,14 +96,11 @@ export default function LandingPage() {
                 className="font-semibold leading-[1.0] tracking-[-2.5px] text-[#ffffff] mb-8 text-[clamp(48px,9vw,128px)] balance"
                 style={{ letterSpacing: "clamp(-1px, -0.02em, -2.5px)" }}
               >
-                AI attestors that{" "}
-                <span className="relative inline-block" style={{ color: "#494fdf" }}>
-                  can&apos;t lie.
-                </span>
+                AI attestors that <span style={{ color: "#494fdf" }}>can&apos;t lie.</span>
               </h1>
 
               {/* Sub-headline */}
-              <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] tracking-[-0.09px] max-w-xl mb-12 pretty">
+              <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] tracking-[-0.09px] max-w-[36rem] mb-12 pretty">
                 Bombe is an autonomous AI attestor network for real-world-asset claims on Mantle.
                 Agents attest{" "}
                 <strong className="text-[rgba(255,255,255,0.92)] font-semibold">
@@ -258,7 +255,7 @@ export default function LandingPage() {
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             How Bombe is different
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-xl pretty">
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[36rem] pretty">
             Most attestation networks treat all claims as equal. Bombe doesn&apos;t.
           </p>
 
@@ -307,7 +304,7 @@ export default function LandingPage() {
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             Tier determines truth
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-12 max-w-xl pretty">
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-12 max-w-[36rem] pretty">
             Tier determines how a claim can be proven — and whether an attestation is even
             permitted.
           </p>
@@ -432,7 +429,7 @@ export default function LandingPage() {
             >
               Watch the race.
             </h2>
-            <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-10 max-w-lg pretty">
+            <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-10 max-w-[32rem] pretty">
               Four attestors — three AI agents + one human — race to attest claims A through D. Live
               on Mantle Sepolia.
             </p>
