@@ -124,7 +124,12 @@ export {
   deterministicVerdict,
   decideTier1,
 } from "./data/reconciler.js";
-export type { Verdict, ReconcileResult, DecisionInputs, DecisionResult } from "./data/reconciler.js";
+export type {
+  Verdict,
+  ReconcileResult,
+  DecisionInputs,
+  DecisionResult,
+} from "./data/reconciler.js";
 export { MockDataSource, StubDataSource } from "./data/mock-source.js";
 export type {
   DataSource,
@@ -134,3 +139,17 @@ export type {
   YieldQuery,
   ClockLike,
 } from "./data/types.js";
+export { LiveDataSource, POOL_IDS } from "./data/live-source.js";
+export { createDataSource } from "./data/factory.js";
+export {
+  HttpDefiLlamaClient,
+  DefiLlamaError,
+  windowedAnnualizedYieldBps,
+  DefiLlamaChartPointSchema,
+} from "./data/defillama.js";
+export type {
+  DefiLlamaClient,
+  DefiLlamaChartPoint,
+  FetchLike,
+  WindowedYield,
+} from "./data/defillama.js";

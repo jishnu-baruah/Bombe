@@ -7,7 +7,14 @@ await p.waitForTimeout(3500);
 const sections = await p.locator("section").count();
 console.log("sections:", sections);
 for (let i = 0; i < sections; i++) {
-  try { await p.locator("section").nth(i).screenshot({ path: `_shots/sec-${i}.png` }); console.log("shot sec", i); }
-  catch (e) { console.log("sec", i, "fail", String(e).slice(0,80)); }
+  try {
+    await p
+      .locator("section")
+      .nth(i)
+      .screenshot({ path: `_shots/sec-${i}.png` });
+    console.log("shot sec", i);
+  } catch (e) {
+    console.log("sec", i, "fail", String(e).slice(0, 80));
+  }
 }
 await b.close();
