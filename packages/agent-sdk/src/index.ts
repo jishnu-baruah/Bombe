@@ -144,6 +144,13 @@ export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";
 export {
+  decideRun,
+  streakTableHeader,
+  streakRowMarkdown,
+  streakJsonEntry,
+} from "./data/scheduler.js";
+export type { RunDecision, DedupeInputs, StreakRecord } from "./data/scheduler.js";
+export {
   HttpDefiLlamaClient,
   DefiLlamaError,
   windowedAnnualizedYieldBps,
