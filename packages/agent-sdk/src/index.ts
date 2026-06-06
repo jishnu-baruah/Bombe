@@ -145,6 +145,7 @@ export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";
 export {
   decideRun,
+  isSelfTestRun,
   streakTableHeader,
   streakRowMarkdown,
   streakJsonEntry,
