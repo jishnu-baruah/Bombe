@@ -1,6 +1,7 @@
 "use client";
 
-import type { AgentDoneEvent, AgentStepEvent, ClaimPostedEvent, SseEvent } from "@bombe/shared";
+// Import via alias — browser-safe (avoids Node-only @bombe/shared barrel). See next.config.ts.
+import type { AgentDoneEvent, AgentStepEvent, ClaimPostedEvent, SseEvent } from "@bombe-events";
 import { useEffect, useReducer, useRef } from "react";
 import { parseEvent } from "./parseEvent";
 

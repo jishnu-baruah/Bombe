@@ -1,0 +1,37 @@
+version: "3.9"
+
+# Plugboard — Hermes Agent runtime for the external attestor.
+#
+# HERMES_RUNTIME_TAG is pinned to ensure deterministic replay and
+# reproducible skill-snapshot audits. Update only after epoch settlement
+# and a new epoch-snapshot has been saved to epoch-snapshots/.
+#
+# In mock mode (MODE=mock), this service is not started — the runner
+# uses transcript replay directly via @bombe/plugboard. (PRD §6.8, T-504)
+#
+# Isolation contract: stopping this service has ZERO effect on SDK agents
+# or the settlement path. The runner catches Plugboard failures via
+# Promise.allSettled and continues normally. (PRD §14.13)
+
+services:
+  plugboard:
+    image: "ghcr.io/nous-research/hermes-agent:${HERMES_RUNTIME_TAG:-PLACEHOLDER}"
+    environment:
+      # Required in live mode — absent in mock mode (process never starts)
+      - PLUGBOARD_WALLET_KEY=${PLUGBOARD_WALLET_KEY}
+      - TOOL_GATEWAY_URL=${TOOL_GATEWAY_URL:-http://tool-gateway:3001}
+      - TOOL_GATEWAY_KEY=${TOOL_GATEWAY_KEY:-dev-gateway}
+      - ATTESTATION_CONTRACT_ADDRESS=${ATTESTATION_CONTRACT_ADDRESS}
+      - SKILL_FILE=/workspace/bombe-attestor.skill.md
+      - EPOCH_SNAPSHOTS_DIR=/workspace/epoch-snapshots
+    volumes:
+      - ./bombe-attestor.skill.md:/workspace/bombe-attestor.skill.md
+      - ./epoch-snapshots:/workspace/epoch-snapshots
+    ports:
+      - "8765:8765"
+    restart: "on-failure"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

@@ -1,0 +1,31 @@
+{
+  "claimId": "B",
+  "agentId": "plugboard",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "Claim B: mETH 30-day yield 34bps. Fetching oracle — expecting possible staleness.",
+      "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-stale" } },
+      "observation": {
+        "value": 34,
+        "stale": true,
+        "source": "fixture:oracles/meth-stale.json",
+        "fetchedAt": 1748649600,
+        "confidence": 2000
+      }
+    },
+    {
+      "step": 2,
+      "thought": "Primary source is stale with low confidence. Only one source available. Cannot attest with a stale single source.",
+      "action": {
+        "finalize": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "mETH yield oracle is stale (>24h) and no secondary source is available. Abstaining per staleness rule."
+        }
+      }
+    }
+  ],
+  "traceHash": "0xd1bf27edae5fa5529b6b52f5112e38c160b4c409aaaae35453ff1e29b48a8db4",
+  "expectedOnChainDecision": "ABSTAIN"
+}

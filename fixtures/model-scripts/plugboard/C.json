@@ -1,0 +1,62 @@
+{
+  "claimId": "C",
+  "agentId": "plugboard",
+  "steps": [
+    {
+      "step": 1,
+      "thought": "Claim C: PC-POOL-1 cashflow match. Reading servicer report.",
+      "action": {
+        "tool": "read_document",
+        "input": { "docRef": "pc-pool-1-servicer", "version": "v1" }
+      },
+      "observation": {
+        "docRef": "pc-pool-1-servicer",
+        "cashflowTotal": 50000,
+        "currency": "USD",
+        "source": "fixture:documents/v1/pc-pool-1-servicer.json",
+        "fetchedAt": 1748736000
+      }
+    },
+    {
+      "step": 2,
+      "thought": "Servicer report shows cashflowTotal 50,000 USD. Now reading bank statement.",
+      "action": {
+        "tool": "read_document",
+        "input": { "docRef": "pc-pool-1-statement", "version": "v1" }
+      },
+      "observation": {
+        "docRef": "pc-pool-1-statement",
+        "lineItemsTotal": 45000,
+        "currency": "USD",
+        "source": "fixture:documents/v1/pc-pool-1-statement.json",
+        "fetchedAt": 1748736000
+      }
+    },
+    {
+      "step": 3,
+      "thought": "Statement lineItemsTotal is 45,000 vs servicer 50,000 — delta 5,000. Verifying computation.",
+      "action": {
+        "tool": "compute_expected",
+        "input": { "observedBps": 45000, "expectedBps": 50000 }
+      },
+      "observation": {
+        "withinTolerance": false,
+        "delta": 5000,
+        "toleranceBps": 2
+      }
+    },
+    {
+      "step": 4,
+      "thought": "5,000 USD mismatch confirmed. Servicer report and bank statement diverge. Cashflow match claim is false.",
+      "action": {
+        "finalize": {
+          "decision": "REJECTED",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Servicer report (50,000 USD) and bank statement line-items (45,000 USD) differ by 5,000 USD — outside any reasonable tolerance. CASHFLOW_MATCH claim REJECTED. Both documents hashed and cited."
+        }
+      }
+    }
+  ],
+  "traceHash": "0x94b85a284e90f723adf0fd6b3e96698e922c58cb5cc3902f55d7a0aa2f92318b",
+  "expectedOnChainDecision": "REJECTED"
+}

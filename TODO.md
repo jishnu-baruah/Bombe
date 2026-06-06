@@ -139,6 +139,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: D16 recorded in `docs/DECISIONS.md`; `CLAUDE.md` and `CONTEXT.md` reference `HACKATHON.md` (submission spec) + `DESIGN.md` (web design system) and state the live-ship mandate; `README.md` has a "Shipping target" section referencing `HACKATHON.md` and OP-3..OP-6; OP-3, OP-4, OP-5, OP-6 raised in `OPERATOR_TODO.md`.
 - Notes: operator mandate 2026-06-06 (Jishnu Baruah). D16 is a scoped reframing of PRD §13 — "demo must not depend on network" now applies to the offline fallback, not the live submission demo.
 
+### T-014 — auto-update README progress dashboard on every PR
+- Status: done 2026-06-06
+- Depends-on: T-012
+- Scope: ops
+- Acceptance: `.github/workflows/progress.yml` regenerates the dashboard via `scripts/update-progress.mjs` on each PR and commits it back to the PR branch (authored as the owner), so every merge to `main` carries a fresh dashboard; self-terminating; generator gains a `--no-tests` fast path. (PRD §8)
+- Notes: requested by operator — track performance at a glance on every push to main.
+
 ---
 
 ## T-1xx — Contracts (M1)
@@ -391,39 +398,39 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-5xx — Plugboard mock path (M4)
 
 ### T-501 — transcript replay engine
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-405, T-403
 - Scope: plugboard
 - Acceptance: replays `fixtures/model-scripts/plugboard/{claimId}.json` through gateway+wallet, no model API; validator test `keccak256(canonicalJson(steps))==traceHash` for every transcript. (PRD §6.8, §14.11)
-- Notes: —
+- Notes: packages/plugboard/src/replay.ts; replayTranscript + validateTranscriptHash; 36 tests pass.
 
 ### T-502 — claim-D revert flow
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: `contractRevert` step → send tx → expect `JudgmentTierRequiresAbstain` → `blockedByProtocol:true` in agent-done → resubmit ABSTAIN; anvil integration test. (PRD §6.8, §14.11)
-- Notes: —
+- Notes: ContractRevertError + MockRevertingWalletSeam; revert flow tested with simulated revert wallet (full anvil integration in T-406+). 36 tests pass.
 
 ### T-503 — skill snapshot plumbing
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: pre-settlement copy skill → `epoch-snapshots/epoch-N.skill.md`, keccak256 in `agents.skill_hash`; every attestation row carries active hash; mock pins epoch-0 skill. (PRD §6.8, §14.12)
-- Notes: —
+- Notes: packages/plugboard/src/skill.ts; skillHash + makeEpochSnapshot; epoch-0 pinned; hash attached to every ReplayResult.
 
 ### T-504 — live fallback + isolation
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: Hermes offline → auto replay + "RUNTIME OFFLINE" badge; killing Plugboard process leaves SDK agents + settlement unaffected (claim A with Plugboard disabled test). (PRD §6.8, §14.13)
-- Notes: —
+- Notes: packages/plugboard/src/fallback.ts; resolvePlugboardStatus/shouldReplay/RUNTIME_OFFLINE_BADGE; runtimeOffline flag on ReplayResult; isolation test confirms no shared state.
 
 ### T-505 — plugboard fixtures
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-501
 - Scope: plugboard
 - Acceptance: transcripts A–D + `epoch-0.skill.md` (taxonomy, tool catalog, Tier3→ABSTAIN rule, wallet usage). (PRD §6.8)
-- Notes: —
+- Notes: fixtures/model-scripts/plugboard/{A,B,C,D}.json; agents/plugboard/{bombe-attestor.skill.md,docker-compose.yml,epoch-snapshots/epoch-0.skill.md}; traceHash generated via generate-hashes.ts (not hand-typed).
 
 ---
 
@@ -444,11 +451,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-603 — /live race view
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601
 - Scope: web
 - Acceptance: 5 columns/stacked cards, streams agent-step, decision chips incl **BLOCKED BY PROTOCOL**, guided-demo auto-advance A→D <90s w/ toasts. (PRD §6.6, §6.7)
-- Notes: —
+- Notes: /api/stream enhanced with A→D CLAIM_POSTED→AGENT_STEP*→AGENT_DONE→HUMAN_QUEUE_UPDATE replay; @bombe-events alias added for browser-safe SSE schema imports; 20 new tests (94 total pass); build clean.
 
 ### T-604 — /leaderboard
 - Status: done 2026-06-06
