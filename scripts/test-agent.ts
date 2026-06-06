@@ -62,7 +62,7 @@ function getCurrentCommit(): string {
 }
 
 function log(msg: string): void {
-  process.stderr.write(msg + "\n");
+  process.stderr.write(`${msg}\n`);
 }
 
 // ─── Suite runners ────────────────────────────────────────────────────────────
@@ -124,17 +124,13 @@ function runVitest(): TestReport {
 
   // Use the vitest binary from root node_modules/.bin (installed as devDep)
   const vitestBin = resolve(ROOT, "node_modules", ".bin", "vitest");
-  const result = spawnSync(
-    vitestBin,
-    ["run", "--reporter=json", `--outputFile=${rawPath}`],
-    {
-      encoding: "utf8",
-      cwd: ROOT,
-      shell: true,
-      maxBuffer: 50 * 1024 * 1024,
-      env: { ...process.env, FORCE_COLOR: "0" },
-    },
-  );
+  const result = spawnSync(vitestBin, ["run", "--reporter=json", `--outputFile=${rawPath}`], {
+    encoding: "utf8",
+    cwd: ROOT,
+    shell: true,
+    maxBuffer: 50 * 1024 * 1024,
+    env: { ...process.env, FORCE_COLOR: "0" },
+  });
 
   // vitest exits 1 on failure too, that's expected
   if (!existsSync(rawPath)) {
@@ -262,7 +258,7 @@ async function main(): Promise<void> {
   const summary = aggregateReports(reports);
 
   // Print the machine-readable summary to stdout
-  process.stdout.write(JSON.stringify(summary, null, 2) + "\n");
+  process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
 
   // Also print a human-readable summary to stderr
   log("\n[test-agent] ─── SUMMARY ────────────────────────────────────────");
@@ -288,9 +284,7 @@ async function main(): Promise<void> {
     }
   }
 
-  log(
-    `[test-agent] ─────────────────────────────────────────────────────`,
-  );
+  log("[test-agent] ─────────────────────────────────────────────────────");
   log(
     `[test-agent] ${summary.allGreen ? "ALL GREEN ✓" : `FAILED — ${summary.total.failed} failure(s) ✗`}`,
   );

@@ -89,13 +89,13 @@ function currentCommit(): string {
 function parseForgeDurationMs(s: string): number {
   let ms = 0;
   const msMatch = s.match(/(\d+(?:\.\d+)?)ms/);
-  if (msMatch?.[1] != null) ms += parseFloat(msMatch[1]);
+  if (msMatch?.[1] != null) ms += Number.parseFloat(msMatch[1]);
   const usMatch = s.match(/(\d+(?:\.\d+)?)µs/);
-  if (usMatch?.[1] != null) ms += parseFloat(usMatch[1]) / 1000;
+  if (usMatch?.[1] != null) ms += Number.parseFloat(usMatch[1]) / 1000;
   const nsMatch = s.match(/(\d+(?:\.\d+)?)ns/);
-  if (nsMatch?.[1] != null) ms += parseFloat(nsMatch[1]) / 1_000_000;
+  if (nsMatch?.[1] != null) ms += Number.parseFloat(nsMatch[1]) / 1_000_000;
   const sMatch = s.match(/(\d+(?:\.\d+)?)s(?!e)/);
-  if (sMatch?.[1] != null) ms += parseFloat(sMatch[1]) * 1000;
+  if (sMatch?.[1] != null) ms += Number.parseFloat(sMatch[1]) * 1000;
   return ms;
 }
 
@@ -153,9 +153,7 @@ export function categorizeError(error: string): FailureCategory {
   }
 
   // Solidity custom error / revert (contract logic)
-  if (
-    /revert|custom error|panic\(0x|assertion failed|vm\.expect|forge.*test|\.t\.sol/.test(e)
-  ) {
+  if (/revert|custom error|panic\(0x|assertion failed|vm\.expect|forge.*test|\.t\.sol/.test(e)) {
     return "contract_logic";
   }
 

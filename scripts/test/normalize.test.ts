@@ -6,11 +6,11 @@
  */
 
 import { readFileSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
 import { TestReportSchema } from "@bombe/shared";
-import { normalizeForge, normalizeVitest, categorizeError } from "../lib/normalize.js";
+import { describe, expect, it } from "vitest";
+import { categorizeError, normalizeForge, normalizeVitest } from "../lib/normalize.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = resolve(__dirname, "fixtures");

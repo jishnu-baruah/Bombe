@@ -11,11 +11,11 @@
  */
 
 import { readFileSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
 import type { TestReport } from "@bombe/shared";
 import { TestReportSchema } from "@bombe/shared";
+import { describe, expect, it } from "vitest";
 import { aggregateReports } from "../test-agent.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

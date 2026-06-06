@@ -39,9 +39,7 @@
           "status": "passed",
           "duration": 12.5,
           "failureMessages": [],
-          "ancestorTitles": [
-            "canonicalJson"
-          ]
+          "ancestorTitles": ["canonicalJson"]
         },
         {
           "title": "produces deterministic output",
@@ -49,9 +47,7 @@
           "status": "passed",
           "duration": 8.1,
           "failureMessages": [],
-          "ancestorTitles": [
-            "canonicalJson"
-          ]
+          "ancestorTitles": ["canonicalJson"]
         },
         {
           "title": "sorted keys",
@@ -59,9 +55,7 @@
           "status": "passed",
           "duration": 5.2,
           "failureMessages": [],
-          "ancestorTitles": [
-            "canonicalJson"
-          ]
+          "ancestorTitles": ["canonicalJson"]
         },
         {
           "title": "handles nested arrays",
@@ -69,9 +63,7 @@
           "status": "passed",
           "duration": 3,
           "failureMessages": [],
-          "ancestorTitles": [
-            "canonicalJson"
-          ]
+          "ancestorTitles": ["canonicalJson"]
         }
       ]
     },
@@ -90,9 +82,7 @@
           "failureMessages": [
             "AssertionError: expected modelSwitched to be true\n  + expected - received\n  -false\n  +true\n    at packages/agent-sdk/test/model-router.test.ts:52:5"
           ],
-          "ancestorTitles": [
-            "ModelRouter"
-          ],
+          "ancestorTitles": ["ModelRouter"],
           "location": {
             "line": 52,
             "column": 5
