@@ -69,6 +69,7 @@ const REPO_ROOT = resolve(__dirname, "../..");
 const ANVIL_RPC = "http://127.0.0.1:18545"; // different port from demo to avoid collision
 const ANVIL_CHAIN_ID = 31337;
 const ATTEST_LOCK = parseEther("0.02");
+const CLAIM_FEE = parseEther("0.01");
 const MIN_BOND = parseEther("0.1");
 
 const KEYS = {
@@ -264,7 +265,7 @@ describe(
           account,
           to: addresses.attestation,
           data,
-          value: 0n,
+          value: CLAIM_FEE,
           chain: testChain(),
         });
         await publicClient.waitForTransactionReceipt({ hash });

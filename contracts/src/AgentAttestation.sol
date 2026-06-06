@@ -37,6 +37,10 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     ///         ABSTAIN locks nothing. Released by TuringLeaderboard / AgentSlashing (T-105/T-106).
     uint256 public constant ATTEST_LOCK = 0.02 ether;
 
+    /// @notice Fee paid by the issuer on claim submission.
+    ///         Held until settlement, then distributed pro-rata to correct attestors (T-016).
+    uint256 public constant CLAIM_FEE = 0.01 ether;
+
     /// @notice Maximum number of attestors allowed per claim.
     uint8 public constant MAX_ATTESTORS = 16;
 
@@ -60,6 +64,8 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
         bool posted;
         bool closed;
         uint8 attestorCount;
+        /// @notice Issuer-paid claim fee held until settlement; zeroed by `seizeClaimFee`.
+        uint256 claimFee;
     }
 
     /// @notice A single attestor's decision and proof data for a given claim.
@@ -99,7 +105,14 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     /// @param tier      Claim tier: 1 = deterministic, 2 = document-falsifiable, 3 = judgment.
     /// @param claimHash Keccak256 hash of the canonical claim payload.
     /// @param claimURI  Off-chain URI with the full claim details.
-    event ClaimPosted(bytes32 indexed claimId, uint8 tier, bytes32 claimHash, string claimURI);
+    /// @param claimFee  ETH fee paid by the issuer, held until settlement (T-016).
+    event ClaimPosted(bytes32 indexed claimId, uint8 tier, bytes32 claimHash, string claimURI, uint256 claimFee);
+
+    /// @notice Emitted when the SETTLER_ROLE holder seizes the claim fee for distribution.
+    /// @param claimId  The claim whose fee was seized.
+    /// @param amount   The ETH amount transferred to the settlement layer.
+    /// @param to       The recipient (TuringLeaderboard / SETTLER_ROLE holder).
+    event ClaimFeeSeized(bytes32 indexed claimId, uint256 amount, address indexed to);
 
     /// @notice Emitted when a registered agent successfully attests to a claim.
     /// @param claimId      The claim being attested.
@@ -166,6 +179,15 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     /// @notice ETH transfer of the seized stake to the settlement contract failed.
     error SeizeTransferFailed();
 
+    /// @notice `postClaim` was called with msg.value != CLAIM_FEE.
+    error IncorrectClaimFee();
+
+    /// @notice `seizeClaimFee` was called but the stored claim fee is already zero.
+    error NoClaimFeeToSeize();
+
+    /// @notice ETH transfer of the seized claim fee to the settlement contract failed.
+    error ClaimFeeTransferFailed();
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -190,6 +212,9 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
     // -------------------------------------------------------------------------
 
     /// @notice Post a new claim for attestors to evaluate.
+    ///         The issuer must send exactly CLAIM_FEE (0.01 ether) with the call.
+    ///         The fee is held in this contract until TuringLeaderboard calls `seizeClaimFee`
+    ///         during settlement and distributes it to correct attestors (T-016).
     /// @param id        Unique identifier for this claim.
     /// @param tier      Must be 1, 2, or 3.
     /// @param claimHash Keccak256 hash of the canonical claim payload.
@@ -199,15 +224,22 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
         uint8 tier,
         bytes32 claimHash,
         string calldata claimURI
-    ) external onlyRole(OPERATOR_ROLE) {
+    ) external payable onlyRole(OPERATOR_ROLE) {
+        if (msg.value != CLAIM_FEE) revert IncorrectClaimFee();
         if (tier < 1 || tier > 3) revert InvalidTier();
         if (_claims[id].posted) revert ClaimExists();
 
         _claims[id] = Claim({
-            tier: tier, claimHash: claimHash, claimURI: claimURI, posted: true, closed: false, attestorCount: 0
+            tier: tier,
+            claimHash: claimHash,
+            claimURI: claimURI,
+            posted: true,
+            closed: false,
+            attestorCount: 0,
+            claimFee: CLAIM_FEE
         });
 
-        emit ClaimPosted(id, tier, claimHash, claimURI);
+        emit ClaimPosted(id, tier, claimHash, claimURI, CLAIM_FEE);
     }
 
     /// @notice Close a claim so that no further attestations are accepted.
@@ -323,6 +355,32 @@ contract AgentAttestation is AccessControl, ReentrancyGuard {
         // interactions: forward the seized stake to the settlement contract.
         (bool success,) = msg.sender.call{ value: amount }("");
         if (!success) revert SeizeTransferFailed();
+    }
+
+    /// @notice Transfer the stored claim fee for `claimId` to the caller (TuringLeaderboard).
+    ///         One-shot: the stored fee is zeroed before the transfer (CEI).
+    ///         The Leaderboard distributes the fee pro-rata to correct attestors via
+    ///         `AgentSlashing.creditClaimable` immediately after this call (T-016).
+    ///
+    ///         Reverts with `NoClaimFeeToSeize` if the fee was already seized (or was never set).
+    ///
+    /// @param claimId The claim whose fee is being seized.
+    /// @return amount The ETH amount transferred to `msg.sender`.
+    function seizeClaimFee(
+        bytes32 claimId
+    ) external onlyRole(SETTLER_ROLE) nonReentrant returns (uint256 amount) {
+        Claim storage claim = _claims[claimId];
+        amount = claim.claimFee;
+        if (amount == 0) revert NoClaimFeeToSeize();
+
+        // effects: zero fee before the external transfer (CEI).
+        claim.claimFee = 0;
+
+        emit ClaimFeeSeized(claimId, amount, msg.sender);
+
+        // interactions: forward the fee to the settlement contract.
+        (bool success,) = msg.sender.call{ value: amount }("");
+        if (!success) revert ClaimFeeTransferFailed();
     }
 
     // -------------------------------------------------------------------------

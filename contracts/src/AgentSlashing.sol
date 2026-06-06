@@ -484,6 +484,15 @@ contract AgentSlashing is AccessControl, ReentrancyGuard {
         emit ClaimableCredited(to, msg.value);
     }
 
+    /// @notice Burn ETH forwarded by TuringLeaderboard (claim-fee remainder or full fee when
+    ///         there are zero correct attestors). The ETH is permanently locked in this contract
+    ///         — the same burn mechanism used by `_burnAndRedistribute`. Only the Leaderboard
+    ///         may call this (LEADERBOARD_ROLE). (T-016)
+    /// @dev `msg.value` is added to `totalBurned` and never credited to any `claimable`.
+    function burnFee() external payable onlyRole(LEADERBOARD_ROLE) {
+        totalBurned += msg.value;
+    }
+
     /// @notice Withdraw the caller's full pull-payment balance.
     ///         Checks-effects-interactions with a reentrancy guard (PRD §9).
     function withdraw() external nonReentrant {

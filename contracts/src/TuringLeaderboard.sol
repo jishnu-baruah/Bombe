@@ -77,6 +77,14 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
     mapping(bytes32 => bool) public settled;
 
     // -------------------------------------------------------------------------
+    // Constants (T-016)
+    // -------------------------------------------------------------------------
+
+    /// @notice Experience cap for the trust-score formula (Part 2, T-016).
+    ///         An agent with >= CAP total attestations scores the full 30 experience points.
+    uint256 public constant TRUST_SCORE_EXP_CAP = 15;
+
+    // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
 
@@ -93,6 +101,13 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
         uint256 wrong,
         uint256 abstained
     );
+
+    /// @notice Emitted when the claim fee is distributed among correct attestors after settlement.
+    /// @param claimId      The settled claim.
+    /// @param total        Total ETH seized from the claim fee pot.
+    /// @param perAttestor  ETH credited to each correct attestor (integer floor).
+    /// @param correctCount Number of correct attestors that received a share.
+    event ClaimFeeDistributed(bytes32 indexed claimId, uint256 total, uint256 perAttestor, uint256 correctCount);
 
     // -------------------------------------------------------------------------
     // Custom errors
@@ -197,6 +212,9 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
         (uint256 wrongCount, uint256 abstainedCount) =
             _settleAttestors(claimId, groundTruth, attestors, correctAttestors);
 
+        // Pass 3: seize claim fee and distribute pro-rata to correct attestors (T-016).
+        _distributeClaimFee(claimId, correctAttestors);
+
         emit Tier1Settled(claimId, groundTruth, correctAttestors.length, wrongCount, abstainedCount);
     }
 
@@ -284,6 +302,50 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
     }
 
     // -------------------------------------------------------------------------
+    // Internal: claim-fee distribution (T-016)
+    // -------------------------------------------------------------------------
+
+    /// @dev Seize the claim fee from AgentAttestation and distribute it pro-rata among
+    ///      `correctAttestors` via AgentSlashing.creditClaimable (the unified withdraw surface).
+    ///
+    ///      Conservation invariant: feeBurned + feeDistributed == fee exactly.
+    ///        - If correctCount == 0: entire fee is burned via `SLASHING.burnFee`.
+    ///        - Otherwise: each correct attestor receives `fee / correctCount` wei.
+    ///          The integer-division remainder is burned via `SLASHING.burnFee`.
+    ///
+    /// @param claimId          The settled claim whose fee to distribute.
+    /// @param correctAttestors Correct (non-abstain, decision == groundTruth) attestors.
+    function _distributeClaimFee(
+        bytes32 claimId,
+        address[] memory correctAttestors
+    ) internal {
+        // Seize the fee from AgentAttestation; ETH arrives in this contract via low-level call.
+        uint256 fee = ATTESTATION.seizeClaimFee(claimId);
+
+        uint256 n = correctAttestors.length;
+        uint256 perAttestor;
+        uint256 distributed;
+
+        if (n == 0) {
+            // Zero correct attestors — burn the entire fee.
+            SLASHING.burnFee{ value: fee }();
+        } else {
+            perAttestor = fee / n;
+            for (uint256 i = 0; i < n; i++) {
+                SLASHING.creditClaimable{ value: perAttestor }(correctAttestors[i]);
+                distributed += perAttestor;
+            }
+            uint256 remainder = fee - distributed;
+            if (remainder != 0) {
+                // Integer-division remainder: burn rather than strand.
+                SLASHING.burnFee{ value: remainder }();
+            }
+        }
+
+        emit ClaimFeeDistributed(claimId, fee, perAttestor, n);
+    }
+
+    // -------------------------------------------------------------------------
     // Views
     // -------------------------------------------------------------------------
 
@@ -310,9 +372,50 @@ contract TuringLeaderboard is AccessControl, ReentrancyGuard {
         return lifetimeStatsMap[agent];
     }
 
-    /// @notice Accept ETH from `AgentAttestation.seizeStake`, which forwards a correct
-    ///         attestor's released own-stake to this contract via a low-level call before
-    ///         it is re-credited to AgentSlashing.creditClaimable in the same transaction.
+    /// @notice Compute a 0–100 normalized trust score from an agent's lifetime stats (T-016).
+    ///
+    ///         Formula (two additive components):
+    ///
+    ///           accuracy_component (0–70):
+    ///             = correct * 70 / (correct + wrong)      if (correct + wrong) > 0
+    ///             = 0                                      if (correct + wrong) == 0
+    ///             (abstentions are excluded from the denominator)
+    ///
+    ///           experience_component (0–30):
+    ///             totalAttestations = correct + wrong + abstained
+    ///             = min(totalAttestations, TRUST_SCORE_EXP_CAP) * 30 / TRUST_SCORE_EXP_CAP
+    ///
+    ///           trustScore = min(accuracy_component + experience_component, 100)
+    ///
+    ///         A brand-new agent with no history returns 0.
+    ///         Mirrors YieldProof's getTrustScore() but operates on Bombe's real lifetime data.
+    ///
+    /// @param agent Address of the agent to score.
+    /// @return score Trust score in the range [0, 100].
+    function trustScore(
+        address agent
+    ) external view returns (uint256 score) {
+        Stats memory s = lifetimeStatsMap[agent];
+
+        // Accuracy component (0–70): abstentions excluded from denominator.
+        uint256 decidedCount = uint256(s.correct) + uint256(s.wrong);
+        uint256 accuracy;
+        if (decidedCount > 0) {
+            accuracy = (uint256(s.correct) * 70) / decidedCount;
+        }
+
+        // Experience component (0–30): cap at TRUST_SCORE_EXP_CAP total attestations.
+        uint256 totalAttestations = uint256(s.correct) + uint256(s.wrong) + uint256(s.abstained);
+        uint256 capped = totalAttestations < TRUST_SCORE_EXP_CAP ? totalAttestations : TRUST_SCORE_EXP_CAP;
+        uint256 experience = (capped * 30) / TRUST_SCORE_EXP_CAP;
+
+        score = accuracy + experience;
+        if (score > 100) score = 100;
+    }
+
+    /// @notice Accept ETH from `AgentAttestation.seizeStake` and `AgentAttestation.seizeClaimFee`,
+    ///         which forward ETH to this contract via low-level calls before it is forwarded to
+    ///         AgentSlashing in the same transaction.
     ///         ETH only ever transits this contract within `settleTier1`; no balance accrues.
     ///         Only `AgentAttestation` may send ETH here, so accidental/griefing direct sends cannot be locked.
     receive() external payable {

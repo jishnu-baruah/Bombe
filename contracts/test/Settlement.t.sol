@@ -21,6 +21,7 @@ contract SettlementTest is Test {
 
     uint256 internal constant MIN_BOND = 0.1 ether;
     uint256 internal constant ATTEST_LOCK = 0.02 ether;
+    uint256 internal constant CLAIM_FEE = 0.01 ether;
     uint256 internal constant EPOCH_SECONDS = 300; // demo value
     string internal constant META_URI = "ipfs://QmAgentMeta";
     string internal constant TRACE_URI = "ipfs://QmTrace";
@@ -79,6 +80,9 @@ contract SettlementTest is Test {
             vm.prank(agents[i]);
             registry.registerAgent{ value: MIN_BOND }(META_URI);
         }
+
+        // Fund operator for CLAIM_FEE payments.
+        vm.deal(operator, 10 ether);
     }
 
     // -------------------------------------------------------------------------
@@ -87,7 +91,7 @@ contract SettlementTest is Test {
 
     function _postAndClose() internal {
         vm.prank(operator);
-        attestation.postClaim(CLAIM_ID, 1, CLAIM_HASH, "ipfs://QmClaim");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID, 1, CLAIM_HASH, "ipfs://QmClaim");
     }
 
     function _close() internal {
@@ -124,22 +128,26 @@ contract SettlementTest is Test {
 
         _settle(AgentAttestation.Decision.VALID);
 
-        // No burn — nobody was wrong.
-        assertEq(slashing.totalBurned(), 0, "no burn expected");
+        // No slash burn — nobody was wrong.
+        // CLAIM_FEE (0.01e) split 3 ways: 3_333_333_333_333_333 each; 1 wei remainder burned.
+        uint256 feeShare = CLAIM_FEE / 3; // 3_333_333_333_333_333 wei
+        uint256 feeRemainder = CLAIM_FEE - feeShare * 3; // 1 wei
+        assertEq(slashing.totalBurned(), feeRemainder, "only fee remainder burned");
 
         address[3] memory correct = [a1, a2, a3];
         for (uint256 i = 0; i < correct.length; i++) {
             assertEq(leaderboard.lifetimeStats(correct[i]).correct, 1, "correct++");
             assertEq(registry.getAgent(correct[i]).reputation, 1, "reputation +1");
-            // Each gets exactly their own 0.02e back as claimable.
-            assertEq(slashing.pendingWithdrawal(correct[i]), ATTEST_LOCK, "own stake released");
+            // Each gets own stake back + pro-rata fee share.
+            assertEq(slashing.pendingWithdrawal(correct[i]), ATTEST_LOCK + feeShare, "own stake + fee share");
         }
 
         // Withdraw works for a correct attestor.
+        uint256 expected = ATTEST_LOCK + feeShare;
         uint256 balBefore = a1.balance;
         vm.prank(a1);
         slashing.withdraw();
-        assertEq(a1.balance, balBefore + ATTEST_LOCK, "withdraw returns own stake");
+        assertEq(a1.balance, balBefore + expected, "withdraw returns stake + fee share");
         assertEq(slashing.pendingWithdrawal(a1), 0, "balance cleared");
     }
 
@@ -159,14 +167,19 @@ contract SettlementTest is Test {
 
         // Wrong attestor a1: seized = 0.02e; burn = 0.01e; distribute = 0.01e split 2 ways.
         uint256 seized = ATTEST_LOCK; // 0.02 ether
-        uint256 burn = seized / 2; // 0.01 ether
-        uint256 distribute = seized - burn; // 0.01 ether
-        uint256 share = distribute / 2; // 0.005 ether each
+        uint256 slashBurn = seized / 2; // 0.01 ether
+        uint256 distribute = seized - slashBurn; // 0.01 ether
+        uint256 slashShare = distribute / 2; // 0.005 ether each
 
-        assertEq(burn, 0.01 ether, "burn should be 0.01e");
-        assertEq(share, 0.005 ether, "each correct gets 0.005e redistribution");
+        // CLAIM_FEE (0.01e) split 2 ways = 0.005e each (exact, no remainder).
+        uint256 feeShare = CLAIM_FEE / 2; // 0.005 ether
+        uint256 feeRemainder = CLAIM_FEE - feeShare * 2; // 0 wei
 
-        assertEq(slashing.totalBurned(), burn, "totalBurned == 0.01e");
+        assertEq(slashBurn, 0.01 ether, "slash burn should be 0.01e");
+        assertEq(slashShare, 0.005 ether, "each correct gets 0.005e slash redistribution");
+
+        // totalBurned = slashBurn + feeRemainder
+        assertEq(slashing.totalBurned(), slashBurn + feeRemainder, "totalBurned == slash burn + fee remainder");
 
         // a1 wrong: -10 reputation, wrong++/slashes++, no claimable.
         assertEq(registry.getAgent(a1).reputation, -10, "wrong reputation -10");
@@ -174,17 +187,20 @@ contract SettlementTest is Test {
         assertEq(leaderboard.lifetimeStats(a1).slashes, 1, "slashes++");
         assertEq(slashing.pendingWithdrawal(a1), 0, "wrong attestor has no claimable");
 
-        // a2 + a3 correct: own 0.02e released + 0.005e redistribution = 0.025e each.
-        uint256 expectedCorrect = ATTEST_LOCK + share; // 0.025 ether
-        assertEq(expectedCorrect, 0.025 ether, "correct claimable == 0.025e");
+        // a2 + a3 correct: own 0.02e released + 0.005e slash redistribution + 0.005e fee share = 0.03e each.
+        uint256 expectedCorrect = ATTEST_LOCK + slashShare + feeShare; // 0.03 ether
+        assertEq(expectedCorrect, 0.03 ether, "correct claimable == 0.03e");
         assertEq(slashing.pendingWithdrawal(a2), expectedCorrect, "a2 claimable");
         assertEq(slashing.pendingWithdrawal(a3), expectedCorrect, "a3 claimable");
         assertEq(registry.getAgent(a2).reputation, 1, "a2 reputation +1");
         assertEq(registry.getAgent(a3).reputation, 1, "a3 reputation +1");
 
-        // Conservation: seized == burn + total distributed.
-        uint256 totalDistributed = share * 2;
-        assertEq(seized, burn + totalDistributed, "conservation: seized == burn + distributed");
+        // Conservation: seized (slash) == slashBurn + total slash distributed.
+        uint256 totalSlashDistributed = slashShare * 2;
+        assertEq(seized, slashBurn + totalSlashDistributed, "slash conservation: seized == burn + distributed");
+
+        // Fee conservation: fee == feeShare * 2 + feeRemainder.
+        assertEq(CLAIM_FEE, feeShare * 2 + feeRemainder, "fee conservation: fee == distributed + burned");
     }
 
     // =========================================================================
@@ -200,12 +216,17 @@ contract SettlementTest is Test {
 
         _settle(AgentAttestation.Decision.VALID);
 
-        // The 0.01e distribute pot splits equally: 0.005e each, on top of own released stake.
-        uint256 redistA2 = slashing.pendingWithdrawal(a2) - ATTEST_LOCK;
-        uint256 redistA3 = slashing.pendingWithdrawal(a3) - ATTEST_LOCK;
-        assertEq(redistA2, redistA3, "pro-rata: equal shares");
-        assertEq(redistA2, 0.005 ether, "each share is 0.005e");
-        assertEq(redistA2 + redistA3, 0.01 ether, "shares sum to the distribute pot");
+        // Slash redistribution: 0.01e split equally → 0.005e each.
+        // Fee redistribution: 0.01e CLAIM_FEE split equally → 0.005e each (exact).
+        // Total over own stake: 0.005e (slash) + 0.005e (fee) = 0.01e each.
+        uint256 overStakeA2 = slashing.pendingWithdrawal(a2) - ATTEST_LOCK;
+        uint256 overStakeA3 = slashing.pendingWithdrawal(a3) - ATTEST_LOCK;
+        assertEq(overStakeA2, overStakeA3, "pro-rata: equal shares");
+        assertEq(overStakeA2, 0.005 ether + CLAIM_FEE / 2, "each share is slash + fee portion");
+        // Slash pot conservation.
+        uint256 slashDistribute = ATTEST_LOCK - ATTEST_LOCK / 2; // 0.01e
+        assertEq(overStakeA2 - CLAIM_FEE / 2, 0.005 ether, "slash share is 0.005e");
+        assertEq((overStakeA2 - CLAIM_FEE / 2) * 2, slashDistribute, "slash shares sum to distribute pot");
     }
 
     // =========================================================================
@@ -229,8 +250,13 @@ contract SettlementTest is Test {
         assertEq(registry.getAgent(a3).reputation, 0, "abstain reputation unchanged");
         assertEq(slashing.pendingWithdrawal(a3), 0, "abstain has no claimable");
 
-        // The single correct attestor a2 receives the WHOLE distribute pot (abstain excluded).
-        assertEq(slashing.pendingWithdrawal(a2), ATTEST_LOCK + 0.01 ether, "lone correct gets full pot");
+        // The single correct attestor a2 receives: own stake + full slash distribute pot + full CLAIM_FEE.
+        // slash distribute pot = 0.01e; CLAIM_FEE = 0.01e
+        assertEq(
+            slashing.pendingWithdrawal(a2),
+            ATTEST_LOCK + 0.01 ether + CLAIM_FEE,
+            "lone correct gets own stake + full slash pot + full fee"
+        );
     }
 
     // =========================================================================
@@ -282,7 +308,7 @@ contract SettlementTest is Test {
         // Post a tier-3 claim, abstain, close, then attempt settle.
         bytes32 t3 = keccak256("t3-claim");
         vm.prank(operator);
-        attestation.postClaim(t3, 3, CLAIM_HASH, "ipfs://QmT3");
+        attestation.postClaim{ value: CLAIM_FEE }(t3, 3, CLAIM_HASH, "ipfs://QmT3");
         vm.prank(a1);
         attestation.attest{ value: 0 }(
             t3, AgentAttestation.Decision.ABSTAIN, 0, SOURCES_HASH, REASONING_HASH, TRACE_URI
@@ -343,8 +369,8 @@ contract SettlementTest is Test {
         _close();
         _settle(AgentAttestation.Decision.VALID);
 
-        // a2 withdraws own stake (0.02e) + half the 0.01e pot (0.01e, lone correct) = 0.03e.
-        uint256 expected = ATTEST_LOCK + 0.01 ether; // lone correct gets full distribute pot
+        // a2 is lone correct attestor: own stake + full slash distribute pot + full CLAIM_FEE.
+        uint256 expected = ATTEST_LOCK + 0.01 ether + CLAIM_FEE;
         assertEq(slashing.pendingWithdrawal(a2), expected, "claimable before withdraw");
 
         uint256 balBefore = a2.balance;
@@ -373,17 +399,31 @@ contract SettlementTest is Test {
         _close();
         _settle(AgentAttestation.Decision.VALID);
 
-        // seized from the wrong attestor.
+        // Slash conservation: seized == slashBurn + slashDistributed.
         uint256 seized = ATTEST_LOCK;
-        uint256 burn = slashing.totalBurned();
-        // distributed = redistribution shares only (exclude released own-stake of correct attestors).
-        uint256 distributed =
-            (slashing.pendingWithdrawal(a2) - ATTEST_LOCK) + (slashing.pendingWithdrawal(a3) - ATTEST_LOCK);
-        assertEq(seized, burn + distributed, "conservation: seized == burn + distributed");
+        uint256 feeShare = CLAIM_FEE / 2; // exact for 2 correct attestors
+        // Over-stake for each correct = slash redistribution share + fee share.
+        uint256 overStake = slashing.pendingWithdrawal(a2) - ATTEST_LOCK;
+        uint256 slashShare = overStake - feeShare;
+        uint256 slashDistributed = slashShare * 2;
+        uint256 slashBurn = seized / 2; // 0.01e
+        assertEq(seized, slashBurn + slashDistributed, "slash conservation: seized == burn + distributed");
 
-        // The slashing contract still physically holds: burn (forever) + all claimable balances.
+        // Fee conservation: CLAIM_FEE == feeDistributed + feeBurned.
+        uint256 feeDistributed = feeShare * 2;
+        uint256 feeBurned = CLAIM_FEE - feeDistributed; // 0 wei remainder
+        assertEq(CLAIM_FEE, feeDistributed + feeBurned, "fee conservation: fee == distributed + burned");
+
+        // totalBurned = slashBurn + feeBurned.
+        assertEq(slashing.totalBurned(), slashBurn + feeBurned, "totalBurned == slashBurn + feeBurned");
+
+        // The slashing contract holds: totalBurned (forever) + all claimable balances.
         uint256 claimableTotal = slashing.pendingWithdrawal(a2) + slashing.pendingWithdrawal(a3);
-        assertEq(address(slashing).balance, burn + claimableTotal, "contract holds burn + claimable");
+        assertEq(
+            address(slashing).balance,
+            slashing.totalBurned() + claimableTotal,
+            "contract holds totalBurned + all claimable"
+        );
     }
 
     // =========================================================================
@@ -397,8 +437,13 @@ contract SettlementTest is Test {
         _close();
         _settle(AgentAttestation.Decision.VALID);
 
-        // Two wrong, zero correct: each 0.02e seized is fully burned -> 0.04e burned.
-        assertEq(slashing.totalBurned(), 2 * ATTEST_LOCK, "all seized stake burned when no correct peers");
+        // Two wrong, zero correct: each 0.02e seized is fully burned + CLAIM_FEE also burned.
+        // totalBurned = 2 * ATTEST_LOCK + CLAIM_FEE
+        assertEq(
+            slashing.totalBurned(),
+            2 * ATTEST_LOCK + CLAIM_FEE,
+            "all seized stake + claim fee burned when no correct peers"
+        );
         assertEq(slashing.pendingWithdrawal(a1), 0, "no claimable");
         assertEq(slashing.pendingWithdrawal(a2), 0, "no claimable");
         assertEq(registry.getAgent(a1).reputation, -10, "a1 -10");
