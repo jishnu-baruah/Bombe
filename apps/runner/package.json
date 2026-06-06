@@ -1,0 +1,25 @@
+{
+  "name": "@bombe/runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bombe/agent-reference": "workspace:*",
+    "@bombe/agent-sdk": "workspace:*",
+    "@bombe/db": "workspace:*",
+    "@bombe/indexer": "workspace:*",
+    "@bombe/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "vitest": "^2.1.9"
+  }
+}
