@@ -1,10 +1,11 @@
 # Bombe
 
-Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sepolia** (chain id 5003). Agents attest only to falsifiable claims (Tier 1 deterministic / Tier 2 document-falsifiable); judgment claims (Tier 3) produce abstentions, never attestations. Safety lives at the contract layer — proven live by Plugboard, an external attestor Bombe's team did not write.
+Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sepolia** (chain id 5003). Agents attest only to falsifiable claims (Tier 1 deterministic / Tier 2 document-falsifiable); judgment claims (Tier 3) produce abstentions, never attestations. Safety lives at the contract layer, proven live by Plugboard, an external attestor Bombe's team did not write.
 
 - Thesis & non-goals: [CONTEXT.md](CONTEXT.md)
 - Full spec: [docs/bombe-prd.md](docs/bombe-prd.md)
 - Hackathon submission: [HACKATHON.md](HACKATHON.md) · Live deployment: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md)
+- For issuers: [/issuers](https://bombe-web.vercel.app/issuers) · Integration guide: [docs/INTEGRATION.md](docs/INTEGRATION.md)
 - Model accuracy benchmarks: [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
 - **Live site:** https://bombe-web.vercel.app · **Explorer:** https://sepolia.mantlescan.xyz
 
@@ -58,7 +59,7 @@ Refresh the dashboard with `pnpm progress`.
 
 ## Shipping target
 
-Bombe ships **live on Mantle Sepolia**: real LLM inference, real on-chain `attest()` transactions (explorer-visible at https://explorer.sepolia.mantle.xyz), and real blob-backed trace traceability. See [`HACKATHON.md`](HACKATHON.md) for the submission spec and judging rubric. Four operator-provided credentials gate the live path — see [`OPERATOR_TODO.md`](OPERATOR_TODO.md) OP-3 (AI gateway key), OP-4 (RPC + funded wallets), OP-5 (blob token), OP-6 (Neon Postgres URL).
+Bombe ships **live on Mantle Sepolia**: real LLM inference, real on-chain `attest()` transactions (visible on the explorer at https://sepolia.mantlescan.xyz), and real blob-backed trace traceability. See [`HACKATHON.md`](HACKATHON.md) for the submission spec and judging rubric, and [`docs/DEPLOYMENTS.md`](docs/DEPLOYMENTS.md) for the live addresses and a verified end-to-end run.
 
 ---
 
@@ -76,12 +77,12 @@ T-XXX: <verb> <object>
 
 ### PR title format
 ```
-T-XXX — <title>
+T-XXX, <title>
 ```
 
 ### Merge policy (D6 + D9)
 - `docs/` and `chore/` PRs: auto-merge on green CI (`gh pr merge --auto --squash`).
-- `feat/` and `fix/` PRs: operator merges manually — logic changes require the human gate.
+- `feat/` and `fix/` PRs: operator merges manually, logic changes require the human gate.
 - **D9 autonomous-mode override:** during operator-directed unattended runs, `feat`/`fix` PRs auto-merge after green required CI + a passing two-stage subagent review, substituting adversarial review for the human merge gate.
 - Branch protection on `main` requires the `ci` status check (D8).
 
@@ -94,7 +95,7 @@ T-XXX — <title>
 ### OPERATOR_TODO protocol
 When blocked on a credential, a live-service verification, or an owner-only decision:
 1. Append an `OP-N` entry to `OPERATOR_TODO.md`.
-2. Set the related task to `Status: blocked — see OP-N`.
+2. Set the related task to `Status: blocked, see OP-N`.
 3. Keep working other unblocked tasks.
 **Never fabricate credentials or fake verification to appear done.**
 
@@ -115,7 +116,7 @@ pnpm install
 git submodule update --init --recursive
 
 # Full CI gate: lint + typecheck + forge build + forge test + vitest
-pnpm run ci        # NOTE: pnpm run ci (NOT pnpm ci — reserved by pnpm, D7)
+pnpm run ci        # NOTE: pnpm run ci (NOT pnpm ci, reserved by pnpm, D7)
 
 # Contracts only
 forge test --root contracts
@@ -132,4 +133,4 @@ pnpm test:contracts:deep
 
 Refresh the dashboard with `pnpm progress`.
 
-> A fuller README per PRD §12 — architecture diagram, "Why not LangGraph/CrewAI/ElizaOS", env table, Plugboard trust model — is a later task **T-805** and will expand this file significantly.
+> A fuller README per PRD §12, architecture diagram, "Why not LangGraph/CrewAI/ElizaOS", env table, Plugboard trust model, is a later task **T-805** and will expand this file significantly.

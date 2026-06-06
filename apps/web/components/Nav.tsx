@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/live", label: "Live" },
   { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/issuers", label: "Issuers" },
   { href: "/operator", label: "Operator" },
 ] as const;
 
@@ -45,7 +46,7 @@ export function Nav() {
         </span>
       </Link>
 
-      {/* Desktop nav links — hidden below md */}
+      {/* Desktop nav links, hidden below md */}
       <ul className="hidden md:flex items-center gap-0.5">
         {NAV_LINKS.map(({ href, label }) => {
           const isActive = pathname === href;
@@ -66,7 +67,7 @@ export function Nav() {
         })}
       </ul>
 
-      {/* Desktop CTA — button-primary (white pill on dark) */}
+      {/* Desktop CTA, button-primary (white pill on dark) */}
       <Link
         href="/live"
         className="hidden md:inline-flex items-center ml-4 px-5 py-2 text-[14px] font-semibold bg-[#ffffff] text-[#000000] rounded-full hover:bg-[#e8e8e8] active:scale-[0.97] transition-all duration-150 hover:shadow-[0_2px_12px_rgba(255,255,255,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"

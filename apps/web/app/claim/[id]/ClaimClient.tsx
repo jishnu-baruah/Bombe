@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ClaimClient.tsx — Client rendering component for /claim/[id].
+ * ClaimClient.tsx, Client rendering component for /claim/[id].
  *
  * Receives pre-fetched claim + attestation data as props from the server
  * page wrapper (app/claim/[id]/page.tsx). Handles interactive tabs,
@@ -28,7 +28,7 @@ import { verifyTraceHash } from "@/lib/verify-hash";
 import type { Claim } from "@bombe/shared";
 import Link from "next/link";
 import { useState } from "react";
-// Note: `use` removed — params are now pre-resolved by the server wrapper (page.tsx)
+// Note: `use` removed, params are now pre-resolved by the server wrapper (page.tsx)
 
 // ---------------------------------------------------------------------------
 // Tier badge
@@ -37,12 +37,12 @@ import { useState } from "react";
 function TierBadge({ tier }: { tier: number }) {
   const v = tier === 1 ? "tier-1" : tier === 2 ? "tier-2" : "tier-3";
   const label =
-    tier === 1 ? "Tier 1 — Deterministic" : tier === 2 ? "Tier 2 — Document" : "Tier 3 — Judgment";
+    tier === 1 ? "Tier 1 · Deterministic" : tier === 2 ? "Tier 2 · Document" : "Tier 3 · Judgment";
   return <Badge variant={v} label={label} />;
 }
 
 // ---------------------------------------------------------------------------
-// Decision chip — handles BLOCKED BY PROTOCOL
+// Decision chip, handles BLOCKED BY PROTOCOL
 // ---------------------------------------------------------------------------
 
 function DecisionChip({
@@ -263,8 +263,7 @@ function OnChainRecord({
             Epoch Snapshot Diff
           </p>
           <p className="text-[#505a63] text-[13px] italic">
-            Epoch snapshot diff not yet available — Plugboard T-503 (skill snapshot plumbing)
-            pending. skill_hash above is the current epoch-0 anchor.
+            Epoch snapshot diff not yet available. skill_hash above is the current epoch-0 anchor.
           </p>
         </div>
       )}

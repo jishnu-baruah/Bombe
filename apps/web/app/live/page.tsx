@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * /live — T-603 flagship race view.
+ * /live, T-603 flagship race view.
  *
  * Layout: 5 columns (desktop ≥640px) / stacked tap-to-expand cards (≤380px).
  * Columns: Reflector · Rotor · Stator · Plugboard (EXTERNAL RUNTIME) · Human queue.
@@ -17,7 +17,7 @@
  * PRD §6.6, §6.7, DESIGN.md.
  */
 
-// Import via alias — browser-safe (avoids Node-only @bombe/shared barrel). See next.config.ts.
+// Import via alias, browser-safe (avoids Node-only @bombe/shared barrel). See next.config.ts.
 import type { AgentDoneEvent, AgentStepEvent, ClaimPostedEvent, SseEvent } from "@bombe-events";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Badge } from "../../components/ui/Badge";
@@ -207,10 +207,10 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
 // ---------------------------------------------------------------------------
 
 const CLAIM_NARRATIONS: Record<ClaimId, string> = {
-  A: "Claim A: mETH yield 34bps — all agents converge on VALID with fresh oracle data.",
-  B: "Claim B: stale feed — Reflector abstains: one stale source isn't enough. Rotor commits anyway.",
-  C: "Claim C: cashflow mismatch $50,000 vs $45,000 — every agent rejects the claim.",
-  D: "Claim D: judgment tier — SDK agents abstain. The contract just rejected an external agent's judgment attestation.",
+  A: "Claim A: mETH yield 34bps, all agents converge on VALID with fresh oracle data.",
+  B: "Claim B: stale feed, Reflector abstains: one stale source isn't enough. Rotor commits anyway.",
+  C: "Claim C: cashflow mismatch $50,000 vs $45,000, every agent rejects the claim.",
+  D: "Claim D: judgment tier, SDK agents abstain. The contract just rejected an external agent's judgment attestation.",
 };
 
 // ---------------------------------------------------------------------------
@@ -245,7 +245,7 @@ function AgentFooter({ done }: { done: AgentDoneEvent }) {
     <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-between gap-2 flex-wrap">
       <span className="text-[11px] font-mono text-[#505a63]">{done.latencyMs}ms</span>
       <span className="text-[11px] font-mono text-[#505a63]">
-        {done.costUsd > 0 ? `$${done.costUsd.toFixed(4)}` : "—"}
+        {done.costUsd > 0 ? `$${done.costUsd.toFixed(4)}` : "-"}
       </span>
     </div>
   );
@@ -344,7 +344,7 @@ function AgentColumn({
         </div>
       </button>
 
-      {/* Expandable body — always visible ≥sm, toggle on mobile */}
+      {/* Expandable body, always visible ≥sm, toggle on mobile */}
       <div className={`${expanded ? "block" : "hidden"} sm:block flex-1 flex flex-col gap-3`}>
         {/* Human queue special rendering */}
         {isHuman ? (
@@ -562,7 +562,7 @@ export default function LivePage() {
     human: true,
   });
 
-  // currentClaimIdx is always in [0, 3], CLAIM_IDS always has 4 entries — safe non-null assertion
+  // currentClaimIdx is always in [0, 3], CLAIM_IDS always has 4 entries, safe non-null assertion
   const currentClaimId = CLAIM_IDS[raceState.currentClaimIdx] as ClaimId;
   const currentClaimState = raceState.claims[currentClaimId];
 
@@ -647,7 +647,7 @@ export default function LivePage() {
 
     setGuidedRunning(false);
     setGuidedDone(true);
-    addToast("Guided demo complete — all 4 claims A→D processed.");
+    addToast("Guided demo complete, all 4 claims A→D processed.");
   }, [startClaim, addToast, raceState.currentClaimIdx]);
 
   // ---- Manual "Next claim" -------------------------------------------------
@@ -695,7 +695,7 @@ export default function LivePage() {
             Agent Race
           </h1>
           <p className="text-[rgba(255,255,255,0.60)] text-[16px] max-w-2xl leading-[1.5] mb-6 pretty">
-            Watch four attestors race on each claim — Reflector, Rotor, Stator (SDK agents),
+            Watch four attestors race on each claim, Reflector, Rotor, Stator (SDK agents),
             Plugboard (external runtime), and a Human Queue. Outcomes match §6.7 exactly.
           </p>
 
@@ -790,7 +790,7 @@ export default function LivePage() {
             >
               ✓ Claim {currentClaimId} complete
               {!atLastClaim && !guidedRunning && (
-                <span className="text-[#505a63]"> — click Next claim to continue</span>
+                <span className="text-[#505a63]">, click Next claim to continue</span>
               )}
             </div>
           )}

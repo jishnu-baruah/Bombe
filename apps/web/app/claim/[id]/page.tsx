@@ -1,5 +1,5 @@
 /**
- * /claim/[id] — Server component wrapper.
+ * /claim/[id], Server component wrapper.
  *
  * Resolves params, fetches claim + attestation data server-side via data-source.ts
  * (which selects demo-data or live-data based on MODE env), then renders the
@@ -11,7 +11,7 @@
  * On RPC error the live getters return undefined/[] and the page renders
  * gracefully (claim-not-found / no-attestations state, never crashes).
  *
- * T-J04 — live on-chain data layer.
+ * T-J04, live on-chain data layer.
  */
 
 import { getAttestations, getClaim } from "@/lib/data-source";

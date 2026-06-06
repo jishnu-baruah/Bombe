@@ -1,13 +1,13 @@
 "use client";
 /**
- * /operator — Operator Console
+ * /operator, Operator Console
  *
  * Gated by an OPERATOR_KEY stored in localStorage. Shows a key entry form
  * when no key is present; once entered, renders the full operator console
  * with forms for every operator API endpoint.
  *
- * PRD §6.6 — /operator page; §9 — operator-key gating.
- * DESIGN.md — dark canvas, surface-elevated cards, pill buttons.
+ * PRD §6.6, /operator page; §9, operator-key gating.
+ * DESIGN.md, dark canvas, surface-elevated cards, pill buttons.
  */
 
 import { Button } from "@/components/ui/Button";
@@ -388,10 +388,10 @@ function HumanAttestForm({ operatorKey }: { operatorKey: string }) {
             value={claimId}
             onChange={(e) => setClaimId(e.target.value)}
           >
-            <option value="A">A — YIELD_BPS (clean)</option>
-            <option value="B">B — YIELD_BPS (stale)</option>
-            <option value="C">C — CASHFLOW_MATCH (mismatch)</option>
-            <option value="D">D — FAIR_VALUE (judgment)</option>
+            <option value="A">A, YIELD_BPS (clean)</option>
+            <option value="B">B, YIELD_BPS (stale)</option>
+            <option value="C">C, CASHFLOW_MATCH (mismatch)</option>
+            <option value="D">D, FAIR_VALUE (judgment)</option>
           </select>
         </Field>
         <Field label="Decision">
@@ -490,7 +490,7 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-[28rem]">
         <p className="text-[#8d969e] text-[13px] font-mono mb-4 text-center">
-          /operator — access control
+          /operator, access control
         </p>
         <h1 className="text-[40px] font-semibold leading-[1.2] tracking-[-0.4px] text-center mb-2">
           Operator Console
@@ -551,7 +551,7 @@ export default function OperatorPage() {
     setOperatorKey(null);
   };
 
-  // Avoid hydration mismatch — only render gated content after mount
+  // Avoid hydration mismatch, only render gated content after mount
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -570,7 +570,7 @@ export default function OperatorPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
           <div>
-            <p className="text-[#8d969e] text-[13px] font-mono mb-2">T-606 — /operator</p>
+            <p className="text-[#8d969e] text-[13px] font-mono mb-2">/operator</p>
             <h1 className="text-[48px] font-semibold leading-[1.21] tracking-[-0.48px]">
               Operator Console
             </h1>
