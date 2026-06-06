@@ -117,3 +117,20 @@ export type {
   AttestationRow,
   AttestationRepository,
 } from "./attest.js";
+
+// DataSource seam + deterministic reconciler (BOMBE-V2-PRD WS1, D11)
+export {
+  reconcileLegs,
+  deterministicVerdict,
+  decideTier1,
+} from "./data/reconciler.js";
+export type { Verdict, ReconcileResult, DecisionInputs, DecisionResult } from "./data/reconciler.js";
+export { MockDataSource, StubDataSource } from "./data/mock-source.js";
+export type {
+  DataSource,
+  DataAsset,
+  SourceLeg,
+  YieldObservation,
+  YieldQuery,
+  ClockLike,
+} from "./data/types.js";
