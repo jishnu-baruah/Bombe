@@ -451,14 +451,14 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-604 — /leaderboard
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601
 - Scope: web
 - Acceptance: interleaved human/AI, accuracy excludes abstentions, sortable, all §6.6 columns. (PRD §6.6, §14.8)
 - Notes: —
 
 ### T-605 — /claim/[id] trace viewer
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601, T-202
 - Scope: web
 - Acceptance: per-agent tabs, step render, source hashes, **verify-hash button** recomputes `keccak256(canonicalJson(trace))` client-side; Plugboard skill_hash + epoch-snapshot diff. (PRD §6.6, §14.4, §14.12)

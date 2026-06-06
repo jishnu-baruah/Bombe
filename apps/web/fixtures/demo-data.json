@@ -1,0 +1,1521 @@
+{
+  "_generated": "2026-06-06T02:28:25.592Z",
+  "_note": "ALL hashes computed via hashCanonical — NEVER hand-typed (PRD §15.4 guardrail)",
+  "plugboardSkillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd",
+  "claims": [
+    {
+      "id": "A",
+      "tier": 1,
+      "asset": "mETH",
+      "claimType": "YIELD_BPS",
+      "payload": {
+        "period": "30d-fresh",
+        "expectedBps": 34
+      },
+      "submitter": "0x000000000000000000000000000000000000dEaD",
+      "postedAt": 1748736000
+    },
+    {
+      "id": "B",
+      "tier": 1,
+      "asset": "mETH",
+      "claimType": "YIELD_BPS",
+      "payload": {
+        "period": "30d-stale",
+        "expectedBps": 34
+      },
+      "submitter": "0x000000000000000000000000000000000000dEaD",
+      "postedAt": 1748736001
+    },
+    {
+      "id": "C",
+      "tier": 2,
+      "asset": "PC-POOL-1",
+      "claimType": "CASHFLOW_MATCH",
+      "payload": {
+        "poolId": "PC-POOL-1",
+        "period": "2026-05",
+        "servicerDocRef": "pc-pool-1-servicer",
+        "statementDocRef": "pc-pool-1-statement"
+      },
+      "submitter": "0x000000000000000000000000000000000000dEaD",
+      "postedAt": 1748736002
+    },
+    {
+      "id": "D",
+      "tier": 3,
+      "asset": "PC-POOL-1",
+      "claimType": "FAIR_VALUE",
+      "payload": {
+        "estimatedValue": 4200000,
+        "currency": "USD"
+      },
+      "submitter": "0x000000000000000000000000000000000000dEaD",
+      "postedAt": 1748736003
+    }
+  ],
+  "attestations": {
+    "A": [
+      {
+        "agentId": "reflector",
+        "claimId": "A",
+        "decision": "VALID",
+        "confidenceBps": 9500,
+        "reasoningHash": "0x1dfc38a696a4a2b465ee57c69940618d854591751280ffc9162995b423c9b932",
+        "sourcesHash": "0x3b514100cf3a816057fb9540009b7474ade9df2e912cb5a9cae491705bc95b80",
+        "traceURI": "mock://reflector/A",
+        "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "agentAddress": "0xRefl0000000000000000000000000000000000001",
+        "latencyMs": 650,
+        "costUsd": 0.00096,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "rotor",
+        "claimId": "A",
+        "decision": "VALID",
+        "confidenceBps": 9500,
+        "reasoningHash": "0x255c0fa44d27964bba89af6b660c09b32ec7eef3d550b4c8274d03bdece6f8a2",
+        "sourcesHash": "0xa3a3d34b52cdc7bd0d3c8ba55e44ba25e1e38b11007cdc49fa62ee9b089fb3a6",
+        "traceURI": "mock://rotor/A",
+        "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "agentAddress": "0xRot00000000000000000000000000000000000002",
+        "latencyMs": 450,
+        "costUsd": 0.00072,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "stator",
+        "claimId": "A",
+        "decision": "VALID",
+        "confidenceBps": 9000,
+        "reasoningHash": "0x2c214e0d50f77a8d599b0eaac010249200f8df8ed8e70d4658049a388b0dc7e1",
+        "sourcesHash": "0x4210a9b1d580b0760e30dcdcada370175f0ee953335bf980a181da6084d6625c",
+        "traceURI": "mock://stator/A",
+        "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "agentAddress": "0xStat0000000000000000000000000000000000003",
+        "latencyMs": 500,
+        "costUsd": 0.00048,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "plugboard",
+        "claimId": "A",
+        "decision": "VALID",
+        "confidenceBps": 9200,
+        "reasoningHash": "0x5a97b8f319b4bc12d9ad82d3fcf06c589679ef00bbe80d51ec6b0e4cec707539",
+        "sourcesHash": "0xaa8ce10fbf3c90b45930ed35ce3d493ef32729b63b14d743c0ac620e1e07dd42",
+        "traceURI": "mock://plugboard/A",
+        "txHash": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "agentAddress": "0xPlug0000000000000000000000000000000000004",
+        "latencyMs": 350,
+        "costUsd": 0.0005,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      {
+        "agentId": "human",
+        "claimId": "A",
+        "decision": "VALID",
+        "confidenceBps": 9000,
+        "reasoningHash": "0x4fd971856972d7b36b30b17ce94456c234f74817c5902186b7a0abe59cfab96b",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://human/A",
+        "txHash": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "agentAddress": "0xHuma0000000000000000000000000000000000005",
+        "latencyMs": 11500,
+        "costUsd": 0,
+        "isHuman": true,
+        "blockedByProtocol": false,
+        "skillHash": null
+      }
+    ],
+    "B": [
+      {
+        "agentId": "reflector",
+        "claimId": "B",
+        "decision": "ABSTAIN",
+        "confidenceBps": 9000,
+        "reasoningHash": "0x28d86ba019c6e3d969c4c8938e9c8fd71d4d0336ae3a4108bf054de8a9655f2b",
+        "sourcesHash": "0x4acf10ab3c89c93042204595d8e6f5daea9238af08ca2f9bc593685a3eeefa37",
+        "traceURI": "mock://reflector/B",
+        "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "agentAddress": "0xRefl0000000000000000000000000000000000001",
+        "latencyMs": 650,
+        "costUsd": 0.00048,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "rotor",
+        "claimId": "B",
+        "decision": "VALID",
+        "confidenceBps": 7500,
+        "reasoningHash": "0x9f95fc5344cd63a990a3d32933b9487a027770b455c84937b6454e44cff71e88",
+        "sourcesHash": "0xa3a3d34b52cdc7bd0d3c8ba55e44ba25e1e38b11007cdc49fa62ee9b089fb3a6",
+        "traceURI": "mock://rotor/B",
+        "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "agentAddress": "0xRot00000000000000000000000000000000000002",
+        "latencyMs": 450,
+        "costUsd": 0.00072,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "stator",
+        "claimId": "B",
+        "decision": "ABSTAIN",
+        "confidenceBps": 2000,
+        "reasoningHash": "0x4c367e33cf637192928e4c45c197cb23a62d326b13264fc672e96d38fd880047",
+        "sourcesHash": "0x4210a9b1d580b0760e30dcdcada370175f0ee953335bf980a181da6084d6625c",
+        "traceURI": "mock://stator/B",
+        "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "agentAddress": "0xStat0000000000000000000000000000000000003",
+        "latencyMs": 500,
+        "costUsd": 0.00048,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "plugboard",
+        "claimId": "B",
+        "decision": "VALID",
+        "confidenceBps": 8800,
+        "reasoningHash": "0xc00058151a5375c3ce3e505f89378861143f6537b5f335dd5d0f53f606304f53",
+        "sourcesHash": "0x9b898f7edaf8d3e46665d29a55935287e44140b2975eaf43c876da16decfaa6b",
+        "traceURI": "mock://plugboard/B",
+        "txHash": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "agentAddress": "0xPlug0000000000000000000000000000000000004",
+        "latencyMs": 350,
+        "costUsd": 0.0005,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      {
+        "agentId": "human",
+        "claimId": "B",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0xd6f69b0ea59fa757c7369e5b86e7210fde1648ac7f3c344eddb6ae5612ab2893",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://human/B",
+        "txHash": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "agentAddress": "0xHuma0000000000000000000000000000000000005",
+        "latencyMs": 11600,
+        "costUsd": 0,
+        "isHuman": true,
+        "blockedByProtocol": false,
+        "skillHash": null
+      }
+    ],
+    "C": [
+      {
+        "agentId": "reflector",
+        "claimId": "C",
+        "decision": "REJECTED",
+        "confidenceBps": 9500,
+        "reasoningHash": "0x734558f01429145bd04cb3863e000e3ecb5ca5022632dc3b46dcd4d793bdf096",
+        "sourcesHash": "0x150fc22964ba73a0eea4244c8b8437039e91c3f9f34c18c549c784d465afe6ce",
+        "traceURI": "mock://reflector/C",
+        "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "agentAddress": "0xRefl0000000000000000000000000000000000001",
+        "latencyMs": 650,
+        "costUsd": 0.00096,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "rotor",
+        "claimId": "C",
+        "decision": "REJECTED",
+        "confidenceBps": 9500,
+        "reasoningHash": "0xc029497fe06482899226ac87a54d9463fd47e9dbcae2407922f15dee4ad69940",
+        "sourcesHash": "0x15179ad1687b24e29e9708c90cf05e0285fdac4078d78b14cd4ea7ed1135a968",
+        "traceURI": "mock://rotor/C",
+        "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "agentAddress": "0xRot00000000000000000000000000000000000002",
+        "latencyMs": 450,
+        "costUsd": 0.00072,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "stator",
+        "claimId": "C",
+        "decision": "REJECTED",
+        "confidenceBps": 9500,
+        "reasoningHash": "0xfa8da6942ce3f3f8b528a7f69b85fe0ce40d79d4da582f7971ddc31b9e478c8c",
+        "sourcesHash": "0x3c24a42ffab77b882d242dd2250a02c04c1eba2fc51421dc309f5b7cb03ff23f",
+        "traceURI": "mock://stator/C",
+        "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "agentAddress": "0xStat0000000000000000000000000000000000003",
+        "latencyMs": 500,
+        "costUsd": 0.00072,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "plugboard",
+        "claimId": "C",
+        "decision": "REJECTED",
+        "confidenceBps": 9300,
+        "reasoningHash": "0xc145559dfecca1f281faea83461e5df1d9199d1a335c524ff12ab47b9a5716c4",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://plugboard/C",
+        "txHash": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "agentAddress": "0xPlug0000000000000000000000000000000000004",
+        "latencyMs": 350,
+        "costUsd": 0.0005,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      {
+        "agentId": "human",
+        "claimId": "C",
+        "decision": "REJECTED",
+        "confidenceBps": 8500,
+        "reasoningHash": "0x42046feba4ab0ad6e66844a02061d55e76d393f395df7c08cd67c6a49953aa70",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://human/C",
+        "txHash": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "agentAddress": "0xHuma0000000000000000000000000000000000005",
+        "latencyMs": 11700,
+        "costUsd": 0,
+        "isHuman": true,
+        "blockedByProtocol": false,
+        "skillHash": null
+      }
+    ],
+    "D": [
+      {
+        "agentId": "reflector",
+        "claimId": "D",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0xd7685f258ecf77136ea69dd425b45280cf1bc303847c65d89da262734e13cf41",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://reflector/D",
+        "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+        "agentAddress": "0xRefl0000000000000000000000000000000000001",
+        "latencyMs": 650,
+        "costUsd": 0,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "rotor",
+        "claimId": "D",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0x668c22d5bf2b068f3b9213fbaa5ecafb3923c59181dcfae924f2b2e1b2c8fb06",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://rotor/D",
+        "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
+        "agentAddress": "0xRot00000000000000000000000000000000000002",
+        "latencyMs": 450,
+        "costUsd": 0,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "stator",
+        "claimId": "D",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0x15660c8a821b0e5c986e5ef7008b740ad038a16ff0572feb9d8b517731bc9601",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://stator/D",
+        "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "agentAddress": "0xStat0000000000000000000000000000000000003",
+        "latencyMs": 500,
+        "costUsd": 0,
+        "isHuman": false,
+        "blockedByProtocol": false,
+        "skillHash": null
+      },
+      {
+        "agentId": "plugboard",
+        "claimId": "D",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0x34baf7e39328243b0713307ccb8c7802740df34aa0134cc6519bcb0656dc07c0",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://plugboard/D",
+        "txHash": "0x4444444444444444444444444444444444444444444444444444444444444444",
+        "agentAddress": "0xPlug0000000000000000000000000000000000004",
+        "latencyMs": 350,
+        "costUsd": 0.0005,
+        "isHuman": false,
+        "blockedByProtocol": true,
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      {
+        "agentId": "human",
+        "claimId": "D",
+        "decision": "ABSTAIN",
+        "confidenceBps": 0,
+        "reasoningHash": "0xfe220dd58a84d49fb074003968ca9d3601371293ae797690c848f2d0caafb61e",
+        "sourcesHash": "0x518674ab2b227e5f11e9084f615d57663cde47bce1ba168b4c19c7ee22a73d70",
+        "traceURI": "mock://human/D",
+        "txHash": "0x5555555555555555555555555555555555555555555555555555555555555555",
+        "agentAddress": "0xHuma0000000000000000000000000000000000005",
+        "latencyMs": 11800,
+        "costUsd": 0,
+        "isHuman": true,
+        "blockedByProtocol": false,
+        "skillHash": null
+      }
+    ]
+  },
+  "leaderboard": [
+    {
+      "agentId": "rotor",
+      "isHuman": false,
+      "isExternal": false,
+      "correct": 3,
+      "wrong": 0,
+      "abstained": 1,
+      "totalDecisions": 4,
+      "totalLatencyMs": 1800,
+      "totalCostUsd": 0.00216,
+      "bond": 0.1,
+      "slashes": 0,
+      "reputation": 100,
+      "accuracyPct": 100,
+      "abstentionPct": 25,
+      "decisivenessPct": 75,
+      "avgLatencyMs": 450,
+      "rank": 1
+    },
+    {
+      "agentId": "plugboard",
+      "isHuman": false,
+      "isExternal": true,
+      "correct": 3,
+      "wrong": 0,
+      "abstained": 1,
+      "totalDecisions": 4,
+      "totalLatencyMs": 1400,
+      "totalCostUsd": 0.002,
+      "bond": 0.5,
+      "slashes": 0,
+      "reputation": 100,
+      "accuracyPct": 100,
+      "abstentionPct": 25,
+      "decisivenessPct": 75,
+      "avgLatencyMs": 350,
+      "rank": 2
+    },
+    {
+      "agentId": "reflector",
+      "isHuman": false,
+      "isExternal": false,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 2,
+      "totalDecisions": 4,
+      "totalLatencyMs": 2600,
+      "totalCostUsd": 0.0024,
+      "bond": 0.1,
+      "slashes": 0,
+      "reputation": 100,
+      "accuracyPct": 100,
+      "abstentionPct": 50,
+      "decisivenessPct": 50,
+      "avgLatencyMs": 650,
+      "rank": 3
+    },
+    {
+      "agentId": "stator",
+      "isHuman": false,
+      "isExternal": false,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 2,
+      "totalDecisions": 4,
+      "totalLatencyMs": 2000,
+      "totalCostUsd": 0.00168,
+      "bond": 0.1,
+      "slashes": 0,
+      "reputation": 100,
+      "accuracyPct": 100,
+      "abstentionPct": 50,
+      "decisivenessPct": 50,
+      "avgLatencyMs": 500,
+      "rank": 4
+    },
+    {
+      "agentId": "human",
+      "isHuman": true,
+      "isExternal": false,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 2,
+      "totalDecisions": 4,
+      "totalLatencyMs": 46600,
+      "totalCostUsd": 0,
+      "bond": 0,
+      "slashes": 0,
+      "reputation": 100,
+      "accuracyPct": 100,
+      "abstentionPct": 50,
+      "decisivenessPct": 50,
+      "avgLatencyMs": 11650,
+      "rank": 5
+    }
+  ],
+  "traces": {
+    "A": {
+      "reflector": {
+        "traceVersion": "1.0",
+        "agentId": "reflector",
+        "claimId": "A",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "I need to verify the mETH 30-day yield claim. I will fetch the primary oracle snapshot first.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-fresh"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-fresh",
+                "yieldBps": 34,
+                "stale": false
+              },
+              "source": "chainlink",
+              "fetchedAt": 1179010,
+              "confidence": 9500
+            },
+            "ts": 1179000
+          },
+          {
+            "step": 1,
+            "thought": "Primary source shows 34 bps and is fresh. As a conservative agent I require a second independent source. I will fetch the Chainlink price feed as corroboration.",
+            "action": {
+              "tool": "fetch_chainlink_price",
+              "input": {
+                "asset": "mETH",
+                "period": "30d-fresh"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-fresh",
+                "priceBps": 34,
+                "stale": false
+              },
+              "source": "chainlink",
+              "fetchedAt": 1179030,
+              "confidence": 9500
+            },
+            "ts": 1179020
+          },
+          {
+            "step": 2,
+            "thought": "Both sources confirm 34 bps fresh. Now I will run the pure math to verify within ±2 bps tolerance.",
+            "action": {
+              "tool": "compute_expected",
+              "input": {
+                "observedBps": 34,
+                "expectedBps": 34
+              }
+            },
+            "observation": {
+              "value": {
+                "observedBps": 34,
+                "expectedBps": 34,
+                "deltaBps": 0,
+                "withinTolerance": true
+              },
+              "source": "compute",
+              "fetchedAt": 1179050,
+              "confidence": 9500
+            },
+            "ts": 1179040
+          },
+          {
+            "step": 3,
+            "thought": "Two independent fresh sources confirm mETH yield is 34 bps, within tolerance. Confidence is very high.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 9500,
+                "rationaleSummary": "Two independent fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1179060
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Two independent fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance.",
+          "reasons": []
+        },
+        "reasoningHash": "0x1dfc38a696a4a2b465ee57c69940618d854591751280ffc9162995b423c9b932"
+      },
+      "rotor": {
+        "traceVersion": "1.0",
+        "agentId": "rotor",
+        "claimId": "A",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Fetching the mETH yield oracle to verify the 34 bps claim.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-fresh"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-fresh",
+                "yieldBps": 34,
+                "stale": false
+              },
+              "source": "chainlink",
+              "fetchedAt": 1179010,
+              "confidence": 9500
+            },
+            "ts": 1179000
+          },
+          {
+            "step": 1,
+            "thought": "Oracle confirms 34 bps, fresh data. Running math check.",
+            "action": {
+              "tool": "compute_expected",
+              "input": {
+                "observedBps": 34,
+                "expectedBps": 34
+              }
+            },
+            "observation": {
+              "value": {
+                "observedBps": 34,
+                "expectedBps": 34,
+                "deltaBps": 0,
+                "withinTolerance": true
+              },
+              "source": "compute",
+              "fetchedAt": 1179030,
+              "confidence": 9500
+            },
+            "ts": 1179020
+          },
+          {
+            "step": 2,
+            "thought": "34 bps within tolerance. Confidence is high. Committing VALID.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 9500,
+                "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value within ±2 bps tolerance. Fresh data."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1179040
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value within ±2 bps tolerance. Fresh data.",
+          "reasons": []
+        },
+        "reasoningHash": "0x255c0fa44d27964bba89af6b660c09b32ec7eef3d550b4c8274d03bdece6f8a2"
+      },
+      "stator": {
+        "traceVersion": "1.0",
+        "agentId": "stator",
+        "claimId": "A",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Fetching mETH yield — single source check for cost efficiency.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-fresh"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-fresh",
+                "yieldBps": 34,
+                "stale": false
+              },
+              "source": "chainlink",
+              "fetchedAt": 1180010,
+              "confidence": 9500
+            },
+            "ts": 1180000
+          },
+          {
+            "step": 1,
+            "thought": "34 bps, fresh data, matches claim. Finalizing VALID immediately.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 9000,
+                "rationaleSummary": "Fresh oracle confirms mETH yield is 34 bps, matching expected value within tolerance."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1180020
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 9000,
+          "rationaleSummary": "Fresh oracle confirms mETH yield is 34 bps, matching expected value within tolerance.",
+          "reasons": []
+        },
+        "reasoningHash": "0x2c214e0d50f77a8d599b0eaac010249200f8df8ed8e70d4658049a388b0dc7e1"
+      },
+      "plugboard": {
+        "traceVersion": "1.0",
+        "agentId": "plugboard",
+        "claimId": "A",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Plugboard: fetching mETH yield via gateway.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-fresh"
+              }
+            },
+            "observation": {
+              "value": 34,
+              "source": "chainlink-primary",
+              "confidence": 9200,
+              "fetchedAt": "2026-06-06T00:00:00Z"
+            },
+            "ts": 1748736100
+          },
+          {
+            "step": 1,
+            "thought": "Plugboard: yield confirmed 34 bps. Committing VALID.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 9200,
+                "rationaleSummary": "Fresh oracle confirms 34 bps."
+              }
+            },
+            "observation": null,
+            "ts": 1748736110
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 9200,
+          "rationaleSummary": "External Hermes runtime confirms mETH yield 34 bps.",
+          "reasons": []
+        },
+        "reasoningHash": "0x5a97b8f319b4bc12d9ad82d3fcf06c589679ef00bbe80d51ec6b0e4cec707539",
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      "human": {
+        "traceVersion": "1.0",
+        "agentId": "human",
+        "claimId": "A",
+        "steps": [],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 9000,
+          "rationaleSummary": "Human attestor decision for claim A.",
+          "reasons": []
+        },
+        "reasoningHash": "0x4fd971856972d7b36b30b17ce94456c234f74817c5902186b7a0abe59cfab96b"
+      }
+    },
+    "B": {
+      "reflector": {
+        "traceVersion": "1.0",
+        "agentId": "reflector",
+        "claimId": "B",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Fetching the mETH yield oracle for the specified period to check the 34 bps claim.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-stale"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-stale",
+                "yieldBps": 34,
+                "stale": true
+              },
+              "source": "chainlink",
+              "fetchedAt": 1180010,
+              "confidence": 2000
+            },
+            "ts": 1180000
+          },
+          {
+            "step": 1,
+            "thought": "The oracle snapshot shows 34 bps and the value matches the expected claim. I will finalize VALID with high confidence.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 9000,
+                "rationaleSummary": "mETH yield oracle confirms 34 bps, matching the expected value within tolerance."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1180020
+          }
+        ],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 9000,
+          "rationaleSummary": "Stale single source detected (1 source(s)); conservative temperament requires ≥2 independent sources.",
+          "reasons": ["STALE_SINGLE_SOURCE"]
+        },
+        "reasoningHash": "0x28d86ba019c6e3d969c4c8938e9c8fd71d4d0336ae3a4108bf054de8a9655f2b"
+      },
+      "rotor": {
+        "traceVersion": "1.0",
+        "agentId": "rotor",
+        "claimId": "B",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Fetching the mETH yield oracle for the stale period.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-stale"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-stale",
+                "yieldBps": 34,
+                "stale": true
+              },
+              "source": "chainlink",
+              "fetchedAt": 1180010,
+              "confidence": 2000
+            },
+            "ts": 1180000
+          },
+          {
+            "step": 1,
+            "thought": "Oracle shows 34 bps. Data is marked stale but the value matches. Running math check.",
+            "action": {
+              "tool": "compute_expected",
+              "input": {
+                "observedBps": 34,
+                "expectedBps": 34
+              }
+            },
+            "observation": {
+              "value": {
+                "observedBps": 34,
+                "expectedBps": 34,
+                "deltaBps": 0,
+                "withinTolerance": true
+              },
+              "source": "compute",
+              "fetchedAt": 1180030,
+              "confidence": 9500
+            },
+            "ts": 1180020
+          },
+          {
+            "step": 2,
+            "thought": "Value matches expected within tolerance. Stale data is a risk factor but the number checks out. Committing VALID.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 7500,
+                "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified — committing."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1180040
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 7500,
+          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified — committing.",
+          "reasons": []
+        },
+        "reasoningHash": "0x9f95fc5344cd63a990a3d32933b9487a027770b455c84937b6454e44cff71e88"
+      },
+      "stator": {
+        "traceVersion": "1.0",
+        "agentId": "stator",
+        "claimId": "B",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Fetching mETH yield for the stale period.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-stale"
+              }
+            },
+            "observation": {
+              "value": {
+                "asset": "mETH",
+                "period": "30d-stale",
+                "yieldBps": 34,
+                "stale": true
+              },
+              "source": "chainlink",
+              "fetchedAt": 1181010,
+              "confidence": 2000
+            },
+            "ts": 1181000
+          },
+          {
+            "step": 1,
+            "thought": "The oracle data is marked stale and returned low confidence. As a cost-optimised agent I abstain when the available evidence is insufficient — a single stale source is not reliable enough to commit.",
+            "action": {
+              "finalize": {
+                "decision": "ABSTAIN",
+                "confidenceBps": 2000,
+                "rationaleSummary": "Single stale oracle source returned low confidence. Insufficient evidence to commit. Abstaining."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1181020
+          }
+        ],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 2000,
+          "rationaleSummary": "Single stale oracle source returned low confidence. Insufficient evidence to commit. Abstaining.",
+          "reasons": ["MODEL_ABSTAIN"]
+        },
+        "reasoningHash": "0x4c367e33cf637192928e4c45c197cb23a62d326b13264fc672e96d38fd880047"
+      },
+      "plugboard": {
+        "traceVersion": "1.0",
+        "agentId": "plugboard",
+        "claimId": "B",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Plugboard: fetching stale mETH yield.",
+            "action": {
+              "tool": "fetch_meth_yield",
+              "input": {
+                "period": "30d-stale"
+              }
+            },
+            "observation": {
+              "value": 34,
+              "source": "chainlink-stale",
+              "stale": true,
+              "confidence": 8800,
+              "fetchedAt": "2026-06-06T00:00:00Z"
+            },
+            "ts": 1748736200
+          },
+          {
+            "step": 1,
+            "thought": "Plugboard: stale but value matches — committing VALID.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 8800,
+                "rationaleSummary": "Stale oracle still confirms 34 bps."
+              }
+            },
+            "observation": null,
+            "ts": 1748736210
+          }
+        ],
+        "final": {
+          "decision": "VALID",
+          "confidenceBps": 8800,
+          "rationaleSummary": "Stale oracle confirms 34 bps — Plugboard commits VALID.",
+          "reasons": []
+        },
+        "reasoningHash": "0xc00058151a5375c3ce3e505f89378861143f6537b5f335dd5d0f53f606304f53",
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      "human": {
+        "traceVersion": "1.0",
+        "agentId": "human",
+        "claimId": "B",
+        "steps": [],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Human attestor decision for claim B.",
+          "reasons": []
+        },
+        "reasoningHash": "0xd6f69b0ea59fa757c7369e5b86e7210fde1648ac7f3c344eddb6ae5612ab2893"
+      }
+    },
+    "C": {
+      "reflector": {
+        "traceVersion": "1.0",
+        "agentId": "reflector",
+        "claimId": "C",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "I need to verify the cashflow match claim for PC-POOL-1. I will read the servicer report first.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-servicer",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-servicer",
+                "docType": "servicer-report",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "reportDate": "2026-05-31",
+                  "cashflowTotal": 50000,
+                  "currency": "USD",
+                  "period": "2026-05"
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-servicer",
+              "fetchedAt": 1181010,
+              "confidence": 9500
+            },
+            "ts": 1181000
+          },
+          {
+            "step": 1,
+            "thought": "Servicer report shows cashflowTotal of 50,000 USD. Now I need the bank statement to cross-reference.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-statement",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-statement",
+                "docType": "bank-statement",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "statementDate": "2026-05-31",
+                  "currency": "USD",
+                  "period": "2026-05",
+                  "lineItems": [
+                    {
+                      "description": "Principal repayment",
+                      "amount": 30000
+                    },
+                    {
+                      "description": "Interest received",
+                      "amount": 12000
+                    },
+                    {
+                      "description": "Fee income",
+                      "amount": 3000
+                    }
+                  ],
+                  "lineItemsTotal": 45000
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-statement",
+              "fetchedAt": 1181030,
+              "confidence": 9500
+            },
+            "ts": 1181020
+          },
+          {
+            "step": 2,
+            "thought": "Bank statement lineItemsTotal is 45,000 USD. There is a discrepancy of 5,000 USD between the servicer report (50,000) and the bank statement (45,000). I will compute the delta.",
+            "action": {
+              "tool": "compute_expected",
+              "input": {
+                "observedBps": 45000,
+                "expectedBps": 50000
+              }
+            },
+            "observation": {
+              "value": {
+                "observedBps": 45000,
+                "expectedBps": 50000,
+                "deltaBps": 5000,
+                "withinTolerance": false
+              },
+              "source": "compute",
+              "fetchedAt": 1181050,
+              "confidence": 9500
+            },
+            "ts": 1181040
+          },
+          {
+            "step": 3,
+            "thought": "The delta is 5,000 — well outside tolerance. Both documents have been read and hashed. The cashflow claim is clearly false. Finalizing REJECTED with very high confidence.",
+            "action": {
+              "finalize": {
+                "decision": "REJECTED",
+                "confidenceBps": 9500,
+                "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD — a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1181060
+          }
+        ],
+        "final": {
+          "decision": "REJECTED",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD — a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED.",
+          "reasons": []
+        },
+        "reasoningHash": "0x734558f01429145bd04cb3863e000e3ecb5ca5022632dc3b46dcd4d793bdf096"
+      },
+      "rotor": {
+        "traceVersion": "1.0",
+        "agentId": "rotor",
+        "claimId": "C",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Reading servicer report for PC-POOL-1 cashflow match.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-servicer",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-servicer",
+                "docType": "servicer-report",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "reportDate": "2026-05-31",
+                  "cashflowTotal": 50000,
+                  "currency": "USD",
+                  "period": "2026-05"
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-servicer",
+              "fetchedAt": 1181010,
+              "confidence": 9500
+            },
+            "ts": 1181000
+          },
+          {
+            "step": 1,
+            "thought": "Servicer shows 50,000. Reading bank statement to cross-check.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-statement",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-statement",
+                "docType": "bank-statement",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "statementDate": "2026-05-31",
+                  "currency": "USD",
+                  "period": "2026-05",
+                  "lineItems": [
+                    {
+                      "description": "Principal repayment",
+                      "amount": 30000
+                    },
+                    {
+                      "description": "Interest received",
+                      "amount": 12000
+                    },
+                    {
+                      "description": "Fee income",
+                      "amount": 3000
+                    }
+                  ],
+                  "lineItemsTotal": 45000
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-statement",
+              "fetchedAt": 1181030,
+              "confidence": 9500
+            },
+            "ts": 1181020
+          },
+          {
+            "step": 2,
+            "thought": "Bank statement shows 45,000 — mismatch of 5,000. Rejecting immediately.",
+            "action": {
+              "finalize": {
+                "decision": "REJECTED",
+                "confidenceBps": 9500,
+                "rationaleSummary": "Servicer report (50,000 USD) does not match bank statement (45,000 USD). Cashflow claim REJECTED."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1181040
+          }
+        ],
+        "final": {
+          "decision": "REJECTED",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Servicer report (50,000 USD) does not match bank statement (45,000 USD). Cashflow claim REJECTED.",
+          "reasons": []
+        },
+        "reasoningHash": "0xc029497fe06482899226ac87a54d9463fd47e9dbcae2407922f15dee4ad69940"
+      },
+      "stator": {
+        "traceVersion": "1.0",
+        "agentId": "stator",
+        "claimId": "C",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Reading servicer report for PC-POOL-1.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-servicer",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-servicer",
+                "docType": "servicer-report",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "reportDate": "2026-05-31",
+                  "cashflowTotal": 50000,
+                  "currency": "USD",
+                  "period": "2026-05"
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-servicer",
+              "fetchedAt": 1182010,
+              "confidence": 9500
+            },
+            "ts": 1182000
+          },
+          {
+            "step": 1,
+            "thought": "Servicer shows 50,000. Reading bank statement.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-statement",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "value": {
+                "docRef": "pc-pool-1-statement",
+                "docType": "bank-statement",
+                "docVersion": "v1",
+                "fields": {
+                  "poolId": "PC-POOL-1",
+                  "statementDate": "2026-05-31",
+                  "currency": "USD",
+                  "period": "2026-05",
+                  "lineItems": [
+                    {
+                      "description": "Principal repayment",
+                      "amount": 30000
+                    },
+                    {
+                      "description": "Interest received",
+                      "amount": 12000
+                    },
+                    {
+                      "description": "Fee income",
+                      "amount": 3000
+                    }
+                  ],
+                  "lineItemsTotal": 45000
+                }
+              },
+              "source": "fixture:v1/pc-pool-1-statement",
+              "fetchedAt": 1182030,
+              "confidence": 9500
+            },
+            "ts": 1182020
+          },
+          {
+            "step": 2,
+            "thought": "Documents disagree: 50,000 vs 45,000. Mismatch is clear. Finalizing REJECTED.",
+            "action": {
+              "finalize": {
+                "decision": "REJECTED",
+                "confidenceBps": 9500,
+                "rationaleSummary": "Servicer report (50,000 USD) and bank statement (45,000 USD) do not match. Cashflow claim REJECTED."
+              }
+            },
+            "observation": {
+              "finalized": true
+            },
+            "ts": 1182040
+          }
+        ],
+        "final": {
+          "decision": "REJECTED",
+          "confidenceBps": 9500,
+          "rationaleSummary": "Servicer report (50,000 USD) and bank statement (45,000 USD) do not match. Cashflow claim REJECTED.",
+          "reasons": []
+        },
+        "reasoningHash": "0xfa8da6942ce3f3f8b528a7f69b85fe0ce40d79d4da582f7971ddc31b9e478c8c"
+      },
+      "plugboard": {
+        "traceVersion": "1.0",
+        "agentId": "plugboard",
+        "claimId": "C",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Plugboard: reading servicer document.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-servicer",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "cashflowTotal": 50000,
+              "currency": "USD"
+            },
+            "ts": 1748736300
+          },
+          {
+            "step": 1,
+            "thought": "Plugboard: reading bank statement.",
+            "action": {
+              "tool": "read_document",
+              "input": {
+                "docRef": "pc-pool-1-statement",
+                "version": "v1"
+              }
+            },
+            "observation": {
+              "lineItemsTotal": 45000,
+              "currency": "USD"
+            },
+            "ts": 1748736310
+          },
+          {
+            "step": 2,
+            "thought": "Plugboard: mismatch confirmed — 50k vs 45k.",
+            "action": {
+              "finalize": {
+                "decision": "REJECTED",
+                "confidenceBps": 9300,
+                "rationaleSummary": "Document mismatch: 50000 vs 45000."
+              }
+            },
+            "observation": null,
+            "ts": 1748736320
+          }
+        ],
+        "final": {
+          "decision": "REJECTED",
+          "confidenceBps": 9300,
+          "rationaleSummary": "Hermes runtime detects 5000 USD cashflow mismatch.",
+          "reasons": []
+        },
+        "reasoningHash": "0xc145559dfecca1f281faea83461e5df1d9199d1a335c524ff12ab47b9a5716c4",
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      "human": {
+        "traceVersion": "1.0",
+        "agentId": "human",
+        "claimId": "C",
+        "steps": [],
+        "final": {
+          "decision": "REJECTED",
+          "confidenceBps": 8500,
+          "rationaleSummary": "Human attestor decision for claim C.",
+          "reasons": []
+        },
+        "reasoningHash": "0x42046feba4ab0ad6e66844a02061d55e76d393f395df7c08cd67c6a49953aa70"
+      }
+    },
+    "D": {
+      "reflector": {
+        "traceVersion": "1.0",
+        "agentId": "reflector",
+        "claimId": "D",
+        "steps": [],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Tier-3 claim (FAIR_VALUE). Attestation is forbidden by protocol.",
+          "reasons": ["TIER3_OVERRIDE"]
+        },
+        "reasoningHash": "0xd7685f258ecf77136ea69dd425b45280cf1bc303847c65d89da262734e13cf41"
+      },
+      "rotor": {
+        "traceVersion": "1.0",
+        "agentId": "rotor",
+        "claimId": "D",
+        "steps": [],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Tier-3 claim (FAIR_VALUE). Attestation is forbidden by protocol.",
+          "reasons": ["TIER3_OVERRIDE"]
+        },
+        "reasoningHash": "0x668c22d5bf2b068f3b9213fbaa5ecafb3923c59181dcfae924f2b2e1b2c8fb06"
+      },
+      "stator": {
+        "traceVersion": "1.0",
+        "agentId": "stator",
+        "claimId": "D",
+        "steps": [],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Tier-3 claim (FAIR_VALUE). Attestation is forbidden by protocol.",
+          "reasons": ["TIER3_OVERRIDE"]
+        },
+        "reasoningHash": "0x15660c8a821b0e5c986e5ef7008b740ad038a16ff0572feb9d8b517731bc9601"
+      },
+      "plugboard": {
+        "traceVersion": "1.0",
+        "agentId": "plugboard",
+        "claimId": "D",
+        "steps": [
+          {
+            "step": 0,
+            "thought": "Plugboard: analysing FAIR_VALUE claim for PC-POOL-1.",
+            "action": {
+              "tool": "fetch_chainlink_price",
+              "input": {
+                "asset": "PC-POOL-1",
+                "period": "current"
+              }
+            },
+            "observation": {
+              "error": "TOOL_REFUSAL",
+              "reason": "tool not allowed for FAIR_VALUE"
+            },
+            "ts": 1748736400
+          },
+          {
+            "step": 1,
+            "thought": "Plugboard: attempting VALID — contract will reject this Tier 3.",
+            "action": {
+              "finalize": {
+                "decision": "VALID",
+                "confidenceBps": 7000,
+                "rationaleSummary": "Estimated value 4.2M USD."
+              }
+            },
+            "observation": {
+              "contractRevert": true,
+              "error": "JudgmentTierRequiresAbstain",
+              "message": "Contract rejected non-ABSTAIN on Tier 3"
+            },
+            "ts": 1748736410
+          },
+          {
+            "step": 2,
+            "thought": "Plugboard: contract blocked VALID — resubmitting ABSTAIN per protocol.",
+            "action": {
+              "finalize": {
+                "decision": "ABSTAIN",
+                "confidenceBps": 0,
+                "rationaleSummary": "Tier 3 judgment — ABSTAIN enforced by contract."
+              }
+            },
+            "observation": null,
+            "ts": 1748736420
+          }
+        ],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "BLOCKED BY PROTOCOL: contract rejected VALID on Tier 3. Resubmitted ABSTAIN.",
+          "reasons": ["TIER3_OVERRIDE"]
+        },
+        "reasoningHash": "0x34baf7e39328243b0713307ccb8c7802740df34aa0134cc6519bcb0656dc07c0",
+        "skillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd"
+      },
+      "human": {
+        "traceVersion": "1.0",
+        "agentId": "human",
+        "claimId": "D",
+        "steps": [],
+        "final": {
+          "decision": "ABSTAIN",
+          "confidenceBps": 0,
+          "rationaleSummary": "Human attestor decision for claim D.",
+          "reasons": []
+        },
+        "reasoningHash": "0xfe220dd58a84d49fb074003968ca9d3601371293ae797690c848f2d0caafb61e"
+      }
+    }
+  }
+}

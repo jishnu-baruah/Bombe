@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { defineConfig } from "vitest/config";
 
 // Root Vitest config. Uses vitest's default include glob (**/*.{test,spec}.ts)
@@ -5,9 +6,18 @@ import { defineConfig } from "vitest/config";
 // Per-package `pnpm --filter <pkg> test` also works via each package's own
 // `vitest run` script. The formal harness (T-7xx) will add reporters/workspace
 // config when it lands in M6.
+//
+// Note: apps/web path aliases (@, @bombe-canonical) are added here so that
+// the root test:unit run can resolve them without a vitest workspace file.
 export default defineConfig({
   test: {
     include: ["packages/**/*.test.ts", "apps/**/*.test.ts"],
     testTimeout: 30_000,
+  },
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "apps/web"),
+      "@bombe-canonical": resolve(__dirname, "packages/shared/src/canonical.ts"),
+    },
   },
 });
