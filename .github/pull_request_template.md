@@ -1,10 +1,10 @@
-## T-XXX — <task title>
+## T-XXX, <task title>
 
 **Closes:** T-XXX
 **Scope:** <contracts | shared | agent-sdk | runner | web | ops | docs | ...>
 
 ### Acceptance (from TODO.md)
-- [ ] <criterion 1 — PRD §ref>
+- [ ] <criterion 1, PRD §ref>
 - [ ] <criterion 2>
 
 ### Checklist

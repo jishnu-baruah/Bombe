@@ -1,8 +1,8 @@
-# TASTE-CONTEXT — Bombe Web UI Design Context
+# TASTE-CONTEXT, Bombe Web UI Design Context
 
 ## One-line design read
 
-Redesign-preserve of an AI-attestor product — landing + live product surfaces — Revolut-style
+Redesign-preserve of an AI-attestor product, landing + live product surfaces, Revolut-style
 premium-fintech, restrained motion. Dark canvas system. Cobalt-violet as a single deliberate stamp.
 
 ---
@@ -20,8 +20,8 @@ premium-fintech, restrained motion. Dark canvas system. Cobalt-violet as a singl
 ## Base design system (DESIGN.md)
 
 - **Canvas:** `#000000` dark storytelling canvas + `#0a0a0a` section alternation + `#16181a` surface-elevated cards.
-- **Accent:** `#494fdf` cobalt-violet. Reserved for `plan-card-featured` stamp and eyebrow labels — never full page-width bands.
-- **Typography:** `Inter` (body, 400/600) — tabular-nums for data cells, tight negative letter-spacing on display sizes (`clamp` from mobile to desktop). `text-wrap: balance` on headlines, `pretty` on prose.
+- **Accent:** `#494fdf` cobalt-violet. Reserved for `plan-card-featured` stamp and eyebrow labels, never full page-width bands.
+- **Typography:** `Inter` (body, 400/600), tabular-nums for data cells, tight negative letter-spacing on display sizes (`clamp` from mobile to desktop). `text-wrap: balance` on headlines, `pretty` on prose.
 - **Buttons:** pill-shaped (`rounded-full`), 48px height, `scale-[0.98]` on active, `shadow` on hover for primary.
 - **Cards:** `rounded-[20px]`, tinted box-shadow for depth, hover-lift transitions.
 - **Radius:** none (full-bleed) → sm (8px, chips) → md (12px, inputs) → lg (20px, cards) → full (buttons/pills).
@@ -47,11 +47,11 @@ premium-fintech, restrained motion. Dark canvas system. Cobalt-violet as a singl
 
 | Level | Color | Use |
 |-------|-------|-----|
-| 0 — canvas | `#000000` | Hero, full-bleed bands, footer |
-| 1 — section | `#0a0a0a` | Alternating content bands |
-| 2 — card | `#16181a` | Feature cards, claim cards |
-| 3 — deep | `#0a0a0a` inside card | Code/chip insets within cards |
-| accent — stamp | `#494fdf` | plan-card-featured, eyebrow labels only |
+| 0, canvas | `#000000` | Hero, full-bleed bands, footer |
+| 1, section | `#0a0a0a` | Alternating content bands |
+| 2, card | `#16181a` | Feature cards, claim cards |
+| 3, deep | `#0a0a0a` inside card | Code/chip insets within cards |
+| accent, stamp | `#494fdf` | plan-card-featured, eyebrow labels only |
 
 ---
 
