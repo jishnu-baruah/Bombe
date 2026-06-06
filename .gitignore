@@ -38,3 +38,5 @@ pglite-data/
 
 # Agent worktrees (background subagents)
 .claude/worktrees/
+
+.vercel
