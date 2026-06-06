@@ -1,4 +1,4 @@
-# Bombe — Development Workflow & Task Flow (Design)
+# Bombe, Development Workflow & Task Flow (Design)
 
 **Date:** 2026-06-05
 **Status:** Approved (brainstorming)
@@ -10,7 +10,7 @@
 
 | # | Decision | Rationale |
 |---|----------|-----------|
-| D1 | **Lightweight solo workflow** — keep klink's `TODO.md` T-XXX board, branch-per-task, task-ID commits, and PR-to-main; **drop** the two-phase claim PRs, auto-merge, and stale-claim rules. | Traceable history without multi-person coordination overhead. |
+| D1 | **Lightweight solo workflow**, keep klink's `TODO.md` T-XXX board, branch-per-task, task-ID commits, and PR-to-main; **drop** the two-phase claim PRs, auto-merge, and stale-claim rules. | Traceable history without multi-person coordination overhead. |
 | D2 | **This pass = workflow + task board only.** No package scaffolding, no implementation. | Clean separation between "set up how we work" and "build the product." |
 | D3 | **GitHub remote + real PRs**, with GitHub Actions running `pnpm ci`. | Hackathon submission benefits from a self-review + CI gate on every task. |
 | D4 | **No Telegram workflow notifications.** The M7 Telegram *bot* feature remains a stretch task on the board. | "Skip the tg update of the workflow" = no TG process notifications. |
@@ -23,7 +23,7 @@ These are mirrored into `docs/DECISIONS.md` as the project's first dated entry.
 
 - `git init`, default branch `main`. (Done during brainstorming so this spec is versioned.)
 - `.gitignore` for the PRD stack: Node/pnpm, Foundry (`out`/`cache`/`broadcast`), Next.js (`.next`), `.env*` (except `.env.example`), `.test-reports/`, pglite files, mock blob dir.
-- GitHub remote: `gh repo create bombe --private --source=. --remote=origin` (operator runs `gh auth login`). Defaults: repo `bombe`, **private**, handle `klinksolana` — adjustable.
+- GitHub remote: `gh repo create bombe --private --source=. --remote=origin` (operator runs `gh auth login`). Defaults: repo `bombe`, **private**, handle `klinksolana`, adjustable.
 - `main` protected by convention: everything lands via PR; no direct pushes.
 
 ## 3. Branch / commit / PR conventions
@@ -31,14 +31,14 @@ These are mirrored into `docs/DECISIONS.md` as the project's first dated entry.
 - **Branches:** `feat/T-XXX-slug`, `fix/T-XXX-slug`, `docs/T-XXX-slug`, `chore/T-XXX-slug`.
 - **Commits:** `T-XXX: <verb> <object>` (reconciles the PRD §15 `fix:` style → `T-XXX: fix <desc>`).
 - **One task = one PR.** If a task balloons, split it and create a new T-XXX entry.
-- **PR title:** `T-XXX — <task title>`. The merge commit also flips the task to Done in `TODO.md`.
+- **PR title:** `T-XXX, <task title>`. The merge commit also flips the task to Done in `TODO.md`.
 - No `claim:`/`unclaim:`/`override:` PRs; no stale-claim rule (solo).
-- **Merge gating (D6):** both "no conflict" and "CI green" are required. On `docs/`/`chore/` PRs the agent enables GitHub auto-merge (`gh pr merge --auto --squash`) so they land themselves once green. On `feat/`/`fix/` PRs the agent opens the PR, leaves it in a mergeable state, and the operator clicks merge — so finished logic queues up for review during unattended sessions.
+- **Merge gating (D6):** both "no conflict" and "CI green" are required. On `docs/`/`chore/` PRs the agent enables GitHub auto-merge (`gh pr merge --auto --squash`) so they land themselves once green. On `feat/`/`fix/` PRs the agent opens the PR, leaves it in a mergeable state, and the operator clicks merge, so finished logic queues up for review during unattended sessions.
 
 ## 4. Claude Code context files
 
-- **`CLAUDE.md`** — operating manual, auto-loaded each session: the conventions above, the PRD §15 fix-loop, the §15.4 guardrails (never touch `.env*`, lockfile by hand, or `traceHash` values by hand; branches only; no disabling tests to go green), and how to read `.test-reports/`.
-- **`CONTEXT.md`** — locked strategic framing: the core thesis (attest only to falsifiable claims; safety lives at the contract layer; Plugboard is the external proof), the non-goals (§2), and §14 acceptance criteria as the definition of done.
+- **`CLAUDE.md`**, operating manual, auto-loaded each session: the conventions above, the PRD §15 fix-loop, the §15.4 guardrails (never touch `.env*`, lockfile by hand, or `traceHash` values by hand; branches only; no disabling tests to go green), and how to read `.test-reports/`.
+- **`CONTEXT.md`**, locked strategic framing: the core thesis (attest only to falsifiable claims; safety lives at the contract layer; Plugboard is the external proof), the non-goals (§2), and §14 acceptance criteria as the definition of done.
 
 ## 5. `docs/` structure (follows the PRD's own §5 layout)
 
@@ -52,7 +52,7 @@ docs/
   superpowers/specs/      brainstorming design docs (this file)
 ```
 
-## 6. `TODO.md` — the task board
+## 6. `TODO.md`, the task board
 
 **Area-based numbering** (klink-style):
 
@@ -71,27 +71,27 @@ docs/
 
 **Granularity:** one task ≈ one PR-sized chunk (a contract + its tests; one seam; one tool with snapshot tests; one route). Each milestone fans into ~4–10 tasks. `Depends-on` encodes milestone ordering. Board seeded with M1–M6 + M8 in full; M7 as a thin stub.
 
-**Task block format** (klink's, minus the OS field — single machine):
+**Task block format** (klink's, minus the OS field, single machine):
 
 ```
-### T-104 — AgentAttestation.attest + tier-3 revert
+### T-104, AgentAttestation.attest + tier-3 revert
 - Status: pending
 - Depends-on: T-101, T-102
 - Scope: contracts
 - Acceptance: attest() happy path + AlreadyAttested + JudgmentTierRequiresAbstain
   reverts covered; ABSTAIN locks 0; forge fmt clean. (PRD §6.2, §14.5)
-- Notes: —
+- Notes: none
 ```
 
-Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <reason or see OP-N>` / `done YYYY-MM-DD`.
+Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reason or see OP-N>` / `done YYYY-MM-DD`.
 Every Acceptance line cites the PRD section + §14 acceptance-criteria number it satisfies.
 
-## 7. `OPERATOR_TODO.md` — human-in-the-loop queue
+## 7. `OPERATOR_TODO.md`, human-in-the-loop queue
 
-Append-only file for anything the agent **cannot do without the operator**. When the agent hits a credential gap, a need-to-verify-against-a-live-service, or an owner-only decision, it logs an `OP-N` entry, sets the related task `Status: blocked — see OP-N`, and continues with other unblocked work.
+Append-only file for anything the agent **cannot do without the operator**. When the agent hits a credential gap, a need-to-verify-against-a-live-service, or an owner-only decision, it logs an `OP-N` entry, sets the related task `Status: blocked, see OP-N`, and continues with other unblocked work.
 
 ```
-## OP-3 — Live AI gateway key needed   [open]
+## OP-3, Live AI gateway key needed   [open]
 - Date: 2026-06-05
 - Blocks: T-805 (live ModelSeam wiring)
 - Need: AI_GATEWAY_KEY + FALLBACK_MODEL access (PRD §7). Mock path works without it.
@@ -109,7 +109,7 @@ Rules:
 1. **Pick** a `pending` task with all deps `done` → `in-progress`, branch `feat/T-XXX-slug`.
 2. **Build** via the §15.3 loop: `pnpm test:agent` → parse `.test-reports/*` → route failure by category → fix → re-run only the failing test. Two fails on one test → DECISIONS.md "ESCALATIONS" (or an `OP-N` if it needs the operator) → move on.
 3. **Gate:** `pnpm test:demo` must pass before marking done (once the subsystem exists).
-4. **Ship:** PR `T-XXX — title`; merge flips to Done; `pnpm ci` is the CI gate.
+4. **Ship:** PR `T-XXX, title`; merge flips to Done; `pnpm ci` is the CI gate.
 5. **Checkpoint** (§15.4): commit before each fix session; branches only.
 
 ## 9. CI skeleton
