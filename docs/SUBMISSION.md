@@ -1,54 +1,63 @@
 # Bombe: DoraHacks submission package
 
-Everything needed to submit Bombe to the Mantle Turing Test Hackathon 2026. Copy the pitch, the
+Everything needed to submit Bombe to the Mantle Turing Test Hackathon. Copy the pitch, the
 answers, and the addresses straight into the DoraHacks form.
 
 ## One-line pitch
 
-Bombe is an autonomous AI attestor network for real-world-asset claims on Mantle, where agents
-attest only to what they can falsify, stake on being right, and are slashed on-chain when wrong.
+Bombe is an autonomous AI attestor network for real-world-asset yields on Mantle: agents fetch the
+ground-truth data, the verdict is deterministic math a verifier can rerun, every decisive call is
+staked and slashable, and the contract forbids attesting anything that cannot be falsified.
 
 ## Track nomination
 
-- Primary: **AI & RWA Track** (Path A, RWA Infrastructure: AI-powered verification).
-- Also eligible: **Grand Champion**, **Best UI/UX**, **20-Project Deployment Award**, **Community Voting**.
+- Primary: AI & RWA Track (RWA Infrastructure, AI-powered verification).
+- Also eligible: Grand Champion, Best UI/UX, 20-Project Deployment Award, Community Voting.
 
 ## What it is
 
-Most attestation networks will vouch for anything, including subjective valuations no one can
-verify, and face no consequence when wrong. Bombe takes the opposite stance:
+Most yield reporting is trust-based: an issuer states a number and you take it on faith. Bombe
+replaces faith with a check that anyone can rerun.
 
-- It attests only to **falsifiable** claims. Tier 1 is deterministic on-chain or oracle math.
-  Tier 2 is checkable against referenced documents. Tier 3 is judgment, and the only allowed
-  answer is abstain.
-- **Safety lives at the contract layer.** A tier-3 claim cannot receive anything but an
-  abstention, because the contract rejects any other answer. This is not a guideline in a
-  framework, it is enforced by the chain.
-- Attestors put up a stake on every decisive call. Correct attestors earn a share of the claim
-  fee and a trust score; wrong attestors are slashed, half burned and half paid to the peers who
-  got it right.
-- An external attestor, **Plugboard**, runs on a third-party agent runtime that our team did not
-  write. It proves the safety guarantee is real and not self-graded: when Plugboard tries to
-  attest a valuation as valid, the chain reverts it.
+- **Real data, not a dashboard's word.** For mETH the yield is derived two ways from the same
+  on-chain ground truth (an aggregator computation and a from-scratch computation of the exchange
+  rate), so transport, staleness, and computation faults are caught. For USDY the source is the
+  published APY, labeled honestly as a single source with full transparency; it is never described
+  as independent and never claims to catch issuer fraud.
+- **A verdict you can rerun.** The decision is not a model's opinion. It is a deterministic
+  function: reconcile the sources within a documented tolerance, then compare to the asserted
+  value. The reconciled inputs and the output are written into the trace, and the trace is hashed
+  on-chain, so anyone can recompute the same verdict and the same hash.
+- **Redundancy over the evidence.** Several independent gatherings must agree on the evidence
+  before a verdict is issued; a split or a failed gathering abstains. With one model in the gateway
+  today this is labeled "single-model triple-run redundancy," not multi-model consensus, until
+  three genuinely different models are wired.
+- **A track record, not a screenshot.** A daily run attests both assets and records every result,
+  including periodic self-tests that assert a deliberately wrong value and are correctly rejected,
+  so the public streak visibly contains VALID, REJECTED, and ABSTAIN, proving the attestor
+  discriminates.
+- **Safety at the contract layer.** A judgment claim can only receive an abstention; the chain
+  rejects anything else. An external attestor, Plugboard, running on a third-party agent runtime,
+  proves this is real and not self-graded: when it tries to attest a valuation, the chain reverts
+  it.
 
 ## "Tell us" answers (AI & RWA track)
 
 **1. What real-world asset are we bringing on-chain?**
-Tokenized RWA yield and value claims. For example a token's reported 30-day yield (an mETH or
-USDY style figure) or a servicer cashflow statement. These are posted as Tier 1 deterministic or
-Tier 2 document-falsifiable claims and attested on-chain.
+Tokenized RWA yields on Mantle: mETH (a Mantle-native staked-ETH yield) and USDY (a tokenized
+US-Treasury yield). These are attested as deterministic or document-checkable claims; valuations
+are refused.
 
 **2. How does AI play a role?**
-Autonomous ReAct agents fetch oracle, feed, and document evidence, reason under explicit cost and
-step budgets, and post a signed attestation (valid, rejected, or abstain) on-chain. The agent's
-full reasoning trace is hashed and the hash is written on-chain, so the decision is both
-explainable and tamper-evident. On a judgment claim the agents abstain, and the contract enforces
-it.
+Autonomous agents gather the evidence (aggregator and on-chain reads), reconcile it, and the
+attestation is posted on-chain with a reasoning trace whose hash is stored on-chain. The agents
+also enforce the abstain-on-judgment rule, mirrored by the contract. The verdict itself is
+deterministic, so the AI is the gatherer and explainer, not an opaque oracle.
 
 **3. How is it realized on Mantle?**
-Four contracts are live on Mantle Sepolia (chain id 5003). An agent's inference result is written
-on-chain through the `attest()` function. The leaderboard and slashing contracts settle the
-economics on Mantle: claim fees in, stake at risk, trust scores out.
+Four contracts are live on Mantle Sepolia (chain id 5003). An attestation is written on-chain via
+`attest()`. The leaderboard and slashing contracts settle the economics: a small claim fee in,
+stake at risk on every decisive call, trust scores out.
 
 ## Live artifacts
 
@@ -56,8 +65,8 @@ economics on Mantle: claim fees in, stake at risk, trust scores out.
 - **Explorer:** https://sepolia.mantlescan.xyz
 - **Network:** Mantle Sepolia, chain id 5003
 - **Open-source repo:** https://github.com/jishnu-baruah/Bombe
-- **Integration guide:** docs/INTEGRATION.md
-- **Model accuracy benchmarks:** docs/BENCHMARKS.md (free model reaches 83 percent majority match; the scripted safety path is fully deterministic)
+- **Read an attestation in minutes:** the consumer quickstart at the top of the README, and docs/INTEGRATION.md
+- **Honest readiness assessment:** docs/MARKET-READINESS.md
 
 ### Deployed contracts (Mantle Sepolia, chain id 5003)
 
@@ -68,52 +77,55 @@ economics on Mantle: claim fees in, stake at risk, trust scores out.
 | AgentSlashing | `0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864` |
 | TuringLeaderboard | `0xE5A157c349A6540C300D6CEcbe391A81EEEec018` |
 
-Explorer address pages follow the pattern `https://sepolia.mantlescan.xyz/address/<address>`.
+Explorer address pages follow `https://sepolia.mantlescan.xyz/address/<address>`.
 
-### Live AI attestation proof
+### On-chain proof
 
-A real agent decision written on-chain, with the reasoning hash matching the published trace.
+An earlier on-chain attestation already proves "AI inference to on-chain attestation with a matching
+reasoning hash":
 
 | Field | Value |
 |-------|-------|
-| Claim | a tier-1 mETH 30-day yield claim |
-| Agent and model | Reflector, gpt-oss:20b via Ollama Cloud |
-| postClaim tx | `0x608eb32ca56dba54989b9dec4bc83de266fc791a273d441f2acdcdd91302d369` |
 | attest tx | `0xa20c3362062ffdfbd20179c3229ba08339f577e421b710bf60076ae63d7ada4d` |
 | on-chain reasoningHash | `0x156a5ff50cb214ea37b8feca78326b3c4f8499ee4ed82b70a64d12391d2fc4b4` |
 | locally recomputed hash | matches the on-chain value |
 
-Transaction pages follow `https://sepolia.mantlescan.xyz/tx/<hash>`.
+The v2 real-data headline transaction (a deterministic, cross-checked mETH attestation) is **pending
+the operator key setup**; the full pipeline that produces it runs end-to-end today in mock with a
+matching, recomputable hash, so capturing the live transaction is a key-and-go step.
 
 ## How it works (architecture brief)
 
 - **Contracts (Solidity, Foundry):** a registry of bonded attestors, the attestation contract
-  (claim posting, attesting, the tier-3 abstain rule), a leaderboard (trust scores, fee
-  distribution), and slashing with disputes. Covered by a deep test and fuzz suite.
-- **Agent SDK (TypeScript):** a ReAct loop with hard safety rules, a deterministic tool router,
-  cost and step budgets, model failover, and seams that swap between live and mock for testing.
-  Three reference agents with distinct temperaments plus the external Plugboard attestor.
-- **Web app (Next.js):** a live race view, a leaderboard, a per-claim trace viewer with a
-  verify-hash button, an operator console, and the issuer and integration pages.
+  (claim posting, attesting, and the judgment-tier abstain rule enforced in Solidity), a
+  leaderboard (trust scores, fee distribution), and slashing with disputes. Covered by a deep test
+  and fuzz suite.
+- **Agent SDK (TypeScript):** a live data layer that fetches and cross-checks evidence, a pure
+  deterministic reconciler that issues the verdict, an evidence-consensus layer, and the attestation
+  builder that hashes the trace and writes it on-chain. Seams keep every test deterministic.
+- **Web app (Next.js):** a live race view, a leaderboard, a per-claim trace viewer with a verify
+  button, an operator console, and the issuer and integration pages.
 
 ## Differentiator in one screen
 
-On the live page, watch the agents converge on a deterministic claim, split on a borderline one,
-reject a document mismatch, and abstain on a valuation. Then watch the external Plugboard agent
-try to attest the valuation as valid and get reverted by the contract: blocked by protocol, not
-by our code.
+Watch the agents converge on a deterministic claim, reject a self-test that asserts a wrong number,
+abstain when the evidence splits, and then watch the external Plugboard agent try to attest a
+valuation and get reverted by the contract: blocked by protocol, not by our code.
 
 ## Submission checklist
 
 Done:
-- Contracts deployed on Mantle Sepolia and recorded.
-- A live, on-chain, AI-driven attestation captured with a matching reasoning hash.
-- Public frontend live, wired to the live contracts.
-- Open-source repo with a README, setup, architecture, and deployed addresses.
-- Issuer page, integration guide, and accuracy benchmarks published.
+- Four contracts live on Mantle Sepolia and recorded.
+- The full decisive pipeline (fetch, cross-check, deterministic verdict, hashable trace, attestation
+  build) runs end-to-end with a matching recomputable hash.
+- A daily run script that records a public streak with self-test rejections.
+- Public frontend live, with a copy-paste consumer quickstart in the README.
+- Open-source repo, integration guide, benchmarks, and an honest readiness assessment.
 
-Operator to complete before hitting submit:
-- Verify the four contracts on the Mantle explorer (needs a Mantlescan API key).
-- Record the demo video, at least two minutes, walking the core flow.
-- Confirm the submission deadline and the voting window, then submit on DoraHacks with the pitch,
-  the answers, and the addresses above.
+Operator to complete before submit:
+- Set up the posting and attestor keys and add them as repo secrets, then let the daily run capture
+  the live, real-data headline transaction and start the public streak.
+- Verify the four contracts on the Mantle explorer.
+- Record the demo video (see docs/DEMO-SCRIPT.md) and post the X thread (see docs/X-THREAD.md).
+- Confirm the deadline and timezone, then submit the BUIDL on DoraHacks with the pitch, answers, and
+  addresses above.
