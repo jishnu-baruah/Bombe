@@ -2,6 +2,10 @@
 
 The file is the board; every status change is a visible commit.
 
+> **Hackathon submission gates live in `## T-Jxx` (bottom of this file).** They layer the Mantle
+> Turing Test Hackathon judging/award requirements on top of the PRD milestones. Full rubric and
+> requirement→task map: [`HACKATHON.md`](HACKATHON.md). **Mandate: ship live on-chain, not a mock.**
+
 ## Status legend
 
 - `pending` — not started; deps may or may not be met.
@@ -341,25 +345,25 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-402 — indexer
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-401, T-109
 - Scope: indexer
 - Acceptance: subscribe (mock EventEmitter / live viem), idempotent upsert on (txHash,logIndex). (PRD §6.5)
-- Notes: —
+- Notes: apps/indexer; startIndexer(bus,db); idempotent on idx:txHash:logIndex; 5/5 tests pass.
 
 ### T-403 — runner
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-213, T-401
 - Scope: runner
 - Acceptance: subscribes `ClaimPosted`, runs 3 SDK agents via `Promise.allSettled` w/ 15s timeout; failures isolated; every failure → `errors` row + structured event. (PRD §4, §6.3.1)
-- Notes: —
+- Notes: apps/runner; runClaim via Promise.allSettled; HangingModelSeam+agentTimeoutMs for failure isolation; 2/2 runner tests pass.
 
 ### T-404 — human queue seam
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-403
 - Scope: runner
 - Acceptance: simulated human attestor; `human-queue` SSE w/ sampled wait; submits `human-decisions.json` via standard `attest()`. (PRD §6.9)
-- Notes: —
+- Notes: apps/runner/src/human-queue.ts; seeded LCG wait; forceElapse for tests; 3/3 human-queue tests pass.
 
 ### T-405 — tool-gateway
 - Status: done 2026-06-06
@@ -585,3 +589,62 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Scope: stretch
 - Acceptance: blind human-vs-AI `/turing` mode. (PRD §6.6, §11 M7)
 - Notes: STRETCH — never gates acceptance.
+
+---
+
+## T-Jxx — Hackathon submission & judging gates
+
+> These are **submission gates**, not PRD milestones — they encode the Mantle Turing Test Hackathon
+> award/judging requirements (see [`HACKATHON.md`](HACKATHON.md)). **Operator mandate: the demo the
+> judges click runs in `MODE=live` against real Mantle with real on-chain txs. Mock/Plugboard-replay
+> is the offline fallback only (T-504), never the submission path.** The 20-Project Deployment Award
+> is first-come-first-served (20 spots) — treat T-J01→T-J05 as time-critical.
+
+### T-J01 — Live Mantle Sepolia deployment + canonical addresses
+- Status: pending
+- Depends-on: T-804, T-802
+- Scope: ops
+- Acceptance: run `pnpm deploy:testnet` against Mantle Sepolia (5003) with real `RPC_URL`/`DEPLOYER_KEY`; all 4 contracts deployed and wired with roles per D14; record the 4 addresses + deploy tx hashes in `docs/DEPLOYMENTS.md` and the README address block. (Deployment Award §Technical; PRD §7, §14.9)
+- Notes: **OP:** RPC_URL + DEPLOYER_KEY + AGENT_KEYS + PLUGBOARD_WALLET_KEY + HUMAN_WALLET_KEY. Blocks → open an OP-N if creds missing. Builds on T-804.
+
+### T-J02 — Verify all 4 contracts on Mantle Explorer
+- Status: pending
+- Depends-on: T-J01
+- Scope: ops
+- Acceptance: `forge verify-contract` (or explorer flow) succeeds for AgentRegistry, AgentAttestation, TuringLeaderboard, AgentSlashing on the Mantle Sepolia explorer; verified source visible; verified URLs recorded in `docs/DEPLOYMENTS.md`. (Deployment Award §Technical: "verified on Mantle Explorer"; Grand Champion: Mantle Ecosystem Contribution)
+- Notes: needs the explorer API key/verifier URL for Mantle Sepolia — capture in `.env.example` if a new var is required; OP-N if blocked.
+
+### T-J03 — Prove an AI function is callable on-chain (live attest tx)
+- Status: pending
+- Depends-on: T-J01, T-403, T-802
+- Scope: runner
+- Acceptance: a scripted live run where an SDK agent's inference result is written on-chain via `attest()` on Mantle Sepolia; capture the resulting tx hash + explorer link; assert the on-chain `ClaimPosted`/attestation records match the agent trace. (Deployment Award §Technical: "AI-powered function callable on-chain")
+- Notes: this is the headline proof for the AI×on-chain criterion. Must be a real tx, not a mock EventEmitter.
+
+### T-J04 — Public, live-wired frontend deployment (not localhost)
+- Status: pending
+- Depends-on: T-608, T-803, T-J01
+- Scope: web
+- Acceptance: web app deployed to a public host (Vercel) wired to live Mantle (T-J01 addresses) + live DB (T-803); public URL loads `/`, `/live`, `/leaderboard`, `/claim/[id]` with no localhost dependency; `MODE=live`. URL recorded in README + HACKATHON.md §8. (Deployment Award §Product; Best UI/UX: runnable frontend)
+- Notes: **OP:** hosting account + production env vars (DATABASE_URL, RPC_URL, BLOB_RW_TOKEN, OPERATOR_KEY, TOOL_GATEWAY_KEY). Plugboard-replay badge stays as offline fallback per T-504.
+
+### T-J05 — Demo video (≥ 2 min) of the live core use case
+- Status: pending
+- Depends-on: T-J04, T-806
+- Scope: docs
+- Acceptance: ≥2-minute screen recording walking the A→D claim flow on the **live** deployment (post claim → 4 attestors → on-chain settlement → verify-hash), narrated to be clear to non-technical viewers; public link recorded in HACKATHON.md §8. (Deployment Award §Product; Best UI/UX; Community Voting)
+- Notes: follows the exact click-path documented in T-806/`docs/DEMO.md`.
+
+### T-J06 — DoraHacks submission package
+- Status: pending
+- Depends-on: T-J01, T-J02, T-J03, T-J04, T-J05, T-805
+- Scope: docs
+- Acceptance: DoraHacks submission filled — track nomination (AI & RWA + Grand Champion eligibility), one-line pitch, the three "Tell us" answers (RWA type / AI role / Mantle realization, HACKATHON.md §3), all 4 deployed addresses, Mantle Explorer verified links, the live attest tx hash (T-J03), public frontend URL, demo-video link, open-source repo URL. Final submission checklist (HACKATHON.md §8) fully checked. (Grand Champion + AI & RWA requirements)
+- Notes: **OP:** the actual submit action + confirming the deadline are operator-owned.
+
+### T-J07 — Community Voting asset (X thread + shareable demo)
+- Status: pending
+- Depends-on: T-J05
+- Scope: stretch
+- Acceptance: a shareable X thread linking the demo video + public URL, framing the pain point and the falsifiable-attestation thesis for a general audience. (Community Voting)
+- Notes: STRETCH — never gates acceptance; maximizes the auto-eligible Community Voting prize.
