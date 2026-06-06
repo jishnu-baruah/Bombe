@@ -7,7 +7,35 @@ Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sep
 - Hackathon submission: [HACKATHON.md](HACKATHON.md) · Live deployment: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md)
 - For issuers: [/issuers](https://bombe-web.vercel.app/issuers) · Integration guide: [docs/INTEGRATION.md](docs/INTEGRATION.md)
 - Model accuracy benchmarks: [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
+- Honest readiness assessment: [docs/MARKET-READINESS.md](docs/MARKET-READINESS.md)
 - **Live site:** https://bombe-web.vercel.app · **Explorer:** https://sepolia.mantlescan.xyz
+
+---
+
+## Read an attestation (consumer quickstart)
+
+Consuming a verdict is a few read calls against one contract on Mantle Sepolia. No keys, no infra.
+
+```solidity
+// AgentAttestation: 0xf2473a0a55D997233C8fBF987c197e7d2180470A  (decision: 0 VALID, 1 REJECTED, 2 ABSTAIN)
+interface IAgentAttestation {
+    function getClaimAttestors(bytes32 claimId) external view returns (address[] memory);
+    function getAttestation(bytes32 claimId, address attestor) external view returns (
+        bool exists, uint8 decision, uint16 confidenceBps,
+        bytes32 sourcesHash, bytes32 reasoningHash, string memory traceURI, uint256 lockedStake);
+}
+```
+
+```ts
+import { createPublicClient, http } from "viem"; // abi: see docs/INTEGRATION.md or `pnpm gen:abis`
+const client = createPublicClient({ transport: http("https://rpc.sepolia.mantle.xyz") });
+const ATT = "0xf2473a0a55D997233C8fBF987c197e7d2180470A";
+const who = await client.readContract({ address: ATT, abi, functionName: "getClaimAttestors", args: [claimId] });
+const a = await client.readContract({ address: ATT, abi, functionName: "getAttestation", args: [claimId, who[0]] });
+// a.decision -> 0 VALID | 1 REJECTED | 2 ABSTAIN ; re-derive a.reasoningHash from the published trace to verify
+```
+
+Full guide: [docs/INTEGRATION.md](docs/INTEGRATION.md). Where the project honestly stands today: [docs/MARKET-READINESS.md](docs/MARKET-READINESS.md).
 
 ---
 
@@ -85,7 +113,7 @@ forge test --root contracts
 pnpm test:contracts:deep
 ```
 
-`pnpm demo` runs the scripted end-to-end demo. `pnpm deploy:testnet` is a stub pending the deploy script.
+`pnpm demo` runs the scripted end-to-end demo. The contracts are live on Mantle Sepolia (see [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md)). **Mainnet deployment: July 2026, after the public Sepolia streak validates the loop** (`contracts/script/DeployMainnet.s.sol` is compile-only and is never run in this phase; an empty mainnet registry would be signaling theater, so we do not deploy one).
 
 ---
 
