@@ -26,6 +26,12 @@ export interface ModelRequest {
   messages: ModelMessage[];
   /** Max tokens to generate. */
   maxTokens: number;
+  /**
+   * Sampling temperature (0.0 – 2.0). Lower values produce more deterministic
+   * tool-calling JSON. Optional — if omitted the model's default is used.
+   * Set to 0.1–0.2 for steady structured output from free models.
+   */
+  temperature?: number;
 }
 
 /** Response from a language model. */

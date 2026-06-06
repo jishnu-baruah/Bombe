@@ -821,9 +821,12 @@ function buildSystemPrompt(agentId: string, claim: Claim, temperament: Temperame
     `Claim type: ${claim.claimType} (Tier ${tier.toString()}).`,
     `Available tools: [${toolList}].`,
     `Confidence threshold: ${temperament.thresholdBps.toString()} bps (0–10000 scale).`,
-    `Max steps: ${temperament.maxSteps.toString()}.`,
+    `Step budget: ${temperament.maxSteps.toString()} steps total (including this finalize step).`,
     "",
     "CRITICAL: Respond with ONLY one JSON object per turn — no prose, no markdown, no explanation outside the JSON. Non-JSON text wastes a step and will be rejected.",
+    "",
+    // T-017 budget nudge: tell the model to finalize early and avoid re-calling tools.
+    `BUDGET RULE: You have at most ${temperament.maxSteps.toString()} steps. As soon as you have sufficient evidence, output a finalize action — do NOT call a tool you have already called. Unused steps are wasted budget; repeated tool calls with the same arguments produce the same result and waste your budget, causing ABSTAIN.`,
     "",
     "Mandatory JSON schema every turn:",
     '  Tool call:  {"thought": "<reasoning>", "action": {"tool": "<tool_name>", "input": <input_object>}}',
@@ -849,12 +852,13 @@ function buildUserPrompt(claim: Claim): string {
       "GUIDANCE (Tier 1): Use the numeric oracle tools (fetch_meth_yield, fetch_usdy_yield, " +
       "fetch_chainlink_price, query_chain_state) to retrieve the observed value, then call " +
       "compute_expected with {observedBps, expectedBps} to check the ±2 bps tolerance. " +
-      "Finalize based on withinTolerance.";
+      "Finalize based on withinTolerance. Typical path: 1 fetch + 1 compute + 1 finalize = 3 steps.";
   } else if (tier === 2) {
     guidance =
       "GUIDANCE (Tier 2): Call read_document first (with {docRef, version}) to read each " +
       "relevant document, then use compute_expected to compare numeric fields. " +
-      "Finalize REJECTED if the delta exceeds tolerance, VALID if within tolerance.";
+      "Finalize REJECTED if the delta exceeds tolerance, VALID if within tolerance. " +
+      "Typical path: read_document × 2 + compute_expected + finalize = 4 steps. Finalize as soon as you have the evidence.";
   } else {
     guidance =
       "GUIDANCE (Tier 3): This is a FAIR_VALUE (Tier 3) claim. No tools are available. " +
