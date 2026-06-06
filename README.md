@@ -16,14 +16,14 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 62 | 0 | 0 | 12 | 74 | 84% |
+| 63 | 0 | 0 | 12 | 75 | 84% |
 
 ### Per-Range Breakdown
 
 | Range | Area | Done | Total |
 |-------|------|------|-------|
 | T-0xx | Ops | 14 | 14 |
-| T-1xx | Contracts (M1) | 9 | 9 |
+| T-1xx | Contracts (M1) | 10 | 10 |
 | T-2xx | shared + agent-sdk (M2) | 14 | 14 |
 | T-3xx | reference agents (M2/M4) | 4 | 4 |
 | T-4xx | runner + indexer + gateway + DB (M3) | 6 | 6 |

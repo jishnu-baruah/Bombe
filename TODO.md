@@ -213,6 +213,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: env-driven `epochSeconds`/`disputeWindowSeconds` (demo 300/60), deploys all four contracts wired with roles; anvil deploy succeeds. (PRD §6.2)
 - Notes: contracts/script/Deploy.s.sol; dry-run `forge script script/Deploy.s.sol` logs all 4 addresses and runs successfully; D14 in DECISIONS.md documents canonical role topology. M1 complete: 4 contracts + 71 tests (incl. fuzz) all pass.
 
+### T-016 — CLAIM_FEE reward model + 0-100 trust score
+- Status: done 2026-06-06
+- Depends-on: T-106, T-105
+- Scope: contracts
+- Acceptance: `CLAIM_FEE=0.01e` required on `postClaim`; `seizeClaimFee` role-gated to SETTLER_ROLE; `settleTier1` distributes fee pro-rata to correct attestors via `AgentSlashing.creditClaimable`; integer remainder + zero-correct-case burned via `burnFee`; `ClaimFeeDistributed` event; `trustScore(address)` view (accuracy 0-70 + experience 0-30, cap 100); conservation fuzz `testFuzz_FeeConservation`; all test callers updated to send `CLAIM_FEE`. (PRD §6.2, §9)
+- Notes: AgentAttestation: CLAIM_FEE constant, payable postClaim, seizeClaimFee, ClaimFeeSeized event, IncorrectClaimFee/NoClaimFeeToSeize/ClaimFeeTransferFailed errors. AgentSlashing: burnFee() LEADERBOARD_ROLE-gated. TuringLeaderboard: _distributeClaimFee, trustScore, TRUST_SCORE_EXP_CAP=15. 5 new tests in FeeAndTrustScore.t.sol; 77 total forge tests pass. ABI regenerated.
+
 ---
 
 ## T-2xx — shared + agent-sdk (M2)
@@ -624,7 +631,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 > is first-come-first-served (20 spots) — treat T-J01→T-J05 as time-critical.
 
 ### T-J01 — Live Mantle Sepolia deployment + canonical addresses
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-804, T-802
 - Scope: ops
 - Acceptance: run `pnpm deploy:testnet` against Mantle Sepolia (5003) with real `RPC_URL`/`DEPLOYER_KEY`; all 4 contracts deployed and wired with roles per D14; record the 4 addresses + deploy tx hashes in `docs/DEPLOYMENTS.md` and the README address block. (Deployment Award §Technical; PRD §7, §14.9)

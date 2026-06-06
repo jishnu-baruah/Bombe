@@ -26,6 +26,7 @@ contract DisputesTest is Test {
 
     uint256 internal constant MIN_BOND = 0.1 ether;
     uint256 internal constant ATTEST_LOCK = 0.02 ether;
+    uint256 internal constant CLAIM_FEE = 0.01 ether;
     uint256 internal constant DISPUTE_BOND = 0.05 ether;
     uint256 internal constant DISPUTE_WINDOW = 60; // demo value
     uint256 internal constant EPOCH_SECONDS = 300;
@@ -104,6 +105,9 @@ contract DisputesTest is Test {
 
         vm.prank(peer);
         registry.registerAgent{ value: MIN_BOND }(META_URI); // bond = 0.1 ether
+
+        // Fund operator for CLAIM_FEE payments.
+        vm.deal(operator, 10 ether);
     }
 
     // -------------------------------------------------------------------------
@@ -113,7 +117,7 @@ contract DisputesTest is Test {
     /// @dev Post a tier-2 claim; returns immediately after posting (not yet closed).
     function _postClaim() internal {
         vm.prank(operator);
-        attestation.postClaim(CLAIM_ID, 2, CLAIM_HASH, "ipfs://QmClaim");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID, 2, CLAIM_HASH, "ipfs://QmClaim");
     }
 
     function _closeClaim() internal {

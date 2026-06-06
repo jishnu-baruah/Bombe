@@ -74,6 +74,7 @@ const ANVIL_RPC = "http://127.0.0.1:8545";
 const ANVIL_CHAIN_ID = 31337;
 
 const ATTEST_LOCK = parseEther("0.02");
+const CLAIM_FEE = parseEther("0.01");
 const MIN_BOND = parseEther("0.1");
 
 const ANVIL_KEYS = {
@@ -262,7 +263,7 @@ async function postClaimOnChain(
     account,
     to: attestationAddr,
     data,
-    value: 0n,
+    value: CLAIM_FEE,
     chain: anvilChain(),
   });
   await publicClient.waitForTransactionReceipt({ hash });

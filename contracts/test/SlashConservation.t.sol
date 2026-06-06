@@ -33,6 +33,7 @@ contract SlashConservationTest is Test {
 
     uint256 internal constant MIN_BOND = 0.1 ether;
     uint256 internal constant ATTEST_LOCK = 0.02 ether;
+    uint256 internal constant CLAIM_FEE = 0.01 ether;
     uint256 internal constant EPOCH_SECONDS = 300;
 
     string internal constant META_URI = "ipfs://QmConservationMeta";
@@ -61,6 +62,7 @@ contract SlashConservationTest is Test {
     function setUp() public {
         admin = makeAddr("admin");
         operator = makeAddr("operator");
+        vm.deal(operator, 100 ether); // fund for CLAIM_FEE payments
 
         registry = new AgentRegistry(admin);
         attestation = new AgentAttestation(address(registry), admin, operator);
@@ -127,7 +129,7 @@ contract SlashConservationTest is Test {
         // ---- post claim ----
         bytes32 claimId = keccak256(abi.encodePacked("fuzz-claim", bond, attestorCount));
         vm.prank(operator);
-        attestation.postClaim(claimId, 1, CLAIM_HASH, "ipfs://QmFuzzClaim");
+        attestation.postClaim{ value: CLAIM_FEE }(claimId, 1, CLAIM_HASH, "ipfs://QmFuzzClaim");
 
         // ---- correct attestors attest VALID (ground truth) ----
         for (uint256 i = 0; i < n; i++) {
@@ -163,33 +165,33 @@ contract SlashConservationTest is Test {
         uint256 burnAfter = slashing.totalBurned();
         uint256 burnDelta = burnAfter - burnBefore;
 
-        // redistributedDelta = sum of (claimable_after - claimable_before - ATTEST_LOCK) for each correct attestor
-        // Explanation: each correct attestor's claimable = their own released ATTEST_LOCK + their redistribution share.
-        // We subtract ATTEST_LOCK to isolate the redistribution portion.
-        uint256 redistributedDelta;
+        // totalDelta = sum of (claimable_after - claimable_before - ATTEST_LOCK) for each correct attestor.
+        // Each correct attestor's claimable = own released ATTEST_LOCK + slash redistribution share + fee share.
+        // We subtract ATTEST_LOCK to isolate the over-stake portion (slash redistribution + fee).
+        uint256 totalDelta;
         for (uint256 i = 0; i < n; i++) {
             uint256 claimableAfter = slashing.pendingWithdrawal(agents[i]);
             uint256 increase = claimableAfter - claimableBefore[i];
-            // increase = ATTEST_LOCK (own released) + redistribution share
-            // redistribution share = increase - ATTEST_LOCK
+            // increase = ATTEST_LOCK (own released) + slash redistribution share + fee share
             assertGe(increase, ATTEST_LOCK, "correct attestor claimable must include own stake");
-            redistributedDelta += increase - ATTEST_LOCK;
+            totalDelta += increase - ATTEST_LOCK;
         }
 
-        // ---- conservation invariant ----
-        // The seized amount from the wrong attestor is exactly ATTEST_LOCK (0.02e).
-        // That ETH must be fully accounted for: burned or redistributed.
+        // ---- conservation invariant (slash + fee combined) ----
+        // The total ETH entering the slash+fee system:
+        //   - ATTEST_LOCK seized from the wrong attestor
+        //   - CLAIM_FEE seized from the claim
+        // All of it must be accounted for: burned or distributed.
         assertEq(
-            burnDelta + redistributedDelta,
-            ATTEST_LOCK,
-            "conservation: burnDelta + redistributedDelta == ATTEST_LOCK (seized)"
+            burnDelta + totalDelta,
+            ATTEST_LOCK + CLAIM_FEE,
+            "conservation: burnDelta + totalDelta == ATTEST_LOCK + CLAIM_FEE"
         );
 
         // ---- secondary invariant: slashing contract balance integrity ----
         // After settlement the slashing contract holds:
         //   - all burned ETH (totalBurned, never credited to anyone)
-        //   - all claimable balances (correct attestors' own stake + redistribution shares)
-        // Sum of all claimable for all agents that participated:
+        //   - all claimable balances (correct attestors' own stake + redistribution + fee shares)
         uint256 claimableTotal;
         for (uint256 i = 0; i < n; i++) {
             claimableTotal += slashing.pendingWithdrawal(agents[i]);
