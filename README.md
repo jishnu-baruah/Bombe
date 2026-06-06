@@ -16,7 +16,7 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 57 | 0 | 0 | 17 | 74 | 77% |
+| 59 | 0 | 0 | 15 | 74 | 80% |
 
 ### Per-Range Breakdown
 
@@ -28,7 +28,7 @@ _Generated: 2026-06-06_
 | T-3xx | reference agents (M2/M4) | 4 | 4 |
 | T-4xx | runner + indexer + gateway + DB (M3) | 5 | 6 |
 | T-5xx | Plugboard mock path (M4) | 5 | 5 |
-| T-6xx | web app (M5) | 4 | 8 |
+| T-6xx | web app (M5) | 6 | 8 |
 | T-7xx | autonomous testing (M6) | 2 | 4 |
 | T-8xx | live seams + ship (M8) | 0 | 7 |
 | T-9xx | STRETCH (M7) | 0 | 3 |
@@ -36,7 +36,7 @@ _Generated: 2026-06-06_
 ### Test Counts
 
 - 71 forge tests
-- 545 vitest tests
+- 601 vitest tests
 
 ### Operator TODO
 

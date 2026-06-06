@@ -472,18 +472,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-606 — /operator + operator API
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601
 - Scope: web
 - Acceptance: all endpoints (seed-claim/advance/settle/register-agent/human-attest/freeze-plugboard) gated by `x-operator-key`; "Attest as Human" form. (PRD §6.6, §9, §14.8)
-- Notes: —
+- Notes: 7 API routes (seed-claim/advance/settle/register-agent/human-attest/freeze-plugboard/unfreeze-plugboard), all gated by x-operator-key header; pure-TS schema validation (no zod dep); mock operator state; /operator page with key-entry gate + all 6 forms incl. "Attest as Human"; 29 unit tests pass.
 
 ### T-607 — /operator/health
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-606
 - Scope: web
 - Acceptance: reads `.test-reports/` summaries, model latency/error/failover counts, demo readiness, mode, Plugboard status. (PRD §6.6, §10)
-- Notes: —
+- Notes: server component reads .test-reports/ (falls back to stubs when absent); pure health-summary derivation module with 27 unit tests; stub agent stats for mock mode; Plugboard status (replaying/frozen/online/offline).
 
 ### T-608 — responsive ≤380px
 - Status: pending
