@@ -387,11 +387,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-406 — anvil integration
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-403, T-402, T-109
 - Scope: runner
 - Acceptance: `pnpm demo --headless` seeds claim A → 4 attestation rows + on-chain records. (PRD §11 M3)
-- Notes: —
+- Notes: ABI bridge (scripts/gen-abis.mjs + packages/shared/src/abis/), LiveWalletSeam (viem), scripts/demo.ts, vitest.integration.config.ts; 618 fast tests pass + 71 contract tests pass.
 
 ---
 

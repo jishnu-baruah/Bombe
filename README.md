@@ -35,8 +35,8 @@ _Generated: 2026-06-06_
 
 ### Test Counts
 
-- 71 forge tests
-- 601 vitest tests
+- forge tests: run `pnpm run ci` for live count
+- vitest tests: run `pnpm run ci` for live count
 
 ### Operator TODO
 

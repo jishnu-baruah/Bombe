@@ -233,9 +233,30 @@ importers:
 
   scripts:
     dependencies:
+      '@bombe/agent-reference':
+        specifier: workspace:*
+        version: link:../packages/agent-reference
+      '@bombe/agent-sdk':
+        specifier: workspace:*
+        version: link:../packages/agent-sdk
+      '@bombe/db':
+        specifier: workspace:*
+        version: link:../packages/db
+      '@bombe/indexer':
+        specifier: workspace:*
+        version: link:../apps/indexer
+      '@bombe/runner':
+        specifier: workspace:*
+        version: link:../apps/runner
       '@bombe/shared':
         specifier: workspace:*
         version: link:../packages/shared
+      drizzle-orm:
+        specifier: ^0.38.4
+        version: 0.38.4(@electric-sql/pglite@0.2.17)(@types/react@19.2.17)(react@19.2.7)
+      viem:
+        specifier: ^2.52.2
+        version: 2.52.2(typescript@5.9.3)(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^25.9.1

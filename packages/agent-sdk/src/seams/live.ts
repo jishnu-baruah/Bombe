@@ -1,14 +1,30 @@
 /**
- * seams/live.ts — Live seam skeleton implementations. (PRD §6.3)
+ * seams/live.ts — Live seam implementations. (PRD §6.3, T-406)
  *
- * These compile and typecheck but throw "not implemented" for live network methods.
- * Real network behavior is implemented in T-801 (ModelSeam), T-802 (Blob + Wallet).
+ * LiveWalletSeam is fully implemented here using viem:
+ *   - address()      derives the checksummed address from the private key account
+ *   - signAndSend()  sends a real transaction via viem WalletClient + returns the
+ *                    real on-chain { txHash, status } from the mined receipt.
  *
- * IMPORTANT: No process.env reads here — all config comes via getConfig() from
- * packages/agent-sdk/src/config.ts (the single env-reading module, PRD §15.4).
+ * Config comes exclusively from the SDK config module (PRD §15.4 guardrail —
+ * no direct process.env reads in this file).
+ *
+ * LiveModelSeam and LiveBlobSeam are skeleton stubs (T-801 / T-802).
+ * LiveClockSeam is fully implemented (Date.now()).
+ * LiveHumanQueueSeam is a skeleton stub (T-404).
  */
 
 import type { Claim } from "@bombe/shared";
+import {
+  http,
+  type Chain,
+  type PublicClient,
+  type WalletClient,
+  createPublicClient,
+  createWalletClient,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { mantle, mantleSepoliaTestnet } from "viem/chains";
 import type { Config } from "../config.js";
 import type {
   BlobSeam,
@@ -23,15 +39,12 @@ import type {
 } from "./types.js";
 
 // ---------------------------------------------------------------------------
-// LiveModelSeam
-// live: implemented in T-801
+// LiveModelSeam — skeleton (T-801)
 // ---------------------------------------------------------------------------
 
 /**
  * LiveModelSeam — skeleton for live AI-gateway model calls.
- *
- * In T-801: will POST to AI_GATEWAY_KEY endpoint with model/messages/maxTokens,
- * parse response, and return ModelResponse.
+ * Implemented in T-801.
  */
 export class LiveModelSeam implements ModelSeam {
   async complete(_req: ModelRequest): Promise<ModelResponse> {
@@ -41,15 +54,12 @@ export class LiveModelSeam implements ModelSeam {
 }
 
 // ---------------------------------------------------------------------------
-// LiveBlobSeam
-// live: implemented in T-802
+// LiveBlobSeam — skeleton (T-802)
 // ---------------------------------------------------------------------------
 
 /**
- * LiveBlobSeam — skeleton for live blob storage (PUT to object store).
- *
- * In T-802: will use BLOB_RW_TOKEN to upload body to a blob store and
- * return the resulting public URL.
+ * LiveBlobSeam — skeleton for live blob storage.
+ * Implemented in T-802.
  */
 export class LiveBlobSeam implements BlobSeam {
   async put(_key: string, _body: string): Promise<{ url: string }> {
@@ -59,44 +69,119 @@ export class LiveBlobSeam implements BlobSeam {
 }
 
 // ---------------------------------------------------------------------------
-// LiveWalletSeam
-// live: implemented in T-802
+// Internal helpers
 // ---------------------------------------------------------------------------
 
 /**
- * LiveWalletSeam — skeleton for live viem WalletClient.
+ * chainFromId — map a chainId to a viem Chain object.
  *
- * In T-802: will create a viem WalletClient from DEPLOYER_KEY (or AGENT_KEYS),
- * connected to RPC_URL on chainId 5003 (Mantle Sepolia).
+ * Supports Mantle Sepolia (5003) and Mantle mainnet (5000).
+ * For any other chainId (e.g. local anvil 31337) we fabricate a minimal Chain
+ * descriptor so viem operates without requiring a chain registry entry.
+ */
+function chainFromId(chainId: number): Chain {
+  if (chainId === 5003) return mantleSepoliaTestnet;
+  if (chainId === 5000) return mantle;
+  // Anvil / custom: minimal descriptor accepted by all viem operations.
+  return {
+    id: chainId,
+    name: `chain-${chainId}`,
+    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+    rpcUrls: {
+      default: { http: [] },
+    },
+  } satisfies Chain;
+}
+
+// ---------------------------------------------------------------------------
+// LiveWalletSeam — fully implemented (T-406)
+// ---------------------------------------------------------------------------
+
+/**
+ * LiveWalletSeam — live viem WalletClient.
+ *
+ * Derives a viem account from a 32-byte hex private key, creates a
+ * WalletClient + PublicClient connected to rpcUrl, and submits real
+ * transactions.  Used for BOTH local anvil and live Mantle Sepolia —
+ * callers swap rpcUrl + deployerKey to change the target network.
+ *
+ * No direct process.env reads — all config injected via constructor
+ * (PRD §15.4 guardrail).
  */
 export class LiveWalletSeam implements WalletSeam {
-  private readonly _address: `0x${string}`;
+  private readonly walletClient: WalletClient;
+  private readonly publicClient: PublicClient;
+  private readonly account: ReturnType<typeof privateKeyToAccount>;
 
-  // live: implemented in T-802
-  constructor(_config: Pick<Config, "rpcUrl" | "chainId" | "deployerKey">) {
-    // Placeholder: real address derived from deployerKey in T-802.
-    this._address = "0x0000000000000000000000000000000000000001";
+  constructor(
+    config: Pick<Config, "rpcUrl" | "chainId" | "deployerKey"> & {
+      /** Override the private key (used by demo to supply per-agent keys). */
+      privateKey?: string;
+    },
+  ) {
+    const { rpcUrl, chainId, deployerKey } = config;
+    // Allow an explicit privateKey override (for demo per-agent keys).
+    const rawKey = config.privateKey ?? deployerKey;
+
+    if (!rawKey) {
+      throw new Error("LiveWalletSeam requires a private key (deployerKey or privateKey)");
+    }
+    if (!rpcUrl) {
+      throw new Error("LiveWalletSeam requires rpcUrl (RPC_URL)");
+    }
+
+    // Ensure key is 0x-prefixed.
+    const normalizedKey: `0x${string}` = rawKey.startsWith("0x")
+      ? (rawKey as `0x${string}`)
+      : (`0x${rawKey}` as `0x${string}`);
+
+    const chain = chainFromId(chainId);
+    const transport = http(rpcUrl);
+
+    this.account = privateKeyToAccount(normalizedKey);
+    this.walletClient = createWalletClient({
+      account: this.account,
+      chain,
+      transport,
+    });
+    this.publicClient = createPublicClient({
+      chain,
+      transport,
+    });
   }
 
   address(): string {
-    // live: implemented in T-802 (derive from DEPLOYER_KEY)
-    return this._address;
+    return this.account.address;
   }
 
-  async signAndSend(_tx: TxRequest): Promise<TxReceipt> {
-    // live: implemented in T-802
-    throw new Error("live WalletSeam not implemented (T-802)");
+  async signAndSend(tx: TxRequest): Promise<TxReceipt> {
+    // Send the transaction and obtain the hash.
+    const txHash = await this.walletClient.sendTransaction({
+      account: this.account,
+      to: tx.to,
+      data: tx.data,
+      value: tx.value ?? 0n,
+      chain: this.walletClient.chain,
+    });
+
+    // Wait for the transaction to be mined.
+    const receipt = await this.publicClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
+
+    return {
+      txHash,
+      status: receipt.status === "success" ? "success" : "reverted",
+    };
   }
 }
 
 // ---------------------------------------------------------------------------
-// LiveClockSeam
-// live: wall clock — no external deps, fully implemented now
+// LiveClockSeam — fully implemented
 // ---------------------------------------------------------------------------
 
 /**
- * LiveClockSeam — wraps Date.now().
- * No network calls; this is the only live seam that is complete in T-205.
+ * LiveClockSeam — wraps Date.now(). No network calls.
  */
 export class LiveClockSeam implements ClockSeam {
   now(): number {
@@ -105,15 +190,12 @@ export class LiveClockSeam implements ClockSeam {
 }
 
 // ---------------------------------------------------------------------------
-// LiveHumanQueueSeam
-// live: implemented in T-404
+// LiveHumanQueueSeam — skeleton (T-404)
 // ---------------------------------------------------------------------------
 
 /**
- * LiveHumanQueueSeam — skeleton for the live human attestor queue.
- *
- * In T-404: will simulate human-queue latency (random ms in configured range)
- * and submit human-decisions.json via the standard attest() path.
+ * LiveHumanQueueSeam — skeleton.
+ * Implemented in T-404.
  */
 export class LiveHumanQueueSeam implements HumanQueueSeam {
   onClaim(_claim: Claim): void {
