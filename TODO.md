@@ -361,6 +361,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: `buildToolSpecs(claimType)` embeds exact zod-derived input schemas in system prompt; one worked few-shot example per tier; stricter JSON-only framing; per-tier user-prompt guidance; tool schemas re-injected on parse/tool-failure; Rotor prompt softened to avoid stalling; all 648 existing tests pass; `pnpm run ci` exit 0. (PRD §6.3, §6.4)
 - Notes: Root cause of 5/12 benchmark match-rate: model received tool names but no input schemas, causing TOOL_FAILURE → ABSTAIN. Fixed in `packages/agent-sdk/src/loop.ts` (buildToolSpecs, buildSystemPrompt, buildUserPrompt, invalidResponseObservation, toolFailureObservation) and `packages/agent-reference/src/agents.ts` (Rotor systemPrompt). Benchmark re-run pending live Ollama access.
 
+### T-017 — multi-run benchmark harness + free-model tuning
+- Status: done 2026-06-06
+- Depends-on: T-015
+- Scope: agent-sdk, agent-reference, ops
+- Acceptance: `scripts/benchmark-llm-multi.ts` runs N=3 passes per (agent × claim), reports modal decision, stability (stable/flaky), mean latency/steps, dominant failure reason; Stator maxSteps 4→6; temperature 0.15 wired through LiveModelSeam; BUDGET_RULE prompt nudge in buildSystemPrompt; tool-failure 1-retry in loop.ts; all existing tests (648+) pass; `pnpm run ci` exit 0; `pnpm benchmark:llm:multi` script wired. (PRD §6.3, §6.4)
+- Notes: Tuning stack: (1) Stator 4→6 maxSteps (STEP_BUDGET fix for claim C); (2) temp=0.15 (steady JSON tool-calling); (3) BUDGET_RULE prompt (finalize early, no repeat calls); (4) tool-failure 1-retry (corrective turn on bad input). SCRIPTED demo 100% deterministic unchanged. Live benchmark output recorded in commit message.
+
 ---
 
 ## T-4xx — runner + indexer + gateway + DB (M3)

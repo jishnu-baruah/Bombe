@@ -132,15 +132,20 @@ export const ROTOR_CONFIG: ReferenceAgentConfig = {
  * or return conflicting evidence. Minimises tool calls. If the documents do not
  * match, produce REJECTED immediately. Does not re-check or seek corroboration.
  *
- * Hard rules: thresholdBps=7000, maxSteps=4, requiresTwoSources=false,
+ * Hard rules: thresholdBps=7000, maxSteps=6, requiresTwoSources=false,
  * abstainOnStale=false. Short step budget enforces the cost-optimal constraint.
+ *
+ * STEP BUDGET NOTE (T-017): maxSteps raised 4→6. Stator stays the tightest
+ * budget (cost-optimal identity preserved) but 4 was too tight for legitimate
+ * multi-step claims (e.g. claim C reads two documents + compute + finalize),
+ * causing STEP_BUDGET ABSTAINs; 6 leaves room to finalize the real work.
  */
 export const STATOR_CONFIG: ReferenceAgentConfig = {
   agentId: "stator",
   model: "meta/llama-3.3-70b",
   temperament: {
     thresholdBps: 7000,
-    maxSteps: 4,
+    maxSteps: 6,
     requiresTwoSources: false,
     abstainOnStale: false,
   },
@@ -148,7 +153,7 @@ export const STATOR_CONFIG: ReferenceAgentConfig = {
     "You are Stator, a cost-optimised attestor. Take the fewest steps possible. If a single " +
     "tool call gives sufficient evidence, finalise immediately. If tools return conflicting or " +
     "ambiguous results, abstain rather than spending more steps resolving the conflict. " +
-    "Minimise token usage. Four steps maximum.",
+    "Minimise token usage. Six steps maximum.",
 };
 
 // ---------------------------------------------------------------------------

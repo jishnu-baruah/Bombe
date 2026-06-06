@@ -82,22 +82,34 @@ export class LiveModelSeam implements ModelSeam {
   private readonly apiKey: string;
   private readonly modelName: string;
   private readonly timeoutMs: number;
+  /**
+   * Default temperature for all requests made by this seam instance.
+   * Can be overridden per-request via ModelRequest.temperature.
+   * Lower values (0.1–0.2) produce more deterministic JSON tool-calling output.
+   */
+  private readonly defaultTemperature: number | undefined;
 
   constructor(config: {
     baseUrl: string;
     apiKey: string;
     modelName: string;
     timeoutMs?: number;
+    /** Default temperature for all requests. Set 0.1–0.2 for steady structured output. */
+    temperature?: number;
   }) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
     this.apiKey = config.apiKey;
     this.modelName = config.modelName;
     this.timeoutMs = config.timeoutMs ?? LIVE_MODEL_TIMEOUT_MS;
+    this.defaultTemperature = config.temperature;
   }
 
   async complete(req: ModelRequest): Promise<ModelResponse> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    // Resolve temperature: per-request overrides instance default.
+    const temperature = req.temperature ?? this.defaultTemperature;
 
     let res: Response;
     try {
@@ -111,6 +123,7 @@ export class LiveModelSeam implements ModelSeam {
           model: this.modelName,
           messages: req.messages,
           max_tokens: req.maxTokens,
+          ...(temperature !== undefined ? { temperature } : {}),
         }),
         signal: controller.signal,
       });

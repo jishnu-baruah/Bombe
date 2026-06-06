@@ -24,7 +24,8 @@
     "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1",
     "test:integration": "vitest run scripts/test/demo-integration.test.ts --config vitest.integration.config.ts",
     "progress": "node scripts/update-progress.mjs",
-    "benchmark:llm": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/benchmark-llm.ts"
+    "benchmark:llm": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/benchmark-llm.ts",
+    "benchmark:llm:multi": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/benchmark-llm-multi.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
