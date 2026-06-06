@@ -1,0 +1,22 @@
+{
+  "suite": "vitest",
+  "timestamp": "2026-06-06T00:00:01.000Z",
+  "commit": "abc1234",
+  "summary": {
+    "total": 5,
+    "passed": 4,
+    "failed": 1,
+    "skipped": 0,
+    "durationMs": 1300
+  },
+  "failures": [
+    {
+      "testName": "ModelRouter falls back on 429",
+      "filePath": "/path/to/packages/agent-sdk/test/model-router.test.ts",
+      "line": 52,
+      "error": "AssertionError: expected modelSwitched to be true\n  + expected - received\n  -false\n  +true\n    at packages/agent-sdk/test/model-router.test.ts:52:5",
+      "stackTrace": "    at packages/agent-sdk/test/model-router.test.ts:52:5",
+      "category": "assertion_mismatch"
+    }
+  ]
+}

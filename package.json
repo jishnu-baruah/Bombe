@@ -17,7 +17,7 @@
     "contracts:test:deep": "forge test --root contracts --profile deep",
     "test:contracts:deep": "pnpm contracts:test:deep",
     "test": "echo \"T-7xx: test harness not implemented yet\" && exit 1",
-    "test:agent": "echo \"T-702: test:agent aggregator not implemented yet\" && exit 1",
+    "test:agent": "node --import ./scripts/node_modules/tsx/dist/esm/index.mjs scripts/test-agent.ts",
     "test:demo": "echo \"T-703: test:demo golden path not implemented yet\" && exit 1",
     "demo": "echo \"M3+: demo boot not implemented yet\" && exit 1",
     "deploy:testnet": "echo \"T-804: deploy:testnet not implemented yet\" && exit 1",

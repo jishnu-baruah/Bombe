@@ -1,0 +1,17 @@
+{
+  "name": "@bombe/scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bombe/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.19.3",
+    "vitest": "^2.1.9"
+  }
+}
