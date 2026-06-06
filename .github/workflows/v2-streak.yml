@@ -19,6 +19,8 @@ concurrency:
 jobs:
   attest:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       POSTING_KEY: ${{ secrets.POSTING_KEY }}
       ATTESTOR_KEY: ${{ secrets.ATTESTOR_KEY }}
@@ -51,12 +53,26 @@ jobs:
         if: steps.gate.outputs.ready != 'true'
         run: echo "OP-8 secrets (POSTING_KEY / ATTESTOR_KEY) not set; daily streak is inert. No post attempted."
 
-      # Live decisive attestation. One retry window. Dedupe + streak persistence
-      # are wired in WS3-full; this step performs the keyed run once enabled.
-      - name: Daily attest (mETH)
+      # Daily decisive run for both assets: dedupe (fail-closed), compute, append
+      # to the streak surfaces. One retry window. Keyed/live; inert without OP-8.
+      - name: Daily streak run
         if: steps.gate.outputs.ready == 'true'
         run: |
-          MODE=live pnpm v2:attest || (echo "retrying once..." && sleep 30 && MODE=live pnpm v2:attest)
+          MODE=live pnpm v2:streak || (echo "retrying once..." && sleep 30 && MODE=live pnpm v2:streak)
+
+      # Persist the streak + marker (D13 committed marker). contents:write token.
+      - name: Commit streak update
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          git config user.name "bombe-streak-bot"
+          git config user.email "streak-bot@users.noreply.github.com"
+          git add docs/STREAK.md docs/streak/
+          if git diff --cached --quiet; then
+            echo "no streak changes to commit"
+          else
+            git commit -m "chore(streak): daily attestation run $(date -u +%F)"
+            git push
+          fi
 
       - name: Alert operator on failure
         if: failure() && steps.gate.outputs.ready == 'true'

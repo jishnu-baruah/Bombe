@@ -44,6 +44,16 @@ export function decideRun(i: DedupeInputs): RunDecision {
   return "run";
 }
 
+/**
+ * isSelfTestRun — every 7th run is a self-test (Q8) that asserts a deliberately
+ * wrong value, so the public record visibly contains a REJECTED (a discriminator,
+ * not a rubber stamp). `priorRunCount` is the number of runs already recorded;
+ * this run is number priorRunCount + 1.
+ */
+export function isSelfTestRun(priorRunCount: number): boolean {
+  return priorRunCount >= 0 && (priorRunCount + 1) % 7 === 0;
+}
+
 export interface StreakRecord {
   date: string;
   asset: string;

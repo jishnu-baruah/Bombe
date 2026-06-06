@@ -2,10 +2,36 @@ import { describe, expect, it } from "vitest";
 import {
   type StreakRecord,
   decideRun,
+  isSelfTestRun,
   streakJsonEntry,
   streakRowMarkdown,
   streakTableHeader,
 } from "./scheduler.js";
+
+describe("isSelfTestRun (Q8 cadence)", () => {
+  it("is true on every 7th run and false otherwise", () => {
+    const flags = Array.from({ length: 14 }, (_, i) => isSelfTestRun(i));
+    expect(flags).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true, // runs 1..7
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true, // runs 8..14
+    ]);
+  });
+  it("is false for a negative prior count", () => {
+    expect(isSelfTestRun(-1)).toBe(false);
+  });
+});
 
 const base = {
   today: "2026-06-09",
