@@ -1,0 +1,26 @@
+{
+  "name": "@bombe/tool-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node --import tsx/esm src/server.ts"
+  },
+  "dependencies": {
+    "@bombe/agent-sdk": "workspace:*",
+    "@bombe/shared": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.6.16",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "vitest": "^2.1.9"
+  }
+}
