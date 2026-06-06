@@ -451,11 +451,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-603 — /live race view
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601
 - Scope: web
 - Acceptance: 5 columns/stacked cards, streams agent-step, decision chips incl **BLOCKED BY PROTOCOL**, guided-demo auto-advance A→D <90s w/ toasts. (PRD §6.6, §6.7)
-- Notes: —
+- Notes: /api/stream enhanced with A→D CLAIM_POSTED→AGENT_STEP*→AGENT_DONE→HUMAN_QUEUE_UPDATE replay; @bombe-events alias added for browser-safe SSE schema imports; 20 new tests (94 total pass); build clean.
 
 ### T-604 — /leaderboard
 - Status: done 2026-06-06
