@@ -3,5 +3,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["*.config.ts", "packages/**/*.ts", "apps/**/*.ts"]
+  "include": ["*.config.ts", "packages/**/*.ts", "apps/**/*.ts"],
+  "exclude": ["apps/web/**"]
 }

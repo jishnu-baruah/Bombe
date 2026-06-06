@@ -430,11 +430,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-6xx — web app (M5)
 
 ### T-601 — app shell + SSE
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-403, T-401, T-203
 - Scope: web
 - Acceptance: Next.js 16 App Router, Tailwind v4, dark theme, monospace hashes; `/api/stream` `text/event-stream`; `EventSource` routes by `kind`. (PRD §6.6, §6.5)
-- Notes: —
+- Notes: apps/web (@bombe/web); DESIGN.md token system as Tailwind v4 @theme; Button/Card/Badge/Mono/ExplorerLink components; Nav+Footer+layout; parseEvent+useEventStream SSE infra; landing page + stub /live /leaderboard /operator; 24 vitest tests pass; root typecheck excludes apps/web; ci gate: pnpm --filter @bombe/web typecheck.
 
 ### T-602 — / landing
 - Status: pending
