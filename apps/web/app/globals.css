@@ -101,12 +101,73 @@ html {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent layout shift from scrollbar */
+  scrollbar-gutter: stable;
 }
 
 body {
   background-color: #000000;
   color: #ffffff;
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ── Focus-visible ring (accessible, not intrusive) ── */
+:focus-visible {
+  outline: 2px solid #494fdf;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Text balance utilities ── */
+.balance {
+  text-wrap: balance;
+}
+.pretty {
+  text-wrap: pretty;
+}
+
+/* ── Tabular numerals for data columns ── */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Ambient hero gradient: subtle violet glow bottom-left ── */
+.hero-ambient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse 80% 60% at 5% 110%,
+      rgba(73, 79, 223, 0.13) 0%,
+      transparent 60%
+    ), radial-gradient(ellipse 40% 40% at 95% -10%, rgba(73, 79, 223, 0.07) 0%, transparent 55%);
+  z-index: 0;
+}
+.hero-ambient > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Subtle noise texture overlay (data-depth) ── */
+.depth-noise {
+  position: relative;
+}
+.depth-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  z-index: 0;
+}
+.depth-noise > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Monospace for hashes / addresses / code (PRD §6.6) */
