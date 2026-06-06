@@ -9,6 +9,7 @@
   "dependencies": {
     "@bombe/agent-reference": "workspace:*",
     "@bombe/agent-sdk": "workspace:*",
+    "@bombe/plugboard": "workspace:*",
     "@bombe/db": "workspace:*",
     "@bombe/indexer": "workspace:*",
     "@bombe/runner": "workspace:*",

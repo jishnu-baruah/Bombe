@@ -16,7 +16,7 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 61 | 0 | 0 | 13 | 74 | 82% |
+| 62 | 0 | 0 | 12 | 74 | 84% |
 
 ### Per-Range Breakdown
 
@@ -29,7 +29,7 @@ _Generated: 2026-06-06_
 | T-4xx | runner + indexer + gateway + DB (M3) | 6 | 6 |
 | T-5xx | Plugboard mock path (M4) | 5 | 5 |
 | T-6xx | web app (M5) | 6 | 8 |
-| T-7xx | autonomous testing (M6) | 2 | 4 |
+| T-7xx | autonomous testing (M6) | 3 | 4 |
 | T-8xx | live seams + ship (M8) | 1 | 7 |
 | T-9xx | STRETCH (M7) | 0 | 3 |
 

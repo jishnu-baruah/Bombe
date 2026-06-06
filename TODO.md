@@ -511,11 +511,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: `pnpm test:agent` wired (`node --import tsx/esm`); aggregateReports() pure fn; exits 0 on all-green, 1 on any failure; 8 aggregation unit tests pass (test-agent.test.ts). Counts parsed from real reporter output, never fabricated. 560 total (71 forge + 489 vitest) all green on first real run.
 
 ### T-703 — scripts/test-demo.ts golden path
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-406, T-502, T-304
 - Scope: testing
 - Acceptance: boots mock headless, advances A→D, waits 4 attestations/claim (5s each), asserts §6.7 matrix + hash stability, <30s. (PRD §15.2, §14.3, §14.16)
-- Notes: —
+- Notes: `pnpm test:demo` runs A→D in 0.43s (<<30s); 16/16 matrix assertions pass; hash stable (0xc3cef617…); .test-reports/demo.json written. 24 unit tests for assertion logic in scripts/test/test-demo.test.ts. CI exit 0 (648+71 tests).
 
 ### T-704 — scripts/seed-bug.ts drill
 - Status: pending
