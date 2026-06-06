@@ -1,0 +1,104 @@
+{
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 1,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 5,
+  "numPassedTests": 4,
+  "numFailedTests": 1,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeyNames": [],
+    "unmatched": 0,
+    "updated": 0
+  },
+  "startTime": 1780000000000,
+  "success": false,
+  "testResults": [
+    {
+      "name": "/path/to/packages/shared/test/canonical.test.ts",
+      "status": "passed",
+      "startTime": 1780000001000,
+      "endTime": 1780000001500,
+      "message": "",
+      "assertionResults": [
+        {
+          "title": "identical traces produce identical hash",
+          "fullName": "canonicalJson identical traces produce identical hash",
+          "status": "passed",
+          "duration": 12.5,
+          "failureMessages": [],
+          "ancestorTitles": [
+            "canonicalJson"
+          ]
+        },
+        {
+          "title": "produces deterministic output",
+          "fullName": "canonicalJson produces deterministic output",
+          "status": "passed",
+          "duration": 8.1,
+          "failureMessages": [],
+          "ancestorTitles": [
+            "canonicalJson"
+          ]
+        },
+        {
+          "title": "sorted keys",
+          "fullName": "canonicalJson sorted keys",
+          "status": "passed",
+          "duration": 5.2,
+          "failureMessages": [],
+          "ancestorTitles": [
+            "canonicalJson"
+          ]
+        },
+        {
+          "title": "handles nested arrays",
+          "fullName": "canonicalJson handles nested arrays",
+          "status": "passed",
+          "duration": 3,
+          "failureMessages": [],
+          "ancestorTitles": [
+            "canonicalJson"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "/path/to/packages/agent-sdk/test/model-router.test.ts",
+      "status": "failed",
+      "startTime": 1780000002000,
+      "endTime": 1780000002800,
+      "message": "",
+      "assertionResults": [
+        {
+          "title": "falls back on 429",
+          "fullName": "ModelRouter falls back on 429",
+          "status": "failed",
+          "duration": 45.3,
+          "failureMessages": [
+            "AssertionError: expected modelSwitched to be true\n  + expected - received\n  -false\n  +true\n    at packages/agent-sdk/test/model-router.test.ts:52:5"
+          ],
+          "ancestorTitles": [
+            "ModelRouter"
+          ],
+          "location": {
+            "line": 52,
+            "column": 5
+          }
+        }
+      ]
+    }
+  ]
+}

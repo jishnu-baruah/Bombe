@@ -490,18 +490,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 ## T-7xx — autonomous testing (M6)
 
 ### T-701 — JSON reporters
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-203, T-108
 - Scope: testing
 - Acceptance: `forge test --json` + vitest `--reporter=json` write `.test-reports/*` conforming to `test-report.ts`. (PRD §15.1, §14.17)
-- Notes: —
+- Notes: `scripts/lib/normalize.ts` converts forge/vitest raw JSON → TestReport (TestReportSchema-conforming). `.test-reports/forge.json` and `.test-reports/vitest.json` validated against schema. 14 unit tests pass (normalize.test.ts).
 
 ### T-702 — scripts/test-agent.ts
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-701
 - Scope: testing
 - Acceptance: runs all suites, normalizes+categorizes (heuristic, `unknown` ok) into one machine-readable summary. (PRD §15.1, §14.16)
-- Notes: —
+- Notes: `pnpm test:agent` wired (`node --import tsx/esm`); aggregateReports() pure fn; exits 0 on all-green, 1 on any failure; 8 aggregation unit tests pass (test-agent.test.ts). Counts parsed from real reporter output, never fabricated. 560 total (71 forge + 489 vitest) all green on first real run.
 
 ### T-703 — scripts/test-demo.ts golden path
 - Status: pending

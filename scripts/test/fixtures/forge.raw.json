@@ -1,0 +1,68 @@
+{
+  "test/AgentAttestation.t.sol:AgentAttestationTest": {
+    "duration": "12ms 500µs",
+    "test_results": {
+      "test_Attest_HappyPath_Valid()": {
+        "status": "Success",
+        "reason": null,
+        "counterexample": null,
+        "logs": [],
+        "decoded_logs": [],
+        "kind": {
+          "Unit": {
+            "gas": 302298
+          }
+        },
+        "traces": [],
+        "labeled_addresses": {},
+        "duration": "1ms 200µs",
+        "breakpoints": {},
+        "gas_snapshots": {}
+      },
+      "test_AbstainLocksNothing()": {
+        "status": "Success",
+        "reason": null,
+        "counterexample": null,
+        "logs": [],
+        "decoded_logs": [],
+        "kind": {
+          "Unit": {
+            "gas": 263759
+          }
+        },
+        "traces": [],
+        "labeled_addresses": {},
+        "duration": "800µs 300ns",
+        "breakpoints": {},
+        "gas_snapshots": {}
+      }
+    },
+    "warnings": []
+  },
+  "test/Slashing.t.sol:AgentSlashingTest": {
+    "duration": "5ms 100µs",
+    "test_results": {
+      "test_SlashConservation_Fails()": {
+        "status": "Failure",
+        "reason": "Assertion failed: slash math incorrect\nCounterexample: value=100",
+        "counterexample": null,
+        "logs": [],
+        "decoded_logs": [
+          "Error: VM revert with custom error JudgmentTierRequiresAbstain",
+          "at test/Slashing.t.sol:42"
+        ],
+        "kind": {
+          "Unit": {
+            "gas": 187000
+          }
+        },
+        "traces": [],
+        "labeled_addresses": {},
+        "duration": "2ms 400µs",
+        "breakpoints": {},
+        "gas_snapshots": {}
+      }
+    },
+    "warnings": []
+  }
+}

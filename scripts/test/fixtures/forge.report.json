@@ -1,0 +1,21 @@
+{
+  "suite": "forge",
+  "timestamp": "2026-06-06T00:00:00.000Z",
+  "commit": "abc1234",
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0,
+    "durationMs": 17
+  },
+  "failures": [
+    {
+      "testName": "test_SlashConservation_Fails()",
+      "filePath": "test/Slashing.t.sol",
+      "error": "Assertion failed: slash math incorrect\nVM revert with custom error JudgmentTierRequiresAbstain",
+      "stackTrace": "VM revert with custom error JudgmentTierRequiresAbstain\nat test/Slashing.t.sol:42",
+      "category": "contract_logic"
+    }
+  ]
+}
