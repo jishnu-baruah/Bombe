@@ -23,11 +23,12 @@ import { fileURLToPath } from "node:url";
 
 import {
   InMemoryAttestationRepository,
+  MockDataSource,
   buildAndSubmitAttestation,
   computeDecisiveAttestation,
-  createDataSource,
   createSeams,
 } from "@bombe/agent-sdk";
+import type { DataAsset } from "@bombe/agent-sdk";
 import type { Claim } from "@bombe/shared";
 import { hashCanonical } from "@bombe/shared";
 
@@ -58,9 +59,20 @@ function loadDotEnv(path: string): Record<string, string> {
 const ENV = loadDotEnv(resolve(REPO_ROOT, ".env.local"));
 const MODE = process.env.MODE === "live" ? "live" : "mock";
 
-// The claim we attest. assertedValueBps is in the source's annualized basis points.
-// In mock mode the fixture mETH value is 34; assert 34 for a VALID demo.
-const ASSERTED_VALUE_BPS = Number(process.env.ASSERTED_BPS ?? "34");
+// Asset is selectable via ASSET (default mETH). In mock mode each asset reads its
+// own fixture (mETH 30d-fresh = 34 bps, USDY 30d = 525 bps), so the default
+// asserted value yields VALID. USDY is a labeled single source per D4a.
+const ASSET: DataAsset = process.env.ASSET === "USDY" ? "USDY" : "mETH";
+const ASSET_CONFIG: Record<
+  DataAsset,
+  { mockPeriod: string; defaultAssertedBps: number; claimId: string }
+> = {
+  mETH: { mockPeriod: "30d-fresh", defaultAssertedBps: 34, claimId: "METH-V2-MOCK" },
+  USDY: { mockPeriod: "30d", defaultAssertedBps: 525, claimId: "USDY-V2-MOCK" },
+};
+const CFG = ASSET_CONFIG[ASSET];
+
+const ASSERTED_VALUE_BPS = Number(process.env.ASSERTED_BPS ?? String(CFG.defaultAssertedBps));
 const REQUESTED_WINDOW_DAYS = Number(process.env.WINDOW_DAYS ?? "30");
 const RECONCILE_TOLERANCE_BPS = 5;
 const VERDICT_TOLERANCE_BPS = 5;
@@ -69,7 +81,7 @@ function buildClaim(claimId: string): Claim {
   return {
     id: claimId,
     tier: 1,
-    asset: "mETH",
+    asset: ASSET,
     claimType: "YIELD_BPS",
     payload: {
       assertedValueBps: ASSERTED_VALUE_BPS,
@@ -107,14 +119,16 @@ async function main(): Promise<void> {
 
   // Mock path: deterministic, no keys, no network.
   const seams = createSeams();
-  const dataSource = createDataSource();
-  const claimId = "METH-V2-MOCK";
+  const dataSource = new MockDataSource({ period: CFG.mockPeriod });
+  const claimId = CFG.claimId;
   const claim = buildClaim(claimId);
+
+  console.log(`[v2-attest] asset: ${ASSET}  asserted: ${ASSERTED_VALUE_BPS} bps`);
 
   const { observation, decision, trace, sources } = await computeDecisiveAttestation(
     {
       claimId,
-      asset: "mETH",
+      asset: ASSET,
       assertedValueBps: ASSERTED_VALUE_BPS,
       reconcileToleranceBps: RECONCILE_TOLERANCE_BPS,
       verdictToleranceBps: VERDICT_TOLERANCE_BPS,
