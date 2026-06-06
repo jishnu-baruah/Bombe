@@ -1,12 +1,12 @@
 /**
- * /operator/health — Operator Health Dashboard (T-607)
+ * /operator/health, Operator Health Dashboard (T-607)
  *
  * Server component. Reads .test-reports/ summaries if present (falls back to
  * stubs when absent). Shows model latency/error/failover counts, demo
  * readiness, current mode, and Plugboard runtime status.
  *
- * PRD §6.6 — /operator/health; §10 — observability.
- * DESIGN.md — dark canvas, surface-elevated cards.
+ * PRD §6.6, /operator/health; §10, observability.
+ * DESIGN.md, dark canvas, surface-elevated cards.
  *
  * NO `any` anywhere.
  */
@@ -57,7 +57,7 @@ async function loadTestReports(): Promise<TestReportSummary[]> {
   try {
     files = await readdir(reportsDir);
   } catch {
-    // .test-reports/ doesn't exist yet — return stubs
+    // .test-reports/ doesn't exist yet, return stubs
     return stubTestReports();
   }
 
@@ -187,7 +187,7 @@ function MetricCard({
 }
 
 // ---------------------------------------------------------------------------
-// Page (server component — no "use client")
+// Page (server component, no "use client")
 // ---------------------------------------------------------------------------
 
 export default async function HealthPage() {
@@ -203,7 +203,7 @@ export default async function HealthPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
           <div>
-            <p className="text-[#8d969e] text-[13px] font-mono mb-2">T-607 — /operator/health</p>
+            <p className="text-[#8d969e] text-[13px] font-mono mb-2">/operator/health</p>
             <h1 className="text-[48px] font-semibold leading-[1.21] tracking-[-0.48px]">
               Health Dashboard
             </h1>
@@ -329,7 +329,7 @@ export default async function HealthPage() {
           <h2 className="text-[20px] font-semibold leading-[1.4] mb-4">Agent Observability</h2>
           <p className="text-[13px] text-[rgba(255,255,255,0.40)] mb-4">
             {health.mode === "mock"
-              ? "Stub latencies — no live telemetry in mock mode."
+              ? "Stub latencies, no live telemetry in mock mode."
               : "Live telemetry per agent per epoch."}
           </p>
           <div className="overflow-x-auto">

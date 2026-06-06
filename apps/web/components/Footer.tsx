@@ -129,7 +129,7 @@ export function Footer() {
         {/* Divider + copyright */}
         <div className="border-t border-[rgba(255,255,255,0.05)] pt-8 flex flex-col md:flex-row justify-between gap-3 text-[13px] text-[#3a3d40]">
           <p>
-            Bombe — AI Attestor Network for RWA claims on Mantle. Testnet only. No real economic
+            Bombe: AI Attestor Network for RWA claims on Mantle. Testnet only. No real economic
             value.
           </p>
           <p className="md:text-right">Mantle Turing Test Hackathon 2026</p>

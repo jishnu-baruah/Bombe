@@ -17,7 +17,7 @@ function truncateMiddle(value: string, chars: number): string {
 }
 
 /**
- * Mono — monospace hash / address display with optional truncation + copy.
+ * Mono, monospace hash / address display with optional truncation + copy.
  * Used for reasoning hashes, tx hashes, agent addresses throughout the UI.
  * PRD §6.6: "monospace for hashes/addresses"
  */

@@ -1,5 +1,5 @@
 /**
- * /leaderboard — Server component wrapper.
+ * /leaderboard, Server component wrapper.
  *
  * Fetches leaderboard rows server-side via data-source.ts (which selects
  * demo-data or live-data based on MODE env). Passes pre-fetched rows to
@@ -11,7 +11,7 @@
  * On RPC error the live getter returns [] and an empty table is shown
  * (graceful degradation, never crashes the page).
  *
- * T-J04 — live on-chain data layer.
+ * T-J04, live on-chain data layer.
  */
 
 import { getLeaderboard } from "@/lib/data-source";

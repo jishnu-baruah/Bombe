@@ -699,3 +699,10 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Scope: stretch
 - Acceptance: a shareable X thread linking the demo video + public URL, framing the pain point and the falsifiable-attestation thesis for a general audience. (Community Voting)
 - Notes: STRETCH — never gates acceptance; maximizes the auto-eligible Community Voting prize.
+
+### T-J08 — issuer page + integrate page + integration guide
+- Status: done 2026-06-06
+- Depends-on: T-602
+- Scope: web + docs
+- Acceptance: `/issuers` (why pay, economics, falsifiable-only), `/issuers` reachable from nav; `/integrate` (how-easy + benefits, 4-step read path, honest operator-posting note); `docs/INTEGRATION.md` runnable reference grounded in live contracts; pages render + linked; copy carries no em-dashes and no internal task IDs; tests + typecheck + biome green; deployed to production.
+- Notes: Split by intent so /integrate is not redundant with /issuers. Also applied two standing rules across the public surface: removed all em-dashes from site + public docs, and stripped internal task IDs (T-XXX / OP-N) from rendered copy and public docs. Spec: docs/superpowers/specs/2026-06-06-issuer-integration-design.md.

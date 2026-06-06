@@ -34,7 +34,7 @@ export function ExplorerLink({ type, value, children, className = "" }: Explorer
     return (
       <span
         className={`inline-flex items-center gap-1 cursor-default ${className}`}
-        title="Links disabled in mock mode — no live chain"
+        title="Links disabled in mock mode, no live chain"
         aria-label={`${type} ${value} (mock chain, link disabled)`}
       >
         {display}

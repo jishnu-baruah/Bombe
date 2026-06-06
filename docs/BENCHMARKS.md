@@ -1,58 +1,60 @@
-# Model benchmarks — Bombe attestor accuracy
+# Model benchmarks: Bombe attestor accuracy
 
-How well do the reference agents (Reflector / Rotor / Stator) reach the **correct**
-attestation decision when driven by a real LLM, against the §6.7 expected-outcome
-matrix? This is the accuracy bar for the *live* demo path. (The scripted Plugboard
-replay path, T-504, is 100 % deterministic and not measured here.)
+How often do the reference agents (Reflector, Rotor, Stator) reach the correct attestation
+decision when driven by a real LLM, measured against the expected-outcome matrix? This is the
+accuracy bar for the live demo path. The scripted Plugboard replay path is fully deterministic
+and is not measured here.
 
 ## Harness
 
-`scripts/benchmark-llm-multi.ts` (`pnpm benchmark:llm:multi`). **Not** part of `pnpm run ci` —
-it hits the live AI gateway and is run manually.
+`scripts/benchmark-llm-multi.ts` (`pnpm benchmark:llm:multi`). It is not part of `pnpm run ci`,
+because it calls the live AI gateway. Run it manually.
 
-- **Grid:** 4 claims (A–D) × 3 agents = **12 cells**.
-- **N = 3** passes per cell; the **modal** (majority) decision is scored to damp single-sample noise.
-- **Stability:** a cell is `stable` if all 3 runs agree, `flaky` if partial.
-- Per cell also reports mean latency, mean steps, and the dominant failure reason
-  (`STEP_BUDGET` / `TOOL_FAILURE` / `BELOW_THRESHOLD` / `TIER3_OVERRIDE` / …).
-- **Model:** `gpt-oss:20b` via Ollama Cloud (a *free* model, OpenAI-compatible chat-completions
-  through `LiveModelSeam`).
+- Grid: 4 claims (A to D) times 3 agents, so 12 cells.
+- 3 passes per cell; the majority (modal) decision is scored to damp single-sample noise.
+- A cell is stable when all 3 runs agree, flaky when they only partly agree.
+- Each cell also reports mean latency, mean steps, and the dominant failure reason
+  (step budget, tool failure, below threshold, judgment override, and so on).
+- Model: `gpt-oss:20b` via Ollama Cloud, a free model, served over an OpenAI-compatible
+  chat-completions endpoint.
 
-### Expected outcomes (PRD §6.7)
+### Expected outcomes
 
 | Claim | Tier | Reflector | Rotor | Stator |
 |-------|------|-----------|-------|--------|
-| A | 1 — yield in range | VALID | VALID | VALID |
-| B | 1 — borderline | ABSTAIN | VALID | ABSTAIN |
-| C | 2 — cashflow mismatch | REJECTED | REJECTED | REJECTED |
-| D | 3 — fair value (judgment) | ABSTAIN | ABSTAIN | ABSTAIN |
+| A | 1, yield in range | VALID | VALID | VALID |
+| B | 1, borderline | ABSTAIN | VALID | ABSTAIN |
+| C | 2, cashflow mismatch | REJECTED | REJECTED | REJECTED |
+| D | 3, fair value (judgment) | ABSTAIN | ABSTAIN | ABSTAIN |
 
-Claim D never reaches the model — `TIER3_OVERRIDE` coerces ABSTAIN in the SDK, mirrored by
-the contract's `JudgmentTierRequiresAbstain` revert.
+Claim D never reaches the model. The judgment-tier override coerces ABSTAIN in the SDK, mirrored
+by the contract rejecting any non-ABSTAIN answer on a tier-3 claim.
 
-## Results — gpt-oss:20b (free)
+## Results: gpt-oss:20b (free)
 
 | Pass | Match rate | Notes |
 |------|-----------|-------|
-| **Before tuning** (T-801 baseline) | **5 / 12 (42 %)** | Model called tools but received tool *names* with no input **schemas** → input validation failed → `TOOL_FAILURE` → spurious ABSTAIN. Tier-3 always correct. |
-| **After T-015** (tool schemas + few-shot) | — | Gave the model JSON input schemas + worked examples in the prompt; eliminated the malformed-input class. |
-| **After T-017** (tuning) | **10 / 12 (83 %)** | `TOOL_FAILURE` eliminated; remaining misses are borderline-threshold judgment, not mechanics. |
+| Baseline | 5 / 12 (42 %) | The model called tools but received tool names with no input schemas, so inputs failed validation, producing tool failures and spurious abstentions. The judgment tier was always correct. |
+| After tool schemas + few-shot | improved | Gave the model JSON input schemas plus worked examples in the prompt, eliminating the malformed-input class. |
+| After tuning | 10 / 12 (83 %) | Tool failures eliminated. The remaining misses are borderline-threshold judgment, not mechanics. |
 
-### Tuning stack (T-017)
+### Tuning stack
 
-1. **Stator `maxSteps` 4 → 6** — cured `STEP_BUDGET` exhaustion on claim C (the multi-step cashflow reconciliation).
-2. **Rotor `maxSteps` 5 → 8** — same headroom for the aggressive profile.
-3. **Temperature 0.15** (wired through `LiveModelSeam`) — steadier JSON tool-calling.
-4. **`BUDGET_RULE` prompt nudge** (`loop.ts buildSystemPrompt`) — finalize early, don't re-call settled tools.
-5. **Tool-failure 1-retry** (`loop.ts`) — one corrective turn on a bad tool input instead of an immediate abort.
+1. Stator step budget raised from 4 to 6, curing step-budget exhaustion on the multi-step
+   cashflow reconciliation (claim C).
+2. Rotor step budget raised from 5 to 8 for the same headroom on the aggressive profile.
+3. Temperature set to 0.15, for steadier JSON tool-calling.
+4. A budget rule in the system prompt, nudging the agent to finalize early and not re-call
+   tools it already settled.
+5. One corrective retry on a bad tool input instead of an immediate abort.
 
 ## Verdict
 
-- **83 % modal match on a free model** is the shippable live-demo bar; the scripted Plugboard
-  path remains 100 % deterministic for the safety proof.
-- A paid frontier model is projected to reach **~11–12 / 12** with the same harness — the
-  remaining misses are threshold-sensitivity on the borderline claim, which higher-quality
-  reasoning resolves. The seams (`LiveModelSeam`, `ModelRouter`) already support swapping the
-  model via `AI_GATEWAY_MODELS` with no code change.
+- 83 % majority match on a free model is the shippable bar for the live demo. The scripted
+  Plugboard path stays fully deterministic for the safety proof.
+- A paid frontier model is projected to reach roughly 11 to 12 out of 12 on the same harness.
+  The remaining misses are threshold sensitivity on the borderline claim, which stronger
+  reasoning resolves. The model seams already support swapping the model through the
+  `AI_GATEWAY_MODELS` setting with no code change.
 
-_Last updated 2026-06-06 (T-017). Re-run: `pnpm benchmark:llm:multi` (requires `AI_GATEWAY_*` in `.env.local`)._
+Re-run with `pnpm benchmark:llm:multi` (requires the `AI_GATEWAY_*` values in `.env.local`).

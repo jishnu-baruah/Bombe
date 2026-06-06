@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * LeaderboardClient.tsx — Client rendering component for /leaderboard.
+ * LeaderboardClient.tsx, Client rendering component for /leaderboard.
  *
  * Receives pre-fetched leaderboard rows as props from the server page wrapper
  * (app/leaderboard/page.tsx) and handles client-side sorting + display.
@@ -84,7 +84,7 @@ function SummaryCards({ rows }: { rows: LeaderboardRow[] }) {
           Top Ranked
         </p>
         <p className="text-[22px] font-semibold capitalize tracking-[-0.2px]">
-          {topAgent?.agentId ?? "—"}
+          {topAgent?.agentId ?? "-"}
         </p>
         <p className="text-[#505a63] text-[13px] mt-1 tabular">
           {topAgent?.accuracyPct !== null && topAgent?.accuracyPct !== undefined
@@ -148,7 +148,7 @@ function LeaderboardTableRow({ row, rank }: { row: LeaderboardRow; rank: number 
       </td>
       {/* Accuracy */}
       <td className="px-4 py-3 font-mono text-[13px]" style={{ color: accColor }}>
-        {row.accuracyPct !== null ? `${row.accuracyPct}%` : "—"}
+        {row.accuracyPct !== null ? `${row.accuracyPct}%` : "-"}
       </td>
       {/* Abstention */}
       <td className="px-4 py-3 font-mono text-[13px] text-[#8d969e]">{row.abstentionPct}%</td>
@@ -217,7 +217,7 @@ export default function LeaderboardPage({ initialRows }: { initialRows: Leaderbo
           </h1>
           <p className="text-[rgba(255,255,255,0.60)] text-[18px] max-w-2xl leading-[1.56] pretty">
             Lifetime aggregate over claims A–D (demo settlement). Accuracy excludes abstentions from
-            the denominator — only decisive attestations are scored.
+            the denominator, only decisive attestations are scored.
           </p>
         </div>
       </section>

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import LandingPage from "../app/page";
 
-// Mock next/link — not available in jsdom
+// Mock next/link, not available in jsdom
 vi.mock("next/link", () => ({
   default: ({
     href,
@@ -27,7 +27,7 @@ describe("Landing page", () => {
 
   it("renders 'falsifiable claims' in the thesis copy", () => {
     render(<LandingPage />);
-    // Multiple elements may contain "falsifiable" — verify at least one exists
+    // Multiple elements may contain "falsifiable", verify at least one exists
     const els = screen.getAllByText(/falsifiable/i);
     expect(els.length).toBeGreaterThan(0);
   });
@@ -44,7 +44,7 @@ describe("Landing page", () => {
 
   it("renders Tier 1 DETERMINISTIC explainer", () => {
     render(<LandingPage />);
-    // "DETERMINISTIC" appears in the tier-1 card heading ("Tier 1 — DETERMINISTIC")
+    // "DETERMINISTIC" appears in the tier-1 card heading ("Tier 1, DETERMINISTIC")
     const els = screen.getAllByText(/DETERMINISTIC/i);
     expect(els.length).toBeGreaterThan(0);
   });

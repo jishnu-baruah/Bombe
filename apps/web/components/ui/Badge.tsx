@@ -1,10 +1,10 @@
-// Badge component — tier badges, AI/human labels, decision chips.
+// Badge component, tier badges, AI/human labels, decision chips.
 // Decision chip colors are semantic, not brand accents:
 //   VALID        → green  (#428619)
 //   REJECTED     → red    (#e23b4a)
 //   ABSTAIN      → amber  (#b09000)
-//   BLOCKED_BY_PROTOCOL → purple (#7c3aed)  — Plugboard contract revert
-//   EXTERNAL_RUNTIME    → stone  (#8d969e)  — Plugboard badge in race view
+//   BLOCKED_BY_PROTOCOL → purple (#7c3aed) , Plugboard contract revert
+//   EXTERNAL_RUNTIME    → stone  (#8d969e) , Plugboard badge in race view
 
 export type DecisionVariant =
   | "VALID"

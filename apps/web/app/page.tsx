@@ -12,8 +12,8 @@ const DELTA_ROWS = [
   },
   {
     dimension: "Safety guarantee",
-    bombe: "Contract layer — rejects invalid attestations on-chain",
-    alternatives: "Application layer — can be bypassed",
+    bombe: "Contract layer, rejects invalid attestations on-chain",
+    alternatives: "Application layer, can be bypassed",
   },
   {
     dimension: "Wrong attestation",
@@ -27,8 +27,8 @@ const DELTA_ROWS = [
   },
   {
     dimension: "Judgment claims",
-    bombe: "ABSTAIN enforced — contract rejects any non-ABSTAIN on Tier 3",
-    alternatives: "Attested freely — no enforcement",
+    bombe: "ABSTAIN enforced, contract rejects any non-ABSTAIN on Tier 3",
+    alternatives: "Attested freely, no enforcement",
   },
 ] as const;
 
@@ -36,29 +36,29 @@ const DELTA_ROWS = [
 const TIERS = [
   {
     tier: "tier-1" as const,
-    label: "Tier 1 — DETERMINISTIC",
+    label: "Tier 1 · DETERMINISTIC",
     types: ["YIELD_BPS", "DISTRIBUTION_PAID"],
     description:
       "Truth derivable from on-chain state or oracle math. Slashing is direct and automatic against ground truth at settlement.",
-    example: "mETH yield at 34bps/30d — oracle confirms or refutes in milliseconds.",
+    example: "mETH yield at 34bps/30d, oracle confirms or refutes in milliseconds.",
   },
   {
     tier: "tier-2" as const,
-    label: "Tier 2 — DOCUMENT",
+    label: "Tier 2 · DOCUMENT",
     types: ["CASHFLOW_MATCH", "ENCUMBRANCE_ABSENT"],
     description:
-      "Truth derivable from referenced fixture documents (servicer reports, bank statements). Slashing only via dispute resolution — a stake-weighted in-protocol vote.",
+      "Truth derivable from referenced fixture documents (servicer reports, bank statements). Slashing only via dispute resolution, a stake-weighted in-protocol vote.",
     example:
       "PC-POOL-1 cashflow: servicer report says 50,000; statement sums to 45,000 → REJECTED.",
   },
   {
     tier: "tier-3" as const,
-    label: "Tier 3 — JUDGMENT",
+    label: "Tier 3 · JUDGMENT",
     types: ["FAIR_VALUE"],
     description:
       "Valuation / opinion. Attestation is FORBIDDEN. The SDK coerces any decision to ABSTAIN; the contract rejects any non-ABSTAIN attestation with JudgmentTierRequiresAbstain.",
     example:
-      'PC-POOL-1 fair value $4.2M — Plugboard attempts VALID → contract reverts → "BLOCKED BY PROTOCOL".',
+      'PC-POOL-1 fair value $4.2M, Plugboard attempts VALID → contract reverts → "BLOCKED BY PROTOCOL".',
   },
 ] as const;
 
@@ -90,7 +90,7 @@ export default function LandingPage() {
                 <span className="text-[13px] text-[#505a63] tabular font-mono">Chain 5003</span>
               </div>
 
-              {/* Hero headline — display-xxl, tight, balanced */}
+              {/* Hero headline, display-xxl, tight, balanced */}
               {/* Note: "AI attestors that" must stay in one text node for landing.test.tsx */}
               <h1
                 className="font-semibold leading-[1.0] tracking-[-2.5px] text-[#ffffff] mb-8 text-[clamp(48px,9vw,128px)] balance"
@@ -110,7 +110,7 @@ export default function LandingPage() {
                 <strong className="text-[rgba(255,255,255,0.92)] font-semibold">
                   contract layer
                 </strong>{" "}
-                — proven live by Plugboard, an external agent Bombe&apos;s team did not write.
+                , proven live by Plugboard, an external agent Bombe&apos;s team did not write.
               </p>
 
               {/* CTAs */}
@@ -124,7 +124,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right stat cluster — subtle elevated panel, visible on lg+ */}
+            {/* Right stat cluster, subtle elevated panel, visible on lg+ */}
             <aside className="hidden lg:flex flex-col gap-4" aria-label="Protocol statistics">
               {/* Stat card: attestors */}
               <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
@@ -147,7 +147,7 @@ export default function LandingPage() {
                   <Badge variant="tier-3" label="T3" />
                 </div>
                 <p className="text-[13px] text-[rgba(255,255,255,0.50)] mt-3">
-                  T3 always ABSTAIN — contract enforced
+                  T3 always ABSTAIN, contract enforced
                 </p>
               </div>
               {/* Stat card: chain */}
@@ -181,14 +181,14 @@ export default function LandingPage() {
             The attestation network that knows its limits.
           </h2>
           <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] max-w-2xl mb-14 pretty">
-            Existing attestation networks attest to any claim — including subjective valuations that
+            Existing attestation networks attest to any claim, including subjective valuations that
             no agent can verify. When wrong, there&apos;s no economic consequence. Bombe changes the
             game.
           </p>
 
           {/* Asymmetric layout: large feature card left, 2-stack right */}
           <div className="grid md:grid-cols-[1.4fr_1fr] gap-6">
-            {/* Featured card — the plan-card-featured stamp */}
+            {/* Featured card, the plan-card-featured stamp */}
             <Card variant="plan-featured" className="flex flex-col justify-between min-h-[260px]">
               <div>
                 <div className="text-[32px] mb-5" style={{ lineHeight: 1 }}>
@@ -222,7 +222,7 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-[14px] text-[rgba(255,255,255,0.60)] leading-[1.56]">
                   Three tiers: deterministic on-chain math (Tier 1), document cross-check (Tier 2),
-                  and judgment — where the only valid answer is ABSTAIN.
+                  and judgment, where the only valid answer is ABSTAIN.
                 </p>
               </Card>
 
@@ -305,15 +305,14 @@ export default function LandingPage() {
             Tier determines truth
           </h2>
           <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-12 max-w-[36rem] pretty">
-            Tier determines how a claim can be proven — and whether an attestation is even
-            permitted.
+            Tier determines how a claim can be proven, and whether an attestation is even permitted.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
             {TIERS.map((tier) => (
               <Card key={tier.tier} variant="feature-dark">
                 <div className="flex items-center gap-3 mb-5">
-                  <Badge variant={tier.tier} label={tier.label.split(" — ")[1]} />
+                  <Badge variant={tier.tier} label={tier.label.split(" · ")[1]} />
                 </div>
                 <h3 className="text-[17px] font-semibold mb-2 tracking-[-0.1px] balance">
                   {tier.label}
@@ -341,7 +340,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Plugboard — the independent proof ─────────────────────────────── */}
+      {/* ── Plugboard, the independent proof ─────────────────────────────── */}
       {/* Asymmetric section: left-anchored prose, no centering */}
       <section className="px-6 py-[88px]">
         <div className="max-w-6xl mx-auto">
@@ -352,10 +351,10 @@ export default function LandingPage() {
                 <Badge variant="AI" label="Hermes Agent" />
               </div>
               <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-6 balance">
-                Plugboard — the independent proof
+                Plugboard, the independent proof
               </h2>
               <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-6 pretty">
-                Plugboard runs on the Hermes Agent runtime (Nous Research) — an agent Bombe&apos;s
+                Plugboard runs on the Hermes Agent runtime (Nous Research), an agent Bombe&apos;s
                 team did not write. It touches the protocol only through public interfaces: the tool
                 gateway over HTTP and the contracts via its own wallet.
               </p>
@@ -365,7 +364,7 @@ export default function LandingPage() {
                 <span className="font-semibold" style={{ color: "#7c3aed" }}>
                   BLOCKED BY PROTOCOL
                 </span>{" "}
-                — not by the SDK, not by a framework, by the chain itself.
+                , not by the SDK, not by a framework, by the chain itself.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/live">
@@ -374,7 +373,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Plugboard proof visual — elevated panel */}
+            {/* Plugboard proof visual, elevated panel */}
             <div className="hidden md:block">
               <div
                 className="rounded-[20px] border border-[rgba(255,255,255,0.08)] p-6 shadow-[0_12px_48px_rgba(0,0,0,0.5)]"
@@ -412,7 +411,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Final CTA band — surface-elevated, NOT cobalt-violet full band ────── */}
+      {/* ── Final CTA band, surface-elevated, NOT cobalt-violet full band ────── */}
       {/* DESIGN.md: reserve #494fdf for plan-card-featured, not full page-width bands */}
       <section
         className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
@@ -430,7 +429,7 @@ export default function LandingPage() {
               Watch the race.
             </h2>
             <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-10 max-w-[32rem] pretty">
-              Four attestors — three AI agents + one human — race to attest claims A through D. Live
+              Four attestors, three AI agents + one human, race to attest claims A through D. Live
               on Mantle Sepolia.
             </p>
             <div className="flex flex-wrap gap-4">

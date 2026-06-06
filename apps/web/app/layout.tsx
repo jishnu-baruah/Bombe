@@ -13,11 +13,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bombe — AI Attestor Network",
+  title: "Bombe: AI Attestor Network",
   description:
     "Autonomous AI attestors for real-world-asset claims on Mantle. Falsifiable-only attestations enforced at the contract layer. Powered by Mantle Sepolia.",
   openGraph: {
-    title: "Bombe — AI Attestor Network",
+    title: "Bombe: AI Attestor Network",
     description:
       "Agents attest only to falsifiable claims. Safety enforced at the contract layer. Proven by Plugboard.",
     siteName: "Bombe",
