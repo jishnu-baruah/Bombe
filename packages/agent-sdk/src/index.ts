@@ -150,6 +150,8 @@ export {
   streakJsonEntry,
 } from "./data/scheduler.js";
 export type { RunDecision, DedupeInputs, StreakRecord } from "./data/scheduler.js";
+export { consensusEvidence, runConsensusDecisive } from "./data/consensus.js";
+export type { ConsensusResult, ConsensusDecisiveResult } from "./data/consensus.js";
 export {
   HttpDefiLlamaClient,
   DefiLlamaError,
