@@ -17,6 +17,36 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 ## Open
 
+> OP-3 through OP-6 unblock the live submission (D16); build proceeds mock-tested and cuts over to live when each resolves.
+
+## OP-3 — AI gateway key (real LLM)   [open]
+- Date: 2026-06-06
+- Blocks: T-801 live ModelSeam + all live agent runs
+- Need: an OpenAI-compatible AI gateway base URL + API key that can serve `anthropic/claude-sonnet-4.6`, `openai/gpt-5`, `meta/llama-3.3-70b` (e.g. OpenRouter, Vercel AI Gateway) → `AI_GATEWAY_KEY` + `AI_GATEWAY_BASE_URL`.
+- Half-done state: live ModelSeam is coded to a standard chat-completions HTTP call; all seam interfaces ready. Cannot make real LLM calls without the key.
+- To resolve: put `AI_GATEWAY_KEY` and `AI_GATEWAY_BASE_URL` in `.env.local` (never committed), then tell the agent "OP-3 ready".
+
+## OP-4 — Mantle Sepolia RPC + funded wallets   [open]
+- Date: 2026-06-06
+- Blocks: T-804 deploy:testnet + all real on-chain attestations (T-J01, T-J02, T-J03)
+- Need: `RPC_URL` for Mantle Sepolia (chain 5003); `DEPLOYER_KEY`; three `AGENT_KEYS` (REFLECTOR, ROTOR, STATOR); `PLUGBOARD_WALLET_KEY`; `HUMAN_WALLET_KEY` — each funded with testnet MNT (faucet: https://faucet.sepolia.mantle.xyz).
+- Half-done state: contracts + live WalletSeam + deploy script ready; cannot deploy or send real txns without funded keys.
+- To resolve: provide all keys + RPC URL in `.env.local`, fund wallets, tell the agent "OP-4 ready".
+
+## OP-5 — Blob storage token   [open]
+- Date: 2026-06-06
+- Blocks: T-802 live BlobSeam (real trace storage for the verify-hash artifact)
+- Need: `BLOB_RW_TOKEN` (e.g. Vercel Blob read-write token).
+- Half-done state: live BlobSeam coded; falls back to local filesystem in mock mode.
+- To resolve: provide `BLOB_RW_TOKEN` in `.env.local`, tell the agent "OP-5 ready".
+
+## OP-6 — Neon Postgres URL   [open]
+- Date: 2026-06-06
+- Blocks: T-803 live DB read-model (leaderboard/traces over live data)
+- Need: `DATABASE_URL` (Neon serverless Postgres connection string).
+- Half-done state: drizzle schema + live client skeleton ready; pglite used in mock and tests.
+- To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
+
 ## Resolved
 
 ## OP-2 — YieldProof submodule URL   [done]
