@@ -617,7 +617,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 > is first-come-first-served (20 spots) — treat T-J01→T-J05 as time-critical.
 
 ### T-J01 — Live Mantle Sepolia deployment + canonical addresses
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-804, T-802
 - Scope: ops
 - Acceptance: run `pnpm deploy:testnet` against Mantle Sepolia (5003) with real `RPC_URL`/`DEPLOYER_KEY`; all 4 contracts deployed and wired with roles per D14; record the 4 addresses + deploy tx hashes in `docs/DEPLOYMENTS.md` and the README address block. (Deployment Award §Technical; PRD §7, §14.9)
