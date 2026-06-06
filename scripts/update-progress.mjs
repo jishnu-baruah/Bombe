@@ -111,6 +111,13 @@ function getTestCounts() {
   let forgeCount = null;
   let vitestCount = null;
 
+  // Fast path (CI / --no-tests): skip running the suites; the dashboard falls
+  // back to a static "run pnpm run ci for live count" note. Keeps the
+  // auto-update workflow fast since CI already runs the suites separately.
+  if (process.argv.includes("--no-tests") || process.env.PROGRESS_NO_TESTS) {
+    return { forgeCount, vitestCount };
+  }
+
   // Forge: parse "Suite result: ok. N passed" lines to avoid double-counting summary table
   try {
     const out = execSync("forge test --root contracts --summary 2>&1", {
