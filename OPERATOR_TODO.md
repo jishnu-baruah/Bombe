@@ -17,21 +17,28 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 ## Open
 
-> OP-3 through OP-6 unblock the live submission (D16); build proceeds mock-tested and cuts over to live when each resolves.
+> OP-5 through OP-7 unblock the live submission (D16); build proceeds mock-tested and cuts over to live when each resolves.
 
-## OP-3 — AI gateway key (real LLM)   [open]
+## OP-5 — Blob storage token   [open]
 - Date: 2026-06-06
-- Blocks: T-801 live ModelSeam + all live agent runs
-- Need: an OpenAI-compatible AI gateway base URL + API key that can serve `anthropic/claude-sonnet-4.6`, `openai/gpt-5`, `meta/llama-3.3-70b` (e.g. OpenRouter, Vercel AI Gateway) → `AI_GATEWAY_KEY` + `AI_GATEWAY_BASE_URL`.
-- Half-done state: live ModelSeam is coded to a standard chat-completions HTTP call; all seam interfaces ready. Cannot make real LLM calls without the key.
-- To resolve: put `AI_GATEWAY_KEY` and `AI_GATEWAY_BASE_URL` in `.env.local` (never committed), then tell the agent "OP-3 ready".
+- Blocks: T-802 live BlobSeam (real trace storage for the verify-hash artifact)
+- Need: `BLOB_RW_TOKEN` (e.g. Vercel Blob read-write token).
+- Half-done state: live BlobSeam coded; falls back to local filesystem in mock mode.
+- To resolve: provide `BLOB_RW_TOKEN` in `.env.local`, tell the agent "OP-5 ready".
 
-## OP-4 — Mantle Sepolia RPC + funded wallets   [open]
+## OP-6 — Neon Postgres URL   [open]
 - Date: 2026-06-06
-- Blocks: T-804 deploy:testnet + all real on-chain attestations (T-J01, T-J02, T-J03)
-- Need: `RPC_URL` for Mantle Sepolia (chain 5003); `DEPLOYER_KEY`; three `AGENT_KEYS` (REFLECTOR, ROTOR, STATOR); `PLUGBOARD_WALLET_KEY`; `HUMAN_WALLET_KEY` — each funded with testnet MNT (faucet: https://faucet.sepolia.mantle.xyz).
-- Half-done state: contracts + live WalletSeam + deploy script ready; cannot deploy or send real txns without funded keys.
-- To resolve: provide all keys + RPC URL in `.env.local`, fund wallets, tell the agent "OP-4 ready".
+- Blocks: T-803 live DB read-model (leaderboard/traces over live data)
+- Need: `DATABASE_URL` (Neon serverless Postgres connection string).
+- Half-done state: drizzle schema + live client skeleton ready; pglite used in mock and tests.
+- To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
+
+## OP-7 — Upstash Redis   [open]
+- Date: 2026-06-06
+- Blocks: live serverless SSE event fan-out (in-process bus won't survive Vercel functions), distributed tool-gateway rate limiting, caching
+- Need: `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (Upstash Redis REST API).
+- Half-done state: in-process EventEmitter bus works in development; needs Upstash for stateless Vercel functions at scale.
+- To resolve: create Upstash Redis instance, add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to `.env.local`, tell the agent "OP-7 ready".
 
 ## OP-5 — Blob storage token   [open]
 - Date: 2026-06-06
@@ -48,6 +55,16 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
 
 ## Resolved
+
+## OP-4 — Mantle Sepolia RPC + funded wallets   [done]
+- Date: 2026-06-06 (resolved 2026-06-06)
+- Blocks: T-804 deploy:testnet + T-J01/T-J02/T-J03 real on-chain attestations
+- Outcome: RPC `https://rpc.sepolia.mantle.xyz` (chain 5003; original `rpc.testnet.mantle.xyz` was dead), deployer `0xe415…7a83` funded 0.84 MNT, 3 agent + human + plugboard wallets generated in `.env.local`. LiveWalletSeam wired and tested (T-406).
+
+## OP-3 — AI gateway key (real LLM)   [done]
+- Date: 2026-06-06 (resolved 2026-06-06)
+- Blocks: T-801 live ModelSeam + all live agent runs
+- Outcome: Ollama Cloud wired for testing (`https://ollama.com/v1`, model `gpt-oss:20b`, key in `.env.local`). LiveModelSeam implemented (T-801) as OpenAI-compatible chat-completions. Real benchmark run: 5/12 match rate (42%) — gpt-oss:20b produces valid tool calls but tool input schemas often fail validation → TOOL_FAILURE abstain; TIER3 (claim D) always correct. For production: Vercel AI Gateway with the same OpenAI-compatible LiveModelSeam using provider-specific model IDs.
 
 ## OP-2 — YieldProof submodule URL   [done]
 - Date: 2026-06-05 (resolved 2026-06-06)

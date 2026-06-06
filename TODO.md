@@ -531,11 +531,11 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 > **CRITICAL PATH for live submission (D16).** T-801–T-804 are elevated above their original M8 ordering and are required for the hackathon submission demo. Each is OP-gated: T-801 → OP-3; T-802 → OP-5 + OP-4; T-803 → OP-6; T-804 → OP-4.
 
 ### T-801 — live ModelSeam (AI gateway)
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-205
 - Scope: agent-sdk
 - Acceptance: compiles/typechecks; live call best-effort. (PRD §8 M8, §14.9)
-- Notes: **OP:** AI_GATEWAY_KEY.
+- Notes: LiveModelSeam (OpenAI-compatible chat-completions) fully implemented; 6 unit tests (mocked fetch) pass; real benchmark: 5/12 match (42%) against Ollama Cloud gpt-oss:20b — model calls tools but input schemas often fail validation; TIER3 always correct; OP-3 resolved.
 
 ### T-802 — live Blob + Wallet seams (viem)
 - Status: pending

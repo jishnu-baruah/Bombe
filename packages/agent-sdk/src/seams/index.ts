@@ -16,8 +16,8 @@ import {
   LiveBlobSeam,
   LiveClockSeam,
   LiveHumanQueueSeam,
-  LiveModelSeam,
   LiveWalletSeam,
+  createLiveModelSeam,
 } from "./live.js";
 import {
   MockBlobSeam,
@@ -46,7 +46,7 @@ export function createSeams(overrides?: Partial<Seams>): Seams {
   let humanQueue: HumanQueueSeam;
 
   if (config.mode === "live") {
-    model = new LiveModelSeam();
+    model = createLiveModelSeam(config);
     blob = new LiveBlobSeam();
     wallet = new LiveWalletSeam(config);
     clock = new LiveClockSeam();

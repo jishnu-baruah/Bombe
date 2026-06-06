@@ -70,6 +70,10 @@ export interface Config {
   deployerKey: string | undefined;
   /** AI gateway API key [live only] */
   aiGatewayKey: string | undefined;
+  /** AI gateway base URL (default "https://ollama.com/v1") */
+  aiGatewayBaseUrl: string | undefined;
+  /** Comma-separated model names served by the gateway (first is primary) */
+  aiGatewayModels: string | undefined;
   /** Blob storage read-write token [live only] */
   blobRwToken: string | undefined;
   /** Pinned Hermes runtime tag [live only] */
@@ -112,6 +116,10 @@ export function getConfig(): Config {
   const hermesRuntimeTag =
     mode === "live" ? (process.env.HERMES_RUNTIME_TAG ?? undefined) : undefined;
 
+  // AI gateway URL + model list — optional in both modes (default to Ollama Cloud).
+  const aiGatewayBaseUrl = process.env.AI_GATEWAY_BASE_URL ?? undefined;
+  const aiGatewayModels = process.env.AI_GATEWAY_MODELS ?? undefined;
+
   return {
     mode,
     testMode,
@@ -121,6 +129,8 @@ export function getConfig(): Config {
     chainId,
     deployerKey,
     aiGatewayKey,
+    aiGatewayBaseUrl,
+    aiGatewayModels,
     blobRwToken,
     hermesRuntimeTag,
     operatorKey,
