@@ -1,5 +1,8 @@
-import { SseEventSchema } from "@bombe/shared";
-import type { SseEvent } from "@bombe/shared";
+// Import via alias so webpack resolves directly to events.ts (browser-safe zod schemas)
+// rather than through the @bombe/shared barrel which pulls in Node-only modules
+// (fixtures.ts → node:fs, event-bus.ts → node:events). See next.config.ts.
+import { SseEventSchema } from "@bombe-events";
+import type { SseEvent } from "@bombe-events";
 
 export type ParseResult = { ok: true; event: SseEvent } | { ok: false; error: string };
 

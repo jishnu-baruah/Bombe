@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
     // This lets lib/hash.ts import only canonical.ts (viem-only, browser-safe)
     // without pulling in the full @bombe/shared barrel which includes Node.js modules
     // (fixtures.ts → fs, event-bus.ts → events).
+    //
+    // @bombe-events — direct alias to the SSE event schemas (zod, browser-safe).
+    // Used by lib/parseEvent.ts so it doesn't pull in the Node-only shared barrel.
     const existingAliasPaths = config.resolve?.alias ?? {};
 
     return {
@@ -36,6 +39,7 @@ const nextConfig: NextConfig = {
         alias: {
           ...existingAliasPaths,
           "@bombe-canonical": resolve(__dirname, "../../packages/shared/src/canonical.ts"),
+          "@bombe-events": resolve(__dirname, "../../packages/shared/src/events.ts"),
         },
         extensionAlias: {
           ...existingAlias,
