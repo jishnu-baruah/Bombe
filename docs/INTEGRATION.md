@@ -4,6 +4,25 @@ How to consume and verify Bombe attestations on Mantle Sepolia, and how claims a
 enter the system. The read and verify paths are permissionless and work today. Posting a claim
 runs through the operator for now (see below).
 
+## Quickstart: read a verdict
+
+Permissionless, no keys. `AgentAttestation` is at `0xf2473a0a55D997233C8fBF987c197e7d2180470A`
+on Mantle Sepolia (RPC `https://rpc.sepolia.mantle.xyz`).
+
+```ts
+import { createPublicClient, http } from "viem"; // abi: `pnpm gen:abis`
+const client = createPublicClient({ transport: http("https://rpc.sepolia.mantle.xyz") });
+const ATT = "0xf2473a0a55D997233C8fBF987c197e7d2180470A";
+const who = await client.readContract({ address: ATT, abi, functionName: "getClaimAttestors", args: [claimId] });
+const a = await client.readContract({ address: ATT, abi, functionName: "getAttestation", args: [claimId, who[0]] });
+// a.decision -> 0 VALID | 1 REJECTED | 2 ABSTAIN
+```
+
+Then verify the reasoning is exactly what was committed: fetch the trace at `a.traceURI`, recompute
+`hashCanonical(trace)`, and confirm it equals `a.reasoningHash` (see "Verify the trace" below). The
+rest of this guide covers the trust-score read, the verify step in full, posting a claim, becoming
+an attestor, and the tier-3 abstain rule.
+
 ## Prerequisites
 
 - Mantle Sepolia, chain id `5003`.
