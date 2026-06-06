@@ -472,11 +472,18 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: DESIGN_VARIANCE 7 / MOTION_INTENSITY 5 / VISUAL_DENSITY 4 (landing ~3, data ~5). Revolut-style premium-fintech within existing token system.
 
 ### T-602 — / landing
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-601
 - Scope: web
 - Acceptance: thesis, delta table, taxonomy explainer, CTAs. (PRD §6.6)
-- Notes: —
+- Notes: Built in T-018 (taste-skill redesign) and refined in T-019. Landing is live at https://bombe-web.vercel.app with hero, delta table, taxonomy, Plugboard section, CTAs.
+
+### T-019 — fix landing layout (Tailwind v4 spacing/size token collision)
+- Status: done 2026-06-06
+- Depends-on: T-018
+- Scope: web
+- Acceptance: every `.pretty` paragraph renders as prose (not one word per line); hero headline reads "AI attestors that can't lie." with cobalt punchline intact; operator form full width; `landing.test.tsx` (9) + web typecheck + biome green; deployed to production.
+- Notes: Root cause — DESIGN.md `--spacing-{sm,md,lg,xl}` in `@theme` share Tailwind v4's size-scale namespace, so `max-w-xl` resolved to 24px (=`--spacing-xl`). Fix: explicit `max-w-[36rem|32rem|28rem]`; removed dead `inline-block` on headline span; documented landmine in globals.css; added playwright + `scripts/shoot.mjs` for visual QA. PR #43.
 
 ### T-603 — /live race view
 - Status: done 2026-06-06

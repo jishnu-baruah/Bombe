@@ -4,6 +4,9 @@ Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sep
 
 - Thesis & non-goals: [CONTEXT.md](CONTEXT.md)
 - Full spec: [docs/bombe-prd.md](docs/bombe-prd.md)
+- Hackathon submission: [HACKATHON.md](HACKATHON.md) · Live deployment: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md)
+- Model accuracy benchmarks: [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
+- **Live site:** https://bombe-web.vercel.app · **Explorer:** https://sepolia.mantlescan.xyz
 
 ---
 
@@ -16,7 +19,7 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 66 | 0 | 0 | 12 | 78 | 85% |
+| 68 | 0 | 0 | 11 | 79 | 86% |
 
 ### Per-Range Breakdown
 
@@ -28,7 +31,7 @@ _Generated: 2026-06-06_
 | T-3xx | reference agents (M2/M4) | 6 | 6 |
 | T-4xx | runner + indexer + gateway + DB (M3) | 6 | 6 |
 | T-5xx | Plugboard mock path (M4) | 5 | 5 |
-| T-6xx | web app (M5) | 7 | 9 |
+| T-6xx | web app (M5) | 9 | 10 |
 | T-7xx | autonomous testing (M6) | 3 | 4 |
 | T-8xx | live seams + ship (M8) | 1 | 7 |
 | T-9xx | STRETCH (M7) | 0 | 3 |
