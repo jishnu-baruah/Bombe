@@ -80,23 +80,31 @@ function SummaryCards({ rows }: { rows: LeaderboardRow[] }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
       <Card variant="feature-dark" className="p-6">
-        <p className="text-[#8d969e] text-[13px] mb-1">Top Ranked</p>
-        <p className="text-[20px] font-semibold capitalize">{topAgent?.agentId ?? "—"}</p>
-        <p className="text-[#8d969e] text-[13px] mt-1">
+        <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-2">
+          Top Ranked
+        </p>
+        <p className="text-[22px] font-semibold capitalize tracking-[-0.2px]">
+          {topAgent?.agentId ?? "—"}
+        </p>
+        <p className="text-[#505a63] text-[13px] mt-1 tabular">
           {topAgent?.accuracyPct !== null && topAgent?.accuracyPct !== undefined
             ? `${topAgent.accuracyPct}% accuracy`
             : "all abstain"}
         </p>
       </Card>
       <Card variant="feature-dark" className="p-6">
-        <p className="text-[#8d969e] text-[13px] mb-1">Total Decisions</p>
-        <p className="text-[20px] font-semibold font-mono">{totalDecisions}</p>
-        <p className="text-[#8d969e] text-[13px] mt-1">across 4 claims</p>
+        <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-2">
+          Total Decisions
+        </p>
+        <p className="text-[22px] font-semibold font-mono tabular">{totalDecisions}</p>
+        <p className="text-[#505a63] text-[13px] mt-1">across 4 claims</p>
       </Card>
       <Card variant="feature-dark" className="p-6 col-span-2 sm:col-span-1">
-        <p className="text-[#8d969e] text-[13px] mb-1">Overall Abstention</p>
-        <p className="text-[20px] font-semibold font-mono">{overallAbstainPct}%</p>
-        <p className="text-[#8d969e] text-[13px] mt-1">
+        <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-2">
+          Overall Abstention
+        </p>
+        <p className="text-[22px] font-semibold font-mono tabular">{overallAbstainPct}%</p>
+        <p className="text-[#505a63] text-[13px] mt-1 tabular">
           {totalAbstained} of {totalDecisions}
         </p>
       </Card>
@@ -202,13 +210,13 @@ export default function LeaderboardPage() {
       {/* ── Hero band ── */}
       <section className="px-6 py-[88px] border-b border-[rgba(255,255,255,0.06)]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[#494fdf] text-[13px] font-semibold tracking-[0.24px] uppercase mb-3">
+          <p className="text-[#494fdf] text-[12px] font-semibold tracking-[0.8px] uppercase mb-4">
             Bombe · Agent Rankings
           </p>
-          <h1 className="text-[48px] sm:text-[80px] font-semibold leading-[1.0] tracking-[-0.48px] sm:tracking-[-0.8px] mb-4">
+          <h1 className="text-[clamp(40px,8vw,80px)] font-semibold leading-[1.0] tracking-[-0.8px] mb-4 balance">
             Leaderboard
           </h1>
-          <p className="text-[rgba(255,255,255,0.72)] text-[18px] max-w-2xl leading-[1.56]">
+          <p className="text-[rgba(255,255,255,0.60)] text-[18px] max-w-2xl leading-[1.56] pretty">
             Lifetime aggregate over claims A–D (demo settlement). Accuracy excludes abstentions from
             the denominator — only decisive attestations are scored.
           </p>

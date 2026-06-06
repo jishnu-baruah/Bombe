@@ -464,6 +464,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: Next.js 16 App Router, Tailwind v4, dark theme, monospace hashes; `/api/stream` `text/event-stream`; `EventSource` routes by `kind`. (PRD §6.6, §6.5)
 - Notes: apps/web (@bombe/web); DESIGN.md token system as Tailwind v4 @theme; Button/Card/Badge/Mono/ExplorerLink components; Nav+Footer+layout; parseEvent+useEventStream SSE infra; landing page + stub /live /leaderboard /operator; 24 vitest tests pass; root typecheck excludes apps/web; ci gate: pnpm --filter @bombe/web typecheck.
 
+### T-018 — UI taste-skill redesign + TASTE-CONTEXT.md
+- Status: done 2026-06-06
+- Depends-on: T-601
+- Scope: web
+- Acceptance: TASTE-CONTEXT.md created; slop audit run; landing asymmetric layout, ambient hero gradient, glassmorphism nav, Button/Card hover+active+focus states, tabular-nums, text-wrap balance/pretty, off-black section alternation, no cobalt-violet full-band; data surfaces (/live, /leaderboard) light-polished; all existing web tests pass; `pnpm run ci` exit 0; `pnpm --filter @bombe/web build` compiles all routes. (PRD §6.6)
+- Notes: DESIGN_VARIANCE 7 / MOTION_INTENSITY 5 / VISUAL_DENSITY 4 (landing ~3, data ~5). Revolut-style premium-fintech within existing token system.
+
 ### T-602 — / landing
 - Status: pending
 - Depends-on: T-601

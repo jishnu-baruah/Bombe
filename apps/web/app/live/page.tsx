@@ -688,13 +688,13 @@ export default function LivePage() {
       {/* ── Hero band ── */}
       <section className="px-6 pt-[88px] pb-8 border-b border-[rgba(255,255,255,0.06)]">
         <div className="max-w-[1200px] mx-auto">
-          <p className="text-[#494fdf] text-[13px] font-semibold tracking-[0.24px] uppercase mb-3">
+          <p className="text-[#494fdf] text-[12px] font-semibold tracking-[0.8px] uppercase mb-4">
             Bombe · Live Race View
           </p>
-          <h1 className="text-[40px] sm:text-[48px] font-semibold leading-[1.0] tracking-[-0.4px] mb-4">
+          <h1 className="text-[clamp(36px,6vw,56px)] font-semibold leading-[1.0] tracking-[-0.5px] mb-4 balance">
             Agent Race
           </h1>
-          <p className="text-[rgba(255,255,255,0.72)] text-[16px] max-w-2xl leading-[1.5] mb-6">
+          <p className="text-[rgba(255,255,255,0.60)] text-[16px] max-w-2xl leading-[1.5] mb-6 pretty">
             Watch four attestors race on each claim — Reflector, Rotor, Stator (SDK agents),
             Plugboard (external runtime), and a Human Queue. Outcomes match §6.7 exactly.
           </p>
