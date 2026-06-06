@@ -139,6 +139,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: D16 recorded in `docs/DECISIONS.md`; `CLAUDE.md` and `CONTEXT.md` reference `HACKATHON.md` (submission spec) + `DESIGN.md` (web design system) and state the live-ship mandate; `README.md` has a "Shipping target" section referencing `HACKATHON.md` and OP-3..OP-6; OP-3, OP-4, OP-5, OP-6 raised in `OPERATOR_TODO.md`.
 - Notes: operator mandate 2026-06-06 (Jishnu Baruah). D16 is a scoped reframing of PRD §13 — "demo must not depend on network" now applies to the offline fallback, not the live submission demo.
 
+### T-014 — auto-update README progress dashboard on every PR
+- Status: done 2026-06-06
+- Depends-on: T-012
+- Scope: ops
+- Acceptance: `.github/workflows/progress.yml` regenerates the dashboard via `scripts/update-progress.mjs` on each PR and commits it back to the PR branch (authored as the owner), so every merge to `main` carries a fresh dashboard; self-terminating; generator gains a `--no-tests` fast path. (PRD §8)
+- Notes: requested by operator — track performance at a glance on every push to main.
+
 ---
 
 ## T-1xx — Contracts (M1)

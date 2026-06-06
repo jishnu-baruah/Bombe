@@ -10,37 +10,41 @@ Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sep
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-05_
+_Generated: 2026-06-06_
 
 ### Overall
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 26 | 0 | 0 | 46 | 72 | 36% |
+| 49 | 0 | 0 | 25 | 74 | 66% |
 
 ### Per-Range Breakdown
 
 | Range | Area | Done | Total |
 |-------|------|------|-------|
-| T-0xx | Ops | 12 | 12 |
+| T-0xx | Ops | 14 | 14 |
 | T-1xx | Contracts (M1) | 9 | 9 |
-| T-2xx | shared + agent-sdk (M2) | 5 | 14 |
-| T-3xx | reference agents (M2/M4) | 0 | 4 |
-| T-4xx | runner + indexer + gateway + DB (M3) | 0 | 6 |
+| T-2xx | shared + agent-sdk (M2) | 14 | 14 |
+| T-3xx | reference agents (M2/M4) | 4 | 4 |
+| T-4xx | runner + indexer + gateway + DB (M3) | 5 | 6 |
 | T-5xx | Plugboard mock path (M4) | 0 | 5 |
-| T-6xx | web app (M5) | 0 | 8 |
+| T-6xx | web app (M5) | 3 | 8 |
 | T-7xx | autonomous testing (M6) | 0 | 4 |
 | T-8xx | live seams + ship (M8) | 0 | 7 |
 | T-9xx | STRETCH (M7) | 0 | 3 |
 
 ### Test Counts
 
-- 71 forge tests
-- 149 vitest tests
+- forge tests: run `pnpm run ci` for live count
+- vitest tests: run `pnpm run ci` for live count
 
 ### Operator TODO
 
-No open operator items.
+**Open:**
+- **OP-3**: AI gateway key (real LLM)
+- **OP-4**: Mantle Sepolia RPC + funded wallets
+- **OP-5**: Blob storage token
+- **OP-6**: Neon Postgres URL
 _Resolved: 2_
 <!-- PROGRESS:END -->
 
