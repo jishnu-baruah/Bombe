@@ -141,6 +141,8 @@ export type {
 } from "./data/types.js";
 export { LiveDataSource, POOL_IDS } from "./data/live-source.js";
 export { createDataSource } from "./data/factory.js";
+export { computeDecisiveAttestation } from "./data/decisive-path.js";
+export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";
 export {
   HttpDefiLlamaClient,
   DefiLlamaError,
