@@ -52,3 +52,18 @@ Script: `scripts/live-attest.ts` (`pnpm live:attest`)
 | Attestor (Reflector) | `0x3BA08C723D41A98339D43Ffa01174791EaE813Fa` |
 
 Note: ABSTAIN is a valid on-chain AI attestation — the proof is "AI inference → on-chain tx", not a specific VALID/REJECTED decision. `ATTEST_LOCK=0 MNT` for ABSTAIN per contract spec. The `reasoningHash` of the actual live trace is stored on-chain and matches the local `keccak256(canonicalJson(trace))` computation.
+
+---
+
+## Vercel Production Deployment — 2026-06-06 (T-J04)
+
+**Public URL: https://bombe-web.vercel.app**
+
+Deployment ID: `dpl_CmbkzzFTTQDScVoj7ax1vzi4HLE4`
+Inspect: https://vercel.com/jishnu-baruahs-projects/bombe-web/CmbkzzFTTQDScVoj7ax1vzi4HLE4
+
+- Framework: Next.js 16.2.7 (webpack, no Turbopack — required for workspace alias resolution)
+- Monorepo: install from repo root (`pnpm install --frozen-lockfile`), build via `pnpm --filter @bombe/web build`
+- `apps/web/vercel.json` configures install/build commands; project `rootDirectory=apps/web` set via Vercel API
+- Mode: `MODE=live` — reads live Mantle Sepolia contracts + Neon Postgres + Upstash Redis
+- Verified: `curl -sI https://bombe-web.vercel.app` → HTTP 200; `/leaderboard` renders HTML
