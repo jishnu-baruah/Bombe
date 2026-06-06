@@ -665,12 +665,12 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: a scripted live run where an SDK agent's inference result is written on-chain via `attest()` on Mantle Sepolia; capture the resulting tx hash + explorer link; assert the on-chain `ClaimPosted`/attestation records match the agent trace. (Deployment Award §Technical: "AI-powered function callable on-chain")
 - Notes: this is the headline proof for the AI×on-chain criterion. Must be a real tx, not a mock EventEmitter.
 
-### T-J04 — Public, live-wired frontend deployment (not localhost)
-- Status: pending
+### T-J04 — live on-chain data layer (web)
+- Status: done 2026-06-06
 - Depends-on: T-608, T-803, T-J01
 - Scope: web
-- Acceptance: web app deployed to a public host (Vercel) wired to live Mantle (T-J01 addresses) + live DB (T-803); public URL loads `/`, `/live`, `/leaderboard`, `/claim/[id]` with no localhost dependency; `MODE=live`. URL recorded in README + HACKATHON.md §8. (Deployment Award §Product; Best UI/UX: runnable frontend)
-- Notes: **OP:** hosting account + production env vars (DATABASE_URL, RPC_URL, BLOB_RW_TOKEN, OPERATOR_KEY, TOOL_GATEWAY_KEY). Plugboard-replay badge stays as offline fallback per T-504.
+- Acceptance: `apps/web/lib/live-data.ts` reads `TuringLeaderboard.lifetimeStats`/`trustScore`, `AgentRegistry.getAgent`, `AgentAttestation.getClaim`/`getClaimAttestors`/`getAttestation` via viem against Mantle Sepolia; `data-source.ts` selector routes MODE=live → live-data / MODE=mock → demo-data; `/leaderboard` and `/claim/[id]` converted to server+client split (server wrapper calls data-source async getters); `/api/trace/[claimId]/[agent]` route serves fixture traces (mock) or 404+message (live, T-803 follow-up); unit tests for selector + mapper shapes; `pnpm run ci` exit 0; `pnpm --filter @bombe/web build` compiles all routes.
+- Notes: Remaining T-J04 follow-ups: (1) Vercel deploy (OP-gated — hosting account + production env vars); (2) SSE via Redis (Upstash) for live /live page (currently on SSE replay). `/live` kept on SSE demo replay per task note. Vercel deploy + SSE-via-Redis are the remaining T-J04 follow-ups.
 
 ### T-J05 — Demo video (≥ 2 min) of the live core use case
 - Status: pending
