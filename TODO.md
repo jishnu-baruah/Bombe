@@ -362,7 +362,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: —
 
 ### T-405 — tool-gateway
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-210, T-211, T-212
 - Scope: tool-gateway
 - Acceptance: `POST /tools/:name` bearer auth + 60/min rate limit, same zod schemas, thin wrapper (never a rewrite); round-trip test green. (PRD §6.8, §9, M3 checkpoint)
