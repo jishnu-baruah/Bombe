@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Brand ── */
+  --color-primary: #494fdf;
+  --color-primary-bright: #4f55f1;
+  --color-primary-deep: #3a40c4;
+  --color-on-primary: #ffffff;
+
+  /* ── Canvas / Surface ── */
+  --color-canvas-light: #ffffff;
+  --color-canvas-dark: #000000;
+  --color-surface-soft: #f4f4f4;
+  --color-surface-card: #ffffff;
+  --color-surface-deep: #0a0a0a;
+  --color-surface-elevated: #16181a;
+
+  /* ── Hairlines / Dividers ── */
+  --color-hairline-light: #e2e2e7;
+  --color-hairline-dark: rgba(255, 255, 255, 0.12);
+  --color-hairline-strong: #191c1f;
+  --color-divider-soft: rgba(255, 255, 255, 0.06);
+
+  /* ── Text ── */
+  --color-ink: #191c1f;
+  --color-body-text: #1f2226;
+  --color-charcoal: #3a3d40;
+  --color-mute: #505a63;
+  --color-ash: #5c5e60;
+  --color-stone: #8d969e;
+  --color-faint: #c9c9cd;
+  --color-on-dark: #ffffff;
+  --color-on-dark-mute: rgba(255, 255, 255, 0.72);
+
+  /* ── Accents (illustrations / iconography only — never button surfaces) ── */
+  --color-accent-teal: #00a87e;
+  --color-accent-blue-link: #376cd5;
+  --color-accent-light-blue: #007bc2;
+  --color-accent-light-green: #428619;
+  --color-accent-green-text: #006400;
+  --color-accent-yellow: #b09000;
+  --color-accent-warning: #ec7e00;
+  --color-accent-pink: #e61e49;
+  --color-accent-danger: #e23b4a;
+  --color-accent-deep-red: #8b0000;
+  --color-accent-brown: #936d62;
+  --color-link: #376cd5;
+
+  /* ── Semantic decision chip colors ── */
+  --color-decision-valid: #428619;
+  --color-decision-rejected: #e23b4a;
+  --color-decision-abstain: #b09000;
+  --color-decision-blocked: #7c3aed;
+  --color-decision-external: #8d969e;
+
+  /* ── Border Radius (DESIGN.md rounded.*) ── */
+  --radius-none: 0px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* ── Spacing (DESIGN.md spacing.*) ── */
+  --spacing-xxs: 4px;
+  --spacing-xs: 6px;
+  --spacing-sm: 8px;
+  --spacing-md: 14px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-xxxl: 48px;
+  --spacing-block: 80px;
+  --spacing-section: 88px;
+  --spacing-band: 120px;
+
+  /* ── Typography font families ── */
+  /* Aeonik Pro substitute: Inter Display / General Sans / Söhne / Inter */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+
+  /* ── Type scale (DESIGN.md typography.*) ── */
+  --text-display-xxl: 136px;
+  --text-display-xl: 80px;
+  --text-display-lg: 48px;
+  --text-display-md: 40px;
+  --text-heading-lg: 32px;
+  --text-heading-md: 24px;
+  --text-heading-sm: 20px;
+  --text-body-lg: 18px;
+  --text-body-md: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 13px;
+}
+
+/* ── Base: dark canvas by default ── */
+html {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Monospace for hashes / addresses / code (PRD §6.6) */
+code,
+pre,
+.mono {
+  font-family: var(--font-mono);
+}

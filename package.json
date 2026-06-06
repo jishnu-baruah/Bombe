@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:unit": "vitest run",
     "//ci": "D7: the ci script (invoke as `pnpm run ci`) is incremental. T-102 added contracts:test to the gate (forge test). T-201 added test:unit (vitest, packages/shared). test:demo appended when M6 lands.",
-    "ci": "pnpm lint && pnpm typecheck && pnpm contracts:build && pnpm contracts:test && pnpm test:unit",
+    "ci": "pnpm lint && pnpm typecheck && pnpm contracts:build && pnpm contracts:test && pnpm test:unit && pnpm --filter @bombe/web typecheck",
     "contracts:build": "forge build --root contracts",
     "contracts:test": "forge test --root contracts",
     "contracts:test:deep": "forge test --root contracts --profile deep",
