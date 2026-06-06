@@ -33,7 +33,10 @@ export interface ReconcileResult {
  * other. A single leg trivially agrees with itself. Zero legs never agree (a
  * source failure must abstain, never silently pass).
  */
-export function reconcileLegs(values: readonly number[], reconcileToleranceBps: number): ReconcileResult {
+export function reconcileLegs(
+  values: readonly number[],
+  reconcileToleranceBps: number,
+): ReconcileResult {
   if (reconcileToleranceBps < 0) {
     throw new Error("reconcileLegs: reconcileToleranceBps must be >= 0");
   }

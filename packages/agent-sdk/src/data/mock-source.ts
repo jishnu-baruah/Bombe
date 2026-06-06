@@ -11,7 +11,14 @@
  */
 
 import { loadOracleSnapshot } from "@bombe/shared";
-import type { ClockLike, DataAsset, DataSource, SourceLeg, YieldObservation, YieldQuery } from "./types.js";
+import type {
+  ClockLike,
+  DataAsset,
+  DataSource,
+  SourceLeg,
+  YieldObservation,
+  YieldQuery,
+} from "./types.js";
 
 /**
  * MockDataSource — reads a yield fixture and returns a single-leg observation.
