@@ -20,37 +20,31 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 68 | 0 | 0 | 11 | 79 | 86% |
+| 69 | 0 | 0 | 10 | 79 | 87% |
 
 ### Per-Range Breakdown
 
-| Range | Area | Done | Total |
-|-------|------|------|-------|
-| T-0xx | Ops | 14 | 14 |
-| T-1xx | Contracts (M1) | 10 | 10 |
-| T-2xx | shared + agent-sdk (M2) | 14 | 14 |
-| T-3xx | reference agents (M2/M4) | 6 | 6 |
-| T-4xx | runner + indexer + gateway + DB (M3) | 6 | 6 |
-| T-5xx | Plugboard mock path (M4) | 5 | 5 |
-| T-6xx | web app (M5) | 9 | 10 |
-| T-7xx | autonomous testing (M6) | 3 | 4 |
-| T-8xx | live seams + ship (M8) | 1 | 7 |
-| T-9xx | STRETCH (M7) | 0 | 3 |
+| Area | Done | Total |
+|------|------|-------|
+| Ops | 14 | 14 |
+| Contracts (M1) | 10 | 10 |
+| shared + agent-sdk (M2) | 14 | 14 |
+| reference agents (M2/M4) | 6 | 6 |
+| runner + indexer + gateway + DB (M3) | 6 | 6 |
+| Plugboard mock path (M4) | 5 | 5 |
+| web app (M5) | 9 | 10 |
+| autonomous testing (M6) | 3 | 4 |
+| live seams + ship (M8) | 1 | 7 |
+| STRETCH (M7) | 1 | 3 |
 
 ### Test Counts
 
 - 77 forge tests
 - 668 vitest tests
 
-### Operator TODO
+### Operator Items
 
-**Open:**
-- **OP-5**: Blob storage token
-- **OP-6**: Neon Postgres URL
-- **OP-7**: Upstash Redis
-- **OP-5**: Blob storage token
-- **OP-6**: Neon Postgres URL
-_Resolved: 4_
+5 open, 4 resolved (tracked in OPERATOR_TODO.md).
 <!-- PROGRESS:END -->
 
 Refresh the dashboard with `pnpm progress`.
@@ -63,43 +57,9 @@ Bombe ships **live on Mantle Sepolia**: real LLM inference, real on-chain `attes
 
 ---
 
-## Workflow at a Glance
+## Contributing
 
-### Branch naming
-```
-feat|fix|docs|chore/T-XXX-slug
-```
-
-### Commit format
-```
-T-XXX: <verb> <object>
-```
-
-### PR title format
-```
-T-XXX, <title>
-```
-
-### Merge policy (D6 + D9)
-- `docs/` and `chore/` PRs: auto-merge on green CI (`gh pr merge --auto --squash`).
-- `feat/` and `fix/` PRs: operator merges manually, logic changes require the human gate.
-- **D9 autonomous-mode override:** during operator-directed unattended runs, `feat`/`fix` PRs auto-merge after green required CI + a passing two-stage subagent review, substituting adversarial review for the human merge gate.
-- Branch protection on `main` requires the `ci` status check (D8).
-
-### The fix-loop
-1. Run `pnpm run ci` or `pnpm test:agent`; parse `.test-reports/*`.
-2. Route failures by category: `contract_logic`/`contract_gas` → edit `.sol` then `forge fmt` + `forge build`; `typescript_type`/`runtime_error`/`assertion_mismatch` → TS; `determinism_failure` → seams / fixtures / `canonicalJson`; `demo_sequence` → fixtures or taxonomy.
-3. Fix, re-run only the failing test. Green → commit.
-4. Two failed attempts → escalate to `docs/DECISIONS.md` under `## ESCALATIONS` (or open an `OP-N`).
-
-### OPERATOR_TODO protocol
-When blocked on a credential, a live-service verification, or an owner-only decision:
-1. Append an `OP-N` entry to `OPERATOR_TODO.md`.
-2. Set the related task to `Status: blocked, see OP-N`.
-3. Keep working other unblocked tasks.
-**Never fabricate credentials or fake verification to appear done.**
-
-See [docs/runbooks/workflow.md](docs/runbooks/workflow.md) and [CLAUDE.md](CLAUDE.md) as authoritative references.
+Branch, commit, and PR conventions, the merge policy, the fix-loop, and the operator-handoff protocol are documented in [CLAUDE.md](CLAUDE.md) and [docs/runbooks/workflow.md](docs/runbooks/workflow.md), which are the authoritative references.
 
 ---
 
@@ -116,7 +76,7 @@ pnpm install
 git submodule update --init --recursive
 
 # Full CI gate: lint + typecheck + forge build + forge test + vitest
-pnpm run ci        # NOTE: pnpm run ci (NOT pnpm ci, reserved by pnpm, D7)
+pnpm run ci        # NOTE: pnpm run ci (NOT pnpm ci, which is reserved by pnpm)
 
 # Contracts only
 forge test --root contracts
@@ -125,7 +85,7 @@ forge test --root contracts
 pnpm test:contracts:deep
 ```
 
-`pnpm demo` and `pnpm deploy:testnet` are stubs; they exit non-zero until later milestones (M3+ and T-804 respectively).
+`pnpm demo` runs the scripted end-to-end demo. `pnpm deploy:testnet` is a stub pending the deploy script.
 
 ---
 
@@ -133,4 +93,4 @@ pnpm test:contracts:deep
 
 Refresh the dashboard with `pnpm progress`.
 
-> A fuller README per PRD §12, architecture diagram, "Why not LangGraph/CrewAI/ElizaOS", env table, Plugboard trust model, is a later task **T-805** and will expand this file significantly.
+> A fuller README (architecture diagram, a "Why not LangGraph / CrewAI / ElizaOS" rationale, an env table, and the Plugboard trust model) is planned and will expand this file.

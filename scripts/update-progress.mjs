@@ -197,12 +197,12 @@ function buildDashboard(ranges, opTodo, testCounts, generatedDate) {
   // Per-range breakdown
   lines.push("### Per-Range Breakdown");
   lines.push("");
-  lines.push("| Range | Area | Done | Total |");
-  lines.push("|-------|------|------|-------|");
+  lines.push("| Area | Done | Total |");
+  lines.push("|------|------|-------|");
   for (const range of ranges) {
     const rangeDone = range.tasks.filter((t) => normalizeStatus(t.status) === "done").length;
     const rangeTotal = range.tasks.length;
-    lines.push(`| ${range.id} | ${range.label} | ${rangeDone} | ${rangeTotal} |`);
+    lines.push(`| ${range.label} | ${rangeDone} | ${rangeTotal} |`);
   }
   lines.push("");
 
@@ -221,18 +221,12 @@ function buildDashboard(ranges, opTodo, testCounts, generatedDate) {
   lines.push(`- ${vitestLine}`);
   lines.push("");
 
-  // OPERATOR_TODO summary
-  lines.push("### Operator TODO");
+  // Operator items summary (counts only; details live in OPERATOR_TODO.md)
+  lines.push("### Operator Items");
   lines.push("");
-  if (opTodo.open.length === 0) {
-    lines.push("No open operator items.");
-  } else {
-    lines.push("**Open:**");
-    for (const op of opTodo.open) {
-      lines.push(`- **${op.id}**: ${op.title}`);
-    }
-  }
-  lines.push(`_Resolved: ${opTodo.resolved.length}_`);
+  lines.push(
+    `${opTodo.open.length} open, ${opTodo.resolved.length} resolved (tracked in OPERATOR_TODO.md).`,
+  );
 
   return lines.join("\n");
 }
