@@ -44,3 +44,12 @@ export type {
   DisputeResolvedEvent,
   SseEvent,
 } from "./events.js";
+
+export { createEventBus } from "./event-bus.js";
+export type {
+  EventBus,
+  BusEvent,
+  ContractEvent,
+  ContractClaimPostedEvent,
+  ContractAttestedEvent,
+} from "./event-bus.js";

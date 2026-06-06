@@ -18,6 +18,47 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@25.9.1)
 
+  apps/indexer:
+    dependencies:
+      '@bombe/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@bombe/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.1
+        version: 25.9.1
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@25.9.1)
+
+  apps/runner:
+    dependencies:
+      '@bombe/agent-reference':
+        specifier: workspace:*
+        version: link:../../packages/agent-reference
+      '@bombe/agent-sdk':
+        specifier: workspace:*
+        version: link:../../packages/agent-sdk
+      '@bombe/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@bombe/indexer':
+        specifier: workspace:*
+        version: link:../indexer
+      '@bombe/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.1
+        version: 25.9.1
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@25.9.1)
+
   packages/agent-reference:
     dependencies:
       '@bombe/agent-sdk':
