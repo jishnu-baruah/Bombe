@@ -354,6 +354,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: `fixtures/model-scripts/{agent}/{claimId}.json` produce the §6.7 outcomes deterministically. (PRD §6.4, §6.7)
 - Notes: 12 model-script JSON files (reflector/rotor/stator × A/B/C/D); fixtures/claims.json added; all 13 vitest tests pass; pnpm run ci exit 0.
 
+### T-015 — agent prompt tool-schema + few-shot improvements
+- Status: done 2026-06-06
+- Depends-on: T-213, T-301, T-302, T-303
+- Scope: agent-sdk
+- Acceptance: `buildToolSpecs(claimType)` embeds exact zod-derived input schemas in system prompt; one worked few-shot example per tier; stricter JSON-only framing; per-tier user-prompt guidance; tool schemas re-injected on parse/tool-failure; Rotor prompt softened to avoid stalling; all 648 existing tests pass; `pnpm run ci` exit 0. (PRD §6.3, §6.4)
+- Notes: Root cause of 5/12 benchmark match-rate: model received tool names but no input schemas, causing TOOL_FAILURE → ABSTAIN. Fixed in `packages/agent-sdk/src/loop.ts` (buildToolSpecs, buildSystemPrompt, buildUserPrompt, invalidResponseObservation, toolFailureObservation) and `packages/agent-reference/src/agents.ts` (Rotor systemPrompt). Benchmark re-run pending live Ollama access.
+
 ---
 
 ## T-4xx — runner + indexer + gateway + DB (M3)

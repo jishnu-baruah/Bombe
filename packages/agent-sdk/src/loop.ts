@@ -188,14 +188,29 @@ function parseProposal(text: string): StepProposal | null {
 /**
  * Observation shape for a parse failure — fed back to the model so it can retry.
  * This is intentionally NOT an ABSTAIN path; the model gets one chance to fix its JSON.
+ * Re-injects tool specs so the model can correct wrong input fields.
  */
-function invalidResponseObservation(text: string): unknown {
+function invalidResponseObservation(text: string, claimType: Claim["claimType"]): unknown {
   return {
     error: "invalid_response",
     message:
       "Your response could not be parsed as a valid StepProposal. " +
-      'Respond with JSON: {"thought": "...", "action": {"tool": "...", "input": {...}} | {"finalize": {"decision": "VALID"|"REJECTED"|"ABSTAIN", "confidenceBps": <0-10000>, "rationaleSummary": "..."}}}',
+      "Respond with ONLY one JSON object, no prose or markdown. " +
+      'Schema: {"thought": "...", "action": {"tool": "...", "input": {...}} | {"finalize": {"decision": "VALID"|"REJECTED"|"ABSTAIN", "confidenceBps": <0-10000>, "rationaleSummary": "..."}}}',
     received: text.slice(0, 200),
+    toolSpecs: buildToolSpecs(claimType),
+  };
+}
+
+/**
+ * Observation shape for a tool failure — re-injects tool specs so the model can correct
+ * wrong input schemas on its next attempt.
+ */
+function toolFailureObservation(toolName: string, claimType: Claim["claimType"]): unknown {
+  return {
+    error: "tool_failure",
+    message: `Tool "${toolName}" failed. Check the input schema below and retry with correct field names and types. Respond with ONLY one JSON object, no prose or markdown.`,
+    toolSpecs: buildToolSpecs(claimType),
   };
 }
 
@@ -368,8 +383,8 @@ export async function runLoop(args: {
     const ts = clock.now();
 
     if (proposal === null) {
-      // Invalid response — feed structured error back to the model.
-      const obs = invalidResponseObservation(resp.text);
+      // Invalid response — feed structured error back to the model (with tool specs re-injected).
+      const obs = invalidResponseObservation(resp.text, claim.claimType);
       steps.push({
         step: stepNum,
         thought: "",
@@ -512,7 +527,18 @@ export async function runLoop(args: {
     );
 
     // ---- Hard rule 6: TOOL_FAILURE ----
+    // Build the tool-failure observation with re-injected schemas (so the trace
+    // records what the model should have sent) then hard-ABSTAIN per the hard rule.
     if (!toolResult.ok) {
+      const toolFailObs = toolFailureObservation(toolName, claim.claimType);
+      steps.push({
+        step: stepNum,
+        thought: proposal.thought,
+        action: proposal.action,
+        observation: toolFailObs,
+        ts,
+        ...(modelSwitched !== undefined ? { modelSwitched } : {}),
+      });
       return buildTrace({
         agentId,
         claim,
@@ -592,19 +618,230 @@ function buildTrace(opts: {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Tool input-schema catalogue (derived from zod schemas in tools/*.ts)
+// ---------------------------------------------------------------------------
+
+/**
+ * TOOL_INPUT_SPECS — exact input JSON schemas for every SDK tool.
+ * Derived directly from the zod input schemas in tools/*.ts.
+ * Used in the system prompt so real LLMs know EXACTLY what fields to pass.
+ */
+const TOOL_INPUT_SPECS: Record<
+  ToolName,
+  { description: string; inputSchema: Record<string, unknown>; example: Record<string, unknown> }
+> = {
+  fetch_chainlink_price: {
+    description: "Reads a generic oracle snapshot by (asset, period).",
+    inputSchema: {
+      type: "object",
+      required: ["asset", "period"],
+      properties: {
+        asset: { type: "string", minLength: 1 },
+        period: { type: "string", minLength: 1 },
+      },
+    },
+    example: { asset: "mETH", period: "30d-fresh" },
+  },
+  fetch_meth_yield: {
+    description: "Reads the mETH yield oracle snapshot. Returns { yieldBps, stale, ... }.",
+    inputSchema: {
+      type: "object",
+      properties: { period: { type: "string", minLength: 1, default: "30d-fresh" } },
+    },
+    example: { period: "30d-fresh" },
+  },
+  fetch_usdy_yield: {
+    description: "Reads the USDY yield oracle snapshot. Returns { yieldBps, stale, ... }.",
+    inputSchema: {
+      type: "object",
+      properties: { period: { type: "string", minLength: 1, default: "30d" } },
+    },
+    example: { period: "30d" },
+  },
+  query_chain_state: {
+    description:
+      "Queries mock chain state via DSL. op='balanceOf' needs {account, token}; op='eventOccurred' needs {claimRef}.",
+    inputSchema: {
+      oneOf: [
+        {
+          type: "object",
+          required: ["op", "account", "token"],
+          properties: {
+            op: { const: "balanceOf" },
+            account: { type: "string", minLength: 1 },
+            token: { type: "string", minLength: 1 },
+          },
+        },
+        {
+          type: "object",
+          required: ["op", "claimRef"],
+          properties: {
+            op: { const: "eventOccurred" },
+            claimRef: { type: "string", minLength: 1 },
+          },
+        },
+      ],
+    },
+    example: { op: "eventOccurred", claimRef: "DIST-2026-05" },
+  },
+  compute_expected: {
+    description:
+      "Pure ±2 bps tolerance check. Returns { observedBps, expectedBps, deltaBps, withinTolerance }.",
+    inputSchema: {
+      type: "object",
+      required: ["observedBps", "expectedBps"],
+      properties: { observedBps: { type: "number" }, expectedBps: { type: "number" } },
+    },
+    example: { observedBps: 34, expectedBps: 34 },
+  },
+  read_document: {
+    description:
+      "Reads a document fixture (servicer report or bank statement). Returns { docRef, docType, docVersion, fields }.",
+    inputSchema: {
+      type: "object",
+      required: ["docRef"],
+      properties: {
+        docRef: { type: "string", minLength: 1 },
+        version: { type: "string", minLength: 1, default: "v1" },
+      },
+    },
+    example: { docRef: "pc-pool-1-servicer", version: "v1" },
+  },
+  cross_check_history: {
+    description:
+      "Queries prior attestation history for a claim. Returns { claimRef, priorAttestations }.",
+    inputSchema: {
+      type: "object",
+      required: ["claimRef"],
+      properties: { claimRef: { type: "string", minLength: 1 } },
+    },
+    example: { claimRef: "A" },
+  },
+};
+
+/**
+ * buildToolSpecs — returns a JSON-serialisable array of tool specs for the allowed
+ * tools of a given claim type. Embedded in the system prompt so real LLMs know the
+ * exact input field names and types to use.
+ */
+function buildToolSpecs(claimType: Claim["claimType"]): Array<{
+  name: ToolName;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  example: Record<string, unknown>;
+}> {
+  const allowed = allowedTools(claimType);
+  return allowed.map((name) => ({
+    name,
+    ...TOOL_INPUT_SPECS[name],
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Few-shot worked examples (one per tier)
+// ---------------------------------------------------------------------------
+
+/**
+ * TIER1_FEW_SHOT — one correct Tier-1 (YIELD_BPS) exchange showing the exact
+ * tool-call input schema, then a correct finalize.
+ */
+const TIER1_FEW_SHOT = `
+EXAMPLE (Tier 1 — YIELD_BPS, claim A: mETH 30d yield ≥ 30 bps):
+  Step 1 — model outputs:
+  {"thought":"I need the mETH 30d yield from the oracle.","action":{"tool":"fetch_meth_yield","input":{"period":"30d-fresh"}}}
+  Step 1 — observation (tool result):
+  {"value":{"asset":"mETH","period":"30d-fresh","yieldBps":34,"stale":false},"source":"chainlink-meth","fetchedAt":1000000,"confidence":9500}
+  Step 2 — model outputs:
+  {"thought":"Yield is 34 bps. Checking within tolerance of 34 bps expected.","action":{"tool":"compute_expected","input":{"observedBps":34,"expectedBps":34}}}
+  Step 2 — observation:
+  {"value":{"observedBps":34,"expectedBps":34,"deltaBps":0,"withinTolerance":true},"source":"compute","fetchedAt":1000010,"confidence":9500}
+  Step 3 — model outputs:
+  {"thought":"withinTolerance is true and confidence is high. Finalising VALID.","action":{"finalize":{"decision":"VALID","confidenceBps":9500,"rationaleSummary":"mETH yield 34 bps is within ±2 bps of expected 34 bps."}}}
+END EXAMPLE
+`.trim();
+
+/**
+ * TIER2_FEW_SHOT — one correct Tier-2 (CASHFLOW_MATCH) exchange.
+ */
+const TIER2_FEW_SHOT = `
+EXAMPLE (Tier 2 — CASHFLOW_MATCH, claim C: servicer report vs bank statement):
+  Step 1 — model outputs:
+  {"thought":"Read the servicer report first.","action":{"tool":"read_document","input":{"docRef":"pc-pool-1-servicer","version":"v1"}}}
+  Step 1 — observation:
+  {"value":{"docRef":"pc-pool-1-servicer","docType":"servicer-report","docVersion":"v1","fields":{"cashflowTotal":50000}},"source":"fixture:v1/pc-pool-1-servicer","fetchedAt":1000000,"confidence":9500}
+  Step 2 — model outputs:
+  {"thought":"Now read the bank statement.","action":{"tool":"read_document","input":{"docRef":"pc-pool-1-statement","version":"v1"}}}
+  Step 2 — observation:
+  {"value":{"docRef":"pc-pool-1-statement","docType":"bank-statement","docVersion":"v1","fields":{"lineItemsTotal":45000}},"source":"fixture:v1/pc-pool-1-statement","fetchedAt":1000010,"confidence":9500}
+  Step 3 — model outputs:
+  {"thought":"50000 vs 45000 — delta is 5000, not within tolerance. REJECTED.","action":{"finalize":{"decision":"REJECTED","confidenceBps":9500,"rationaleSummary":"Servicer cashflow 50000 does not match bank lineItems 45000 (delta 5000)."}}}
+END EXAMPLE
+`.trim();
+
+// ---------------------------------------------------------------------------
+// Prompt builders
+// ---------------------------------------------------------------------------
+
 function buildSystemPrompt(agentId: string, claim: Claim, temperament: Temperament): string {
+  const tier = tierOf(claim.claimType);
   const allowed = allowedTools(claim.claimType);
   const toolList = allowed.length > 0 ? allowed.join(", ") : "(none — Tier 3 claim)";
-  return [
+  const toolSpecs = buildToolSpecs(claim.claimType);
+
+  // Pick the relevant few-shot example based on tier.
+  let fewShot: string;
+  if (tier === 1) {
+    fewShot = TIER1_FEW_SHOT;
+  } else if (tier === 2) {
+    fewShot = TIER2_FEW_SHOT;
+  } else {
+    fewShot = "";
+  }
+
+  const lines: string[] = [
     `You are agent "${agentId}", an autonomous attestor for real-world-asset claims.`,
-    `Claim type: ${claim.claimType} (Tier ${tierOf(claim.claimType).toString()}).`,
+    `Claim type: ${claim.claimType} (Tier ${tier.toString()}).`,
     `Available tools: [${toolList}].`,
-    `Confidence threshold: ${temperament.thresholdBps.toString()} bps.`,
+    `Confidence threshold: ${temperament.thresholdBps.toString()} bps (0–10000 scale).`,
     `Max steps: ${temperament.maxSteps.toString()}.`,
-    `Respond with JSON only: {"thought": "...", "action": {"tool": "...", "input": {...}} | {"finalize": {"decision": "VALID"|"REJECTED"|"ABSTAIN", "confidenceBps": <0-10000>, "rationaleSummary": "..."}}}`,
-  ].join("\n");
+    "",
+    "CRITICAL: Respond with ONLY one JSON object per turn — no prose, no markdown, no explanation outside the JSON. Non-JSON text wastes a step and will be rejected.",
+    "",
+    "Mandatory JSON schema every turn:",
+    '  Tool call:  {"thought": "<reasoning>", "action": {"tool": "<tool_name>", "input": <input_object>}}',
+    '  Finalize:   {"thought": "<reasoning>", "action": {"finalize": {"decision": "VALID"|"REJECTED"|"ABSTAIN", "confidenceBps": <integer 0-10000>, "rationaleSummary": "<one sentence>"}}}',
+    "",
+    "TOOL INPUT SCHEMAS (use EXACTLY these field names — wrong fields cause TOOL_FAILURE → ABSTAIN):",
+    JSON.stringify(toolSpecs, null, 2),
+  ];
+
+  if (fewShot) {
+    lines.push("");
+    lines.push(fewShot);
+  }
+
+  return lines.join("\n");
 }
 
 function buildUserPrompt(claim: Claim): string {
-  return `Claim to attest: ${JSON.stringify(claim)}`;
+  const tier = tierOf(claim.claimType);
+  let guidance: string;
+  if (tier === 1) {
+    guidance =
+      "GUIDANCE (Tier 1): Use the numeric oracle tools (fetch_meth_yield, fetch_usdy_yield, " +
+      "fetch_chainlink_price, query_chain_state) to retrieve the observed value, then call " +
+      "compute_expected with {observedBps, expectedBps} to check the ±2 bps tolerance. " +
+      "Finalize based on withinTolerance.";
+  } else if (tier === 2) {
+    guidance =
+      "GUIDANCE (Tier 2): Call read_document first (with {docRef, version}) to read each " +
+      "relevant document, then use compute_expected to compare numeric fields. " +
+      "Finalize REJECTED if the delta exceeds tolerance, VALID if within tolerance.";
+  } else {
+    guidance =
+      "GUIDANCE (Tier 3): This is a FAIR_VALUE (Tier 3) claim. No tools are available. " +
+      "You MUST immediately finalize with ABSTAIN — do not attempt any tool calls.";
+  }
+  return `Claim to attest: ${JSON.stringify(claim)}\n\n${guidance}`;
 }

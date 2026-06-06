@@ -3,8 +3,8 @@
  *
  * Defines the three SDK reference agents:
  *   Reflector — conservative (thresholdBps 8500, maxSteps 8, requiresTwoSources, abstainOnStale)
- *   Rotor     — aggressive  (thresholdBps 6500, maxSteps 5, no staleness abstain)
- *   Stator    — cost-opt    (thresholdBps 7000, maxSteps 4, shortest path)
+ *   Rotor     — aggressive  (thresholdBps 6500, maxSteps 8, no staleness abstain)
+ *   Stator    — cost-opt    (thresholdBps 7000, maxSteps 6, shortest path)
  *
  * Each agent is an exported config object.
  * A shared runReferenceAgent() helper wires config → runLoop.
@@ -98,22 +98,26 @@ export const REFLECTOR_CONFIG: ReferenceAgentConfig = {
  * second source. Staleness alone is not enough to stop Rotor — it will attest
  * on a single stale feed if confidence is above 6500 bps. Fast and decisive.
  *
- * Hard rules: thresholdBps=6500, maxSteps=5, requiresTwoSources=false,
+ * Hard rules: thresholdBps=6500, maxSteps=8, requiresTwoSources=false,
  * abstainOnStale=false. SDK never fires STALE_SINGLE_SOURCE for Rotor.
+ *
+ * STEP BUDGET NOTE (T-015): maxSteps raised 5→8. Real LLMs need headroom for
+ * fetch → compute → finalize plus the occasional self-correction turn after a
+ * tool-input fix; the old budget of 5 caused STEP_BUDGET ABSTAINs on claim A.
  */
 export const ROTOR_CONFIG: ReferenceAgentConfig = {
   agentId: "rotor",
   model: "openai/gpt-5",
   temperament: {
     thresholdBps: 6500,
-    maxSteps: 5,
+    maxSteps: 8,
     requiresTwoSources: false,
     abstainOnStale: false,
   },
   systemPrompt:
-    "You are Rotor, an aggressive attestor. Commit whenever your confidence exceeds the " +
-    "threshold. A single data source is sufficient. Staleness is a factor in confidence " +
-    "weighting but never a reason to abstain on its own. Speed and decisiveness are rewarded. " +
+    "You are Rotor, an aggressive attestor. Commit once your confidence exceeds the threshold — " +
+    "do not stall waiting for a second source. Staleness is a factor in confidence weighting " +
+    "but never a reason to abstain on its own. Speed and decisiveness are rewarded. " +
     "Use the minimum steps necessary.",
 };
 

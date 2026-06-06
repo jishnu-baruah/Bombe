@@ -16,7 +16,7 @@ _Generated: 2026-06-06_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 63 | 0 | 0 | 12 | 75 | 84% |
+| 64 | 0 | 0 | 12 | 76 | 84% |
 
 ### Per-Range Breakdown
 
@@ -25,7 +25,7 @@ _Generated: 2026-06-06_
 | T-0xx | Ops | 14 | 14 |
 | T-1xx | Contracts (M1) | 10 | 10 |
 | T-2xx | shared + agent-sdk (M2) | 14 | 14 |
-| T-3xx | reference agents (M2/M4) | 4 | 4 |
+| T-3xx | reference agents (M2/M4) | 5 | 5 |
 | T-4xx | runner + indexer + gateway + DB (M3) | 6 | 6 |
 | T-5xx | Plugboard mock path (M4) | 5 | 5 |
 | T-6xx | web app (M5) | 6 | 8 |
