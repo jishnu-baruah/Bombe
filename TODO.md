@@ -213,6 +213,13 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Acceptance: env-driven `epochSeconds`/`disputeWindowSeconds` (demo 300/60), deploys all four contracts wired with roles; anvil deploy succeeds. (PRD §6.2)
 - Notes: contracts/script/Deploy.s.sol; dry-run `forge script script/Deploy.s.sol` logs all 4 addresses and runs successfully; D14 in DECISIONS.md documents canonical role topology. M1 complete: 4 contracts + 71 tests (incl. fuzz) all pass.
 
+### T-016 — CLAIM_FEE reward model + 0-100 trust score
+- Status: done 2026-06-06
+- Depends-on: T-106, T-105
+- Scope: contracts
+- Acceptance: `CLAIM_FEE=0.01e` required on `postClaim`; `seizeClaimFee` role-gated to SETTLER_ROLE; `settleTier1` distributes fee pro-rata to correct attestors via `AgentSlashing.creditClaimable`; integer remainder + zero-correct-case burned via `burnFee`; `ClaimFeeDistributed` event; `trustScore(address)` view (accuracy 0-70 + experience 0-30, cap 100); conservation fuzz `testFuzz_FeeConservation`; all test callers updated to send `CLAIM_FEE`. (PRD §6.2, §9)
+- Notes: AgentAttestation: CLAIM_FEE constant, payable postClaim, seizeClaimFee, ClaimFeeSeized event, IncorrectClaimFee/NoClaimFeeToSeize/ClaimFeeTransferFailed errors. AgentSlashing: burnFee() LEADERBOARD_ROLE-gated. TuringLeaderboard: _distributeClaimFee, trustScore, TRUST_SCORE_EXP_CAP=15. 5 new tests in FeeAndTrustScore.t.sol; 77 total forge tests pass. ABI regenerated.
+
 ---
 
 ## T-2xx — shared + agent-sdk (M2)

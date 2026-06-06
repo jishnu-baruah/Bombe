@@ -16,6 +16,7 @@ contract AgentAttestationTest is Test {
 
     uint256 internal constant MIN_BOND = 0.1 ether;
     uint256 internal constant ATTEST_LOCK = 0.02 ether;
+    uint256 internal constant CLAIM_FEE = 0.01 ether;
     string internal constant META_URI = "ipfs://QmAgentMeta";
     string internal constant TRACE_URI = "ipfs://QmTrace";
 
@@ -55,6 +56,7 @@ contract AgentAttestationTest is Test {
         // Fund agents and register them.
         vm.deal(agent1, 10 ether);
         vm.deal(agent2, 10 ether);
+        vm.deal(operator, 10 ether);
 
         vm.prank(agent1);
         registry.registerAgent{ value: MIN_BOND }(META_URI);
@@ -69,12 +71,12 @@ contract AgentAttestationTest is Test {
 
     function _postClaim1() internal {
         vm.prank(operator);
-        attestation.postClaim(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
     }
 
     function _postClaimT3() internal {
         vm.prank(operator);
-        attestation.postClaim(CLAIM_ID_T3, 3, CLAIM_HASH, "ipfs://QmClaimT3");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID_T3, 3, CLAIM_HASH, "ipfs://QmClaimT3");
     }
 
     // =========================================================================
@@ -83,7 +85,7 @@ contract AgentAttestationTest is Test {
 
     function test_PostClaim() public {
         vm.expectEmit(true, false, false, true, address(attestation));
-        emit AgentAttestation.ClaimPosted(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
+        emit AgentAttestation.ClaimPosted(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1", CLAIM_FEE);
 
         _postClaim1();
 
@@ -96,23 +98,41 @@ contract AgentAttestationTest is Test {
     }
 
     function test_RevertWhen_PostClaim_NotOperator() public {
+        vm.deal(stranger, 1 ether);
         vm.expectRevert(
             abi.encodeWithSelector(
                 bytes4(keccak256("AccessControlUnauthorizedAccount(address,bytes32)")), stranger, operatorRole
             )
         );
         vm.prank(stranger);
-        attestation.postClaim(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
     }
 
     function test_RevertWhen_PostClaim_InvalidTier() public {
         vm.expectRevert(AgentAttestation.InvalidTier.selector);
         vm.prank(operator);
-        attestation.postClaim(keccak256("bad-tier"), 0, CLAIM_HASH, "ipfs://x");
+        attestation.postClaim{ value: CLAIM_FEE }(keccak256("bad-tier"), 0, CLAIM_HASH, "ipfs://x");
 
         vm.expectRevert(AgentAttestation.InvalidTier.selector);
         vm.prank(operator);
-        attestation.postClaim(keccak256("bad-tier2"), 4, CLAIM_HASH, "ipfs://x");
+        attestation.postClaim{ value: CLAIM_FEE }(keccak256("bad-tier2"), 4, CLAIM_HASH, "ipfs://x");
+    }
+
+    function test_RevertWhen_PostClaim_IncorrectFee() public {
+        // Under-pay
+        vm.expectRevert(AgentAttestation.IncorrectClaimFee.selector);
+        vm.prank(operator);
+        attestation.postClaim{ value: CLAIM_FEE - 1 }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
+
+        // Over-pay
+        vm.expectRevert(AgentAttestation.IncorrectClaimFee.selector);
+        vm.prank(operator);
+        attestation.postClaim{ value: CLAIM_FEE + 1 }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
+
+        // Zero
+        vm.expectRevert(AgentAttestation.IncorrectClaimFee.selector);
+        vm.prank(operator);
+        attestation.postClaim{ value: 0 }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1");
     }
 
     function test_RevertWhen_PostClaim_ClaimExists() public {
@@ -120,7 +140,7 @@ contract AgentAttestationTest is Test {
 
         vm.expectRevert(AgentAttestation.ClaimExists.selector);
         vm.prank(operator);
-        attestation.postClaim(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1Again");
+        attestation.postClaim{ value: CLAIM_FEE }(CLAIM_ID_1, 1, CLAIM_HASH, "ipfs://QmClaim1Again");
     }
 
     // =========================================================================
@@ -130,6 +150,8 @@ contract AgentAttestationTest is Test {
     function test_Attest_HappyPath_Valid() public {
         _postClaim1();
 
+        // After postClaim, contract already holds CLAIM_FEE.
+        assertEq(address(attestation).balance, CLAIM_FEE, "contract should hold CLAIM_FEE after postClaim");
         uint256 contractBalanceBefore = address(attestation).balance;
 
         vm.expectEmit(true, true, false, true, address(attestation));
@@ -432,8 +454,10 @@ contract AgentAttestationTest is Test {
         assertEq(attestors[0], agent1, "first attestor should be agent1");
         assertEq(attestors[1], agent2, "second attestor should be agent2");
 
-        // Contract holds 2 × ATTEST_LOCK
-        assertEq(address(attestation).balance, 2 * ATTEST_LOCK, "contract should hold 2x ATTEST_LOCK");
+        // Contract holds CLAIM_FEE (from postClaim) + 2 × ATTEST_LOCK (from attestors)
+        assertEq(
+            address(attestation).balance, CLAIM_FEE + 2 * ATTEST_LOCK, "contract should hold CLAIM_FEE + 2x ATTEST_LOCK"
+        );
     }
 
     // =========================================================================

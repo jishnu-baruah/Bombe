@@ -35,6 +35,19 @@
   },
   {
     "type": "function",
+    "name": "CLAIM_FEE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "DEFAULT_ADMIN_ROLE",
     "inputs": [],
     "outputs": [
@@ -274,6 +287,11 @@
             "name": "attestorCount",
             "type": "uint8",
             "internalType": "uint8"
+          },
+          {
+            "name": "claimFee",
+            "type": "uint256",
+            "internalType": "uint256"
           }
         ]
       }
@@ -386,7 +404,7 @@
       }
     ],
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "payable"
   },
   {
     "type": "function",
@@ -422,6 +440,25 @@
       }
     ],
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "seizeClaimFee",
+    "inputs": [
+      {
+        "name": "claimId",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
@@ -519,6 +556,31 @@
   },
   {
     "type": "event",
+    "name": "ClaimFeeSeized",
+    "inputs": [
+      {
+        "name": "claimId",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "to",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "ClaimPosted",
     "inputs": [
       {
@@ -544,6 +606,12 @@
         "type": "string",
         "indexed": false,
         "internalType": "string"
+      },
+      {
+        "name": "claimFee",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       }
     ],
     "anonymous": false
@@ -697,7 +765,17 @@
   },
   {
     "type": "error",
+    "name": "ClaimFeeTransferFailed",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "ClaimNotFound",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "IncorrectClaimFee",
     "inputs": []
   },
   {
@@ -713,6 +791,11 @@
   {
     "type": "error",
     "name": "JudgmentTierRequiresAbstain",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NoClaimFeeToSeize",
     "inputs": []
   },
   {
