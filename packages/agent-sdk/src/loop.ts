@@ -328,6 +328,12 @@ export async function runLoop(args: {
   const distinctSources = new Set<string>();
   // anyStaleResult: whether any stale result was seen in this run.
   let anyStaleResult = false;
+  // toolFailureRetries: how many times we have already fed a tool failure back to
+  // the model. We allow exactly ONE corrective retry (real models frequently send
+  // a bad tool input first — e.g. a non-existent oracle period — then fix it once
+  // the schema is re-injected). A SECOND failure → hard ABSTAIN(TOOL_FAILURE).
+  let toolFailureRetries = 0;
+  const MAX_TOOL_FAILURE_RETRIES = 1;
 
   // ---- Main ReAct loop ----
   for (let stepNum = 0; stepNum < temperament.maxSteps; stepNum++) {
@@ -527,8 +533,10 @@ export async function runLoop(args: {
     );
 
     // ---- Hard rule 6: TOOL_FAILURE ----
-    // Build the tool-failure observation with re-injected schemas (so the trace
-    // records what the model should have sent) then hard-ABSTAIN per the hard rule.
+    // On the FIRST tool failure, re-inject the tool schemas as an observation and
+    // give the model one corrective turn (bad inputs — e.g. a non-existent oracle
+    // period — are usually fixable once the schema is shown). On a SECOND failure
+    // the hard rule fires: ABSTAIN(TOOL_FAILURE).
     if (!toolResult.ok) {
       const toolFailObs = toolFailureObservation(toolName, claim.claimType);
       steps.push({
@@ -539,6 +547,15 @@ export async function runLoop(args: {
         ts,
         ...(modelSwitched !== undefined ? { modelSwitched } : {}),
       });
+
+      if (toolFailureRetries < MAX_TOOL_FAILURE_RETRIES) {
+        toolFailureRetries++;
+        conversationHistory.push({ role: "assistant", content: resp.text });
+        conversationHistory.push({ role: "user", content: JSON.stringify(toolFailObs) });
+        // Give the model one chance to correct the tool input.
+        continue;
+      }
+
       return buildTrace({
         agentId,
         claim,
