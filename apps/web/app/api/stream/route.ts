@@ -149,9 +149,7 @@ export async function GET(req: NextRequest) {
 
   // Which claims to stream
   const claimIds =
-    claimParam && ["A", "B", "C", "D"].includes(claimParam)
-      ? [claimParam]
-      : ["A", "B", "C", "D"];
+    claimParam && ["A", "B", "C", "D"].includes(claimParam) ? [claimParam] : ["A", "B", "C", "D"];
 
   const stream = new ReadableStream({
     async start(controller) {

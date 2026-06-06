@@ -257,9 +257,7 @@ function AgentFooter({ done }: { done: AgentDoneEvent }) {
 
 function StepFeed({ steps }: { steps: AgentStepEvent[] }) {
   if (steps.length === 0) {
-    return (
-      <p className="text-[#3a3d40] text-[12px] italic">Waiting for first step…</p>
-    );
+    return <p className="text-[#3a3d40] text-[12px] italic">Waiting for first step…</p>;
   }
   return (
     <ul className="flex flex-col gap-2">
@@ -326,18 +324,11 @@ function AgentColumn({
       className="flex flex-col gap-3 p-4 min-w-0 h-full"
       data-testid={`agent-column-${agentId}`}
     >
-      {/* Column header */}
-      <div
-        className="flex items-center justify-between gap-2 cursor-pointer sm:cursor-default"
+      {/* Column header (toggles the card body on mobile; body always visible ≥sm) */}
+      <button
+        type="button"
+        className="flex items-center justify-between gap-2 w-full text-left bg-transparent border-0 p-0 cursor-pointer sm:cursor-default"
         onClick={onToggle}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggle();
-          }
-        }}
-        role="button"
-        tabIndex={0}
         aria-expanded={expanded}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -351,7 +342,7 @@ function AgentColumn({
           {/* Toggle chevron on mobile */}
           <span className="sm:hidden text-[#505a63] text-[11px]">{expanded ? "▲" : "▼"}</span>
         </div>
-      </div>
+      </button>
 
       {/* Expandable body — always visible ≥sm, toggle on mobile */}
       <div className={`${expanded ? "block" : "hidden"} sm:block flex-1 flex flex-col gap-3`}>
@@ -587,34 +578,31 @@ export default function LivePage() {
 
   // ---- SSE event handler ---------------------------------------------------
 
-  const handleSseEvent = useCallback(
-    (event: SseEvent) => {
-      const claimId = "claimId" in event ? (event.claimId as ClaimId) : null;
-      if (!claimId) return;
+  const handleSseEvent = useCallback((event: SseEvent) => {
+    const claimId = "claimId" in event ? (event.claimId as ClaimId) : null;
+    if (!claimId) return;
 
-      if (event.kind === "CLAIM_POSTED") {
-        dispatch({ type: "claim_posted", event, claimId });
-      } else if (event.kind === "AGENT_STEP") {
-        const agentId = ADDR_TO_AGENT[event.agentAddr];
-        if (agentId) {
-          dispatch({ type: "agent_step", event, claimId, agentId });
-        }
-      } else if (event.kind === "AGENT_DONE") {
-        const agentId = ADDR_TO_AGENT[event.agentAddr];
-        if (agentId) {
-          dispatch({ type: "agent_done", event, claimId, agentId });
-        }
-      } else if (event.kind === "HUMAN_QUEUE_UPDATE") {
-        dispatch({
-          type: "human_queue",
-          claimId,
-          position: event.position,
-          estWait: event.estimatedWaitMin,
-        });
+    if (event.kind === "CLAIM_POSTED") {
+      dispatch({ type: "claim_posted", event, claimId });
+    } else if (event.kind === "AGENT_STEP") {
+      const agentId = ADDR_TO_AGENT[event.agentAddr];
+      if (agentId) {
+        dispatch({ type: "agent_step", event, claimId, agentId });
       }
-    },
-    [],
-  );
+    } else if (event.kind === "AGENT_DONE") {
+      const agentId = ADDR_TO_AGENT[event.agentAddr];
+      if (agentId) {
+        dispatch({ type: "agent_done", event, claimId, agentId });
+      }
+    } else if (event.kind === "HUMAN_QUEUE_UPDATE") {
+      dispatch({
+        type: "human_queue",
+        claimId,
+        position: event.position,
+        estWait: event.estimatedWaitMin,
+      });
+    }
+  }, []);
 
   // ---- Stream hook ---------------------------------------------------------
 
@@ -688,9 +676,7 @@ export default function LivePage() {
 
   // ---- Derived --------------------------------------------------------------
 
-  const allDone = AGENTS.every(
-    (a) => currentClaimState.agents[a].done !== null,
-  );
+  const allDone = AGENTS.every((a) => currentClaimState.agents[a].done !== null);
   const atLastClaim = raceState.currentClaimIdx >= CLAIM_IDS.length - 1;
 
   // ---------------------------------------------------------------------------
@@ -709,8 +695,8 @@ export default function LivePage() {
             Agent Race
           </h1>
           <p className="text-[rgba(255,255,255,0.72)] text-[16px] max-w-2xl leading-[1.5] mb-6">
-            Watch four attestors race on each claim — Reflector, Rotor, Stator (SDK agents), Plugboard
-            (external runtime), and a Human Queue. Outcomes match §6.7 exactly.
+            Watch four attestors race on each claim — Reflector, Rotor, Stator (SDK agents),
+            Plugboard (external runtime), and a Human Queue. Outcomes match §6.7 exactly.
           </p>
 
           {/* Controls */}
@@ -729,11 +715,7 @@ export default function LivePage() {
 
             {/* Manual Next claim */}
             {!guidedRunning && !atLastClaim && (
-              <Button
-                variant="outline-dark"
-                onClick={handleNextClaim}
-                data-testid="next-claim-btn"
-              >
+              <Button variant="outline-dark" onClick={handleNextClaim} data-testid="next-claim-btn">
                 Next claim →
               </Button>
             )}

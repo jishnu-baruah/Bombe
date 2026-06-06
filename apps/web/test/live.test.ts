@@ -16,11 +16,7 @@ import { getAttestations, getClaims } from "../lib/demo-data";
 // 1. Decision → chip mapping
 // ---------------------------------------------------------------------------
 
-type DecisionChipVariant =
-  | "VALID"
-  | "REJECTED"
-  | "ABSTAIN"
-  | "BLOCKED_BY_PROTOCOL";
+type DecisionChipVariant = "VALID" | "REJECTED" | "ABSTAIN" | "BLOCKED_BY_PROTOCOL";
 
 /** Mirrors the DecisionChip logic in page.tsx — pure function for testing. */
 function resolveChip(
