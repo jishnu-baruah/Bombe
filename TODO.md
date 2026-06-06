@@ -659,7 +659,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked — <r
 - Notes: needs the explorer API key/verifier URL for Mantle Sepolia — capture in `.env.example` if a new var is required; OP-N if blocked.
 
 ### T-J03 — Prove an AI function is callable on-chain (live attest tx)
-- Status: pending
+- Status: done 2026-06-06
 - Depends-on: T-J01, T-403, T-802
 - Scope: runner
 - Acceptance: a scripted live run where an SDK agent's inference result is written on-chain via `attest()` on Mantle Sepolia; capture the resulting tx hash + explorer link; assert the on-chain `ClaimPosted`/attestation records match the agent trace. (Deployment Award §Technical: "AI-powered function callable on-chain")
