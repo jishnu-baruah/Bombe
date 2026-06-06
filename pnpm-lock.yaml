@@ -86,6 +86,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@bombe/agent-reference':
+        specifier: workspace:*
+        version: link:../../packages/agent-reference
+      '@bombe/agent-sdk':
+        specifier: workspace:*
+        version: link:../../packages/agent-sdk
       '@bombe/shared':
         specifier: workspace:*
         version: link:../../packages/shared

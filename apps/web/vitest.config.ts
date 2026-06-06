@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "."),
+      "@bombe-canonical": resolve(__dirname, "../../packages/shared/src/canonical.ts"),
     },
   },
 });
