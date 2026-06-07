@@ -94,6 +94,10 @@ on-chain reasoning hash equal to the locally computed hash:
 | locally recomputed hash | matches the on-chain value |
 | Source | DefiLlama pricePerShare-derived; on-chain cross-check accrues as the streak runs |
 
+USDY was captured in the same run (single source per D4a, VALID): attest tx
+`0x86fe2ceb78a52514b764dd07a17f312337b14f4a707bba5447c640491bd1440f`, reasoningHash
+`0x0cd7a4b4ab182a6e2b3d1c95aef65c11205666d952752d01c48ae3dec6b29cbd`, hash match confirmed.
+
 An earlier attestation (v1) also proves the AI-to-on-chain path, kept here as historical:
 attest tx `0xa20c3362062ffdfbd20179c3229ba08339f577e421b710bf60076ae63d7ada4d`, reasoningHash
 `0x156a5ff50cb214ea37b8feca78326b3c4f8499ee4ed82b70a64d12391d2fc4b4`, hash match confirmed.
