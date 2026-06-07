@@ -3,6 +3,10 @@
 // Node ESM, no external dependencies.
 // Usage: node scripts/update-progress.mjs
 // Or:    pnpm progress
+//
+// Parses the klink-style TODO.md: active tasks are full "### T-NNN, ..." blocks
+// with a "- Status:" line; completed tasks are one-liners in "## Done (archive)"
+// of the form "- T-NNN done YYYY-MM-DD, title". Both shapes are counted.
 
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -13,36 +17,30 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 // ---------------------------------------------------------------------------
-// Parse TODO.md
+// Parse TODO.md (active blocks + archive one-liners)
 // ---------------------------------------------------------------------------
 function parseTodo() {
   const content = readFileSync(join(ROOT, "TODO.md"), "utf8");
   const lines = content.split("\n");
 
-  // Range section headers: "## T-Nxx — ..."
-  const rangeHeaderRe = /^## (T-\dxx) — (.+)/;
-  // Task blocks: "### T-NNN — title" where NNN is exactly 3 digits
-  // IMPORTANT: ignore the template placeholder "### T-XXX — <task title>"
-  const taskHeaderRe = /^### T-(\d{3}) /;
+  // Active task block header: "### T-608, ..." or "### T-J05, ..."
+  const activeHeaderRe = /^### (T-(?:\d{3}|J\d{2}))[,\s]/;
   const statusRe = /^- Status:\s*(.+)/;
+  // Archive one-liner: "- T-001 done 2026-06-05, title" (also tolerates other statuses)
+  const archiveRe = /^[-*]\s+(T-(?:\d{3}|J\d{2}))\s+(done|pending|blocked|review|in-progress)\b/i;
 
-  const ranges = [];
-  let currentRange = null;
+  const tasks = [];
+  const seen = new Set();
   let currentTask = null;
 
   for (const line of lines) {
-    const rangeMatch = line.match(rangeHeaderRe);
-    if (rangeMatch) {
-      currentRange = { id: rangeMatch[1], label: rangeMatch[2].trim(), tasks: [] };
-      ranges.push(currentRange);
-      currentTask = null;
-      continue;
-    }
-
-    const taskMatch = line.match(taskHeaderRe);
-    if (taskMatch && currentRange) {
-      currentTask = { id: `T-${taskMatch[1]}`, status: "pending", raw: line.trim() };
-      currentRange.tasks.push(currentTask);
+    const header = line.match(activeHeaderRe);
+    if (header) {
+      currentTask = { id: header[1], status: "pending" };
+      if (!seen.has(header[1])) {
+        tasks.push(currentTask);
+        seen.add(header[1]);
+      }
       continue;
     }
 
@@ -50,11 +48,19 @@ function parseTodo() {
       const statusMatch = line.match(statusRe);
       if (statusMatch) {
         currentTask.status = statusMatch[1].trim();
+        currentTask = null;
+        continue;
       }
+    }
+
+    const archive = line.match(archiveRe);
+    if (archive && !seen.has(archive[1])) {
+      tasks.push({ id: archive[1], status: archive[2].toLowerCase() });
+      seen.add(archive[1]);
     }
   }
 
-  return ranges;
+  return tasks;
 }
 
 function normalizeStatus(raw) {
@@ -67,32 +73,53 @@ function normalizeStatus(raw) {
   return "pending";
 }
 
+// Bucket a task id into its T-Nxx area for the per-range breakdown.
+const AREA_LABELS = {
+  "T-0xx": "T-0xx, ops / workflow / CI",
+  "T-1xx": "T-1xx, contracts",
+  "T-2xx": "T-2xx, shared + agent-sdk",
+  "T-3xx": "T-3xx, reference agents",
+  "T-4xx": "T-4xx, runner + indexer + gateway + DB",
+  "T-5xx": "T-5xx, Plugboard",
+  "T-6xx": "T-6xx, web app",
+  "T-7xx": "T-7xx, testing",
+  "T-8xx": "T-8xx, live seams + ship",
+  "T-9xx": "T-9xx, stretch",
+  "T-Jxx": "T-Jxx, submission gates",
+};
+const AREA_ORDER = Object.keys(AREA_LABELS);
+
+function areaOf(id) {
+  if (id.startsWith("T-J")) return "T-Jxx";
+  const m = id.match(/^T-(\d)/);
+  return m ? `T-${m[1]}xx` : "T-0xx";
+}
+
 // ---------------------------------------------------------------------------
-// Parse OPERATOR_TODO.md
+// Parse OPERATOR_TODO.md ("## OP-N, title   [open|done]")
 // ---------------------------------------------------------------------------
 function parseOperatorTodo() {
   const content = readFileSync(join(ROOT, "OPERATOR_TODO.md"), "utf8");
   const lines = content.split("\n");
 
-  // "## OP-N — title   [open]" or "[done]"
-  const opRe = /^## (OP-\d+) — (.+?)\s+\[(open|done)\]/;
+  // Tolerate comma or dash after the id; the file uses "## OP-5, title   [open]".
+  const opRe = /^## (OP-\d+)[,\s].*?\[(open|done)\]/;
 
-  const open = [];
-  const resolved = [];
+  const open = new Map();
+  const resolved = new Map();
 
   for (const line of lines) {
     const m = line.match(opRe);
     if (m) {
-      const entry = { id: m[1], title: m[2].trim(), state: m[3] };
-      if (m[3] === "open") {
-        open.push(entry);
-      } else {
-        resolved.push(entry);
-      }
+      // Last occurrence wins (the file has a couple of duplicated entries).
+      if (m[2] === "open") open.set(m[1], true);
+      else resolved.set(m[1], true);
     }
   }
+  // An id marked done anywhere is resolved, not open.
+  for (const id of resolved.keys()) open.delete(id);
 
-  return { open, resolved };
+  return { open: [...open.keys()], resolved: [...resolved.keys()] };
 }
 
 // ---------------------------------------------------------------------------
@@ -111,14 +138,10 @@ function getTestCounts() {
   let forgeCount = null;
   let vitestCount = null;
 
-  // Fast path (CI / --no-tests): skip running the suites; the dashboard falls
-  // back to a static "run pnpm run ci for live count" note. Keeps the
-  // auto-update workflow fast since CI already runs the suites separately.
   if (process.argv.includes("--no-tests") || process.env.PROGRESS_NO_TESTS) {
     return { forgeCount, vitestCount };
   }
 
-  // Forge: parse "Suite result: ok. N passed" lines to avoid double-counting summary table
   try {
     const out = execSync("forge test --root contracts --summary 2>&1", {
       cwd: ROOT,
@@ -137,7 +160,6 @@ function getTestCounts() {
     // ignore
   }
 
-  // Vitest — use local binary directly (works cross-platform without pnpm in PATH)
   try {
     const vitestBin =
       process.platform === "win32"
@@ -153,7 +175,6 @@ function getTestCounts() {
         env: { ...process.env, FORCE_COLOR: "0", NO_COLOR: "1" },
       });
     } catch (e) {
-      // execSync throws on non-zero exit; capture output anyway
       const err = e;
       out = (err.stdout || "") + (err.stderr || "");
     }
@@ -170,21 +191,19 @@ function getTestCounts() {
 // ---------------------------------------------------------------------------
 // Build dashboard
 // ---------------------------------------------------------------------------
-function buildDashboard(ranges, opTodo, testCounts, generatedDate) {
-  const allTasks = ranges.flatMap((r) => r.tasks);
+function buildDashboard(tasks, opTodo, testCounts, generatedDate) {
   const counts = { done: 0, "in-progress": 0, blocked: 0, review: 0, pending: 0 };
-  for (const t of allTasks) {
+  for (const t of tasks) {
     const s = normalizeStatus(t.status);
     counts[s] = (counts[s] || 0) + 1;
   }
-  const total = allTasks.length;
+  const total = tasks.length;
   const donePct = total > 0 ? Math.round((counts.done / total) * 100) : 0;
 
   const lines = [];
   lines.push(`_Generated: ${generatedDate}_`);
   lines.push("");
 
-  // Overall summary
   lines.push("### Overall");
   lines.push("");
   lines.push("| Done | In-Progress | Blocked | Pending | Total | % Done |");
@@ -194,19 +213,25 @@ function buildDashboard(ranges, opTodo, testCounts, generatedDate) {
   );
   lines.push("");
 
-  // Per-range breakdown
   lines.push("### Per-Range Breakdown");
   lines.push("");
   lines.push("| Area | Done | Total |");
   lines.push("|------|------|-------|");
-  for (const range of ranges) {
-    const rangeDone = range.tasks.filter((t) => normalizeStatus(t.status) === "done").length;
-    const rangeTotal = range.tasks.length;
-    lines.push(`| ${range.label} | ${rangeDone} | ${rangeTotal} |`);
+  const byArea = new Map();
+  for (const t of tasks) {
+    const a = areaOf(t.id);
+    const rec = byArea.get(a) || { done: 0, total: 0 };
+    rec.total += 1;
+    if (normalizeStatus(t.status) === "done") rec.done += 1;
+    byArea.set(a, rec);
+  }
+  for (const area of AREA_ORDER) {
+    const rec = byArea.get(area);
+    if (!rec) continue;
+    lines.push(`| ${AREA_LABELS[area]} | ${rec.done} | ${rec.total} |`);
   }
   lines.push("");
 
-  // Test counts
   lines.push("### Test Counts");
   lines.push("");
   const forgeLine =
@@ -221,7 +246,6 @@ function buildDashboard(ranges, opTodo, testCounts, generatedDate) {
   lines.push(`- ${vitestLine}`);
   lines.push("");
 
-  // Operator items summary (counts only; details live in OPERATOR_TODO.md)
   lines.push("### Operator Items");
   lines.push("");
   lines.push(
@@ -260,15 +284,14 @@ function updateReadme(dashboard) {
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
-const ranges = parseTodo();
+const tasks = parseTodo();
 const opTodo = parseOperatorTodo();
 const testCounts = getTestCounts();
 const generatedDate = new Date().toISOString().slice(0, 10);
-const dashboard = buildDashboard(ranges, opTodo, testCounts, generatedDate);
+const dashboard = buildDashboard(tasks, opTodo, testCounts, generatedDate);
 
 updateReadme(dashboard);
 
-// Print the dashboard to stdout
 console.log("<!-- PROGRESS:START -->");
 console.log(dashboard);
 console.log("<!-- PROGRESS:END -->");
