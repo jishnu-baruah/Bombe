@@ -56,7 +56,10 @@ const TOLERANCE_BPS = 2; // ±2 bps tolerance (PRD §6.3)
  */
 const DEFAULT_REPO_ROOT: string = (() => {
   try {
-    return fileURLToPath(new URL("../../../../", import.meta.url));
+    // Non-literal path so a bundler does not try to statically resolve it as an
+    // asset; resolved the same way at runtime (repo root, four levels up).
+    const upToRoot = `${["..", "..", "..", ".."].join("/")}/`;
+    return fileURLToPath(new URL(upToRoot, import.meta.url));
   } catch {
     // Fallback for environments where import.meta.url is unavailable
     return process.cwd();
