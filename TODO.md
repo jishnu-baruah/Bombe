@@ -54,13 +54,6 @@ The file is the board; every status change is a visible commit.
 - Acceptance: a backend that verifies the issuer's on-chain payment (or x402 settlement), then posts the claim with the platform posting key (OPERATOR_ROLE) and runs the deterministic attestor (attestor key) for the supported claim type, and returns the on-chain attestation + trace + verify link in the platform; per-issuer rate limit; fail-closed dedupe; never double-post; only supported, data-wired claim types auto-attest, everything else declines/abstains honestly.
 - Notes: the v3.2 "custodial paid requests" item, but custodial only in the POSTING sense (operator key calls the contract), not custody of issuer funds. Needs a dedicated minimally-funded posting key (not the deployer key), a receiving address, and explicit operator authorization (OP-9). Open permissionless issuer posting is a v4 contract change post-June-15 (docs/V3-BACKLOG.md).
 
-### T-802, live Blob + Wallet seams (viem)
-- Status: blocked, see OP-5
-- Depends-on: T-205
-- Scope: agent-sdk
-- Acceptance: compiles/typechecks; live trace storage writes a durable artifact whose URL the verify-hash path can fetch. (PRD §14.9)
-- Notes: Wallet seam is live (used by every on-chain attestation). The remaining piece is durable trace storage (BlobSeam), which gates stranger-verifiable `/verify`. Needs `BLOB_RW_TOKEN` (OP-5).
-
 ### T-J05, Demo video (≥ 2 min) of the live core use case
 - Status: blocked, operator-only (screen recording)
 - Depends-on: T-J04, T-806
@@ -191,6 +184,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 ### T-8xx, live seams + ship (M8)
 - T-801 done 2026-06-06 — live ModelSeam (AI gateway, OpenAI-compatible)
 - T-803 done 2026-06-07 — Neon DATABASE_URL wired (@neondatabase/serverless; durable paid-flow request persistence + payment dedupe); the read paths are Redis-cached (Upstash) for speed (OP-6 + OP-7)
+- T-802 done 2026-06-07 — durable reasoning-trace storage on Neon (no blob token needed): self-authenticating POST /api/v1/trace stores a trace only if its hash matches the on-chain reasoningHash; GET /api/trace/[claimId]/[attestor] + /verify read it back; v2-attest stores its trace after on-chain confirmation
 - T-804 done 2026-06-07 — deploy:testnet wrapper (fail-fast env validation + redeploy guard honoring the v2 lock)
 - T-805 done 2026-06-07 — README (architecture, env table, HTTP API, Plugboard trust model, why-not-frameworks)
 - T-806 done 2026-06-07 — DEMO.md final pass (live path + guided mode + operator click-path + fallback notes)

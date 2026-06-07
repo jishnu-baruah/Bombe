@@ -2,15 +2,14 @@
  * /api/trace/[claimId]/[agent] — Serve reasoning trace JSON.
  *
  * MODE=mock : returns the fixture trace from demo-data.ts (for verify-hash in tests).
- * MODE=live : attempts to read from Postgres (DATABASE_URL via @bombe/db);
- *             if not found, returns 404 with a clear JSON message.
+ * MODE=live : reads the stored trace from Neon (T-802). [agent] is the attestor
+ *             address. Returns 404 if not stored.
  *
- * Full trace persistence is a follow-up (T-803); this route wires the endpoint
- * so the /claim/[id] verify-hash button can call traceURI → this path.
- *
- * T-J04.
+ * This is what an attestation's traceURI points to, so the /claim verify-hash
+ * button and /verify can fetch the trace and re-derive the hash.
  */
 
+import { getStoredTrace } from "@/lib/db";
 import { getTrace } from "@/lib/demo-data";
 import { getRunMode } from "@/lib/server-config";
 import { NextResponse } from "next/server";
@@ -29,48 +28,32 @@ export async function GET(
   const { claimId, agent } = await params;
 
   if (getRunMode() === "live") {
-    // Attempt Postgres lookup via @bombe/db + DATABASE_URL
     try {
-      const databaseUrl = process.env.DATABASE_URL;
-      if (!databaseUrl) {
-        return NextResponse.json(
-          {
-            error: "trace_not_available",
-            message: "DATABASE_URL not configured — full trace persistence is a T-803 follow-up.",
-            claimId,
-            agent,
+      const stored = await getStoredTrace(claimId, agent);
+      if (stored) {
+        return new NextResponse(stored, {
+          headers: {
+            "content-type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=300, s-maxage=300",
           },
-          { status: 404 },
-        );
+        });
       }
-
-      // Dynamic import so the module is only loaded when DATABASE_URL is set.
-      // @bombe/db uses pglite (browser-safe) but in Next.js server context
-      // we have Node.js. Trace data is not yet persisted via the runner in
-      // the deployed environment (T-803 follow-up), so we return 404 with
-      // a clear status message.
       return NextResponse.json(
         {
           error: "trace_not_found",
           message:
-            "Trace not yet persisted for this agent/claim in the live database. " +
-            "Full trace write-back is a T-803 follow-up. " +
-            "On-chain attestation records (reasoningHash, sourcesHash, traceURI) are available " +
-            "via the /leaderboard and /claim/[id] pages.",
+            "No stored trace for this claim+attestor yet. Traces are stored at attest time; " +
+            "attestations posted before trace storage went live are hash-on-chain only.",
           claimId,
           agent,
         },
-        { status: 404 },
+        { status: 404, headers: { "Access-Control-Allow-Origin": "*" } },
       );
-    } catch {
+    } catch (e) {
       return NextResponse.json(
-        {
-          error: "db_error",
-          message: "Database lookup failed. Trace persistence is a T-803 follow-up.",
-          claimId,
-          agent,
-        },
-        { status: 503 },
+        { error: "db_error", message: e instanceof Error ? e.message : "trace lookup failed" },
+        { status: 503, headers: { "Access-Control-Allow-Origin": "*" } },
       );
     }
   }
