@@ -139,6 +139,86 @@ export default function IntegratePage() {
         </div>
       </section>
 
+      {/* Headless agent access */}
+      <section className="px-6 py-[72px]">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
+            For agents
+          </p>
+          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+            Headless, end to end.
+          </h2>
+          <p className="text-[16px] text-[rgba(255,255,255,0.6)] leading-[1.56] max-w-[40rem] mb-8 pretty">
+            An AI agent can use Bombe with no human: discover assets, read a verdict, verify it, and
+            even pay for a new attestation, over a keyless JSON API or an MCP server. The
+            integration contract is in{" "}
+            <a
+              href="https://github.com/jishnu-baruah/Bombe/blob/main/SKILL.md"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[#494fdf] hover:text-[#6b70e8]"
+            >
+              SKILL.md
+            </a>
+            ; the MCP server is{" "}
+            <code className="font-mono text-[13px] text-[#8d969e]">@bombe/mcp</code>.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                t: "bombe_list_assets",
+                b: "Discover the RWA yields Bombe attests + the contract.",
+              },
+              { t: "bombe_get_claim", b: "Read a claim and its on-chain verdicts." },
+              { t: "bombe_verify_claim", b: "Re-derive the reasoning hash and compare to chain." },
+              {
+                t: "bombe_request_attestation",
+                b: "Pay from your wallet, get an attestation back.",
+              },
+            ].map((x) => (
+              <div
+                key={x.t}
+                className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5"
+              >
+                <code className="font-mono text-[13px] text-[#ffffff]">{x.t}</code>
+                <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5] mt-2">
+                  {x.b}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Real, auditable reasoning */}
+      <section
+        className="px-6 py-[72px] border-t border-[rgba(255,255,255,0.06)]"
+        style={{ background: "#0a0a0a" }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
+            Real reasoning, deterministic verdict
+          </p>
+          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+            A real model explains; the math decides.
+          </h2>
+          <p className="text-[16px] text-[rgba(255,255,255,0.6)] leading-[1.56] max-w-[40rem] mb-8 pretty">
+            Each attestation carries a genuine, model-authored train of thought that reasons over
+            the real fetched evidence and cites each source by link, so it is auditable. The verdict
+            itself is not the model&apos;s opinion: it is a deterministic reconciliation you can
+            rerun, and the whole trace is hashed on-chain. Pay to attest your own supported yield at{" "}
+            <Link href="/request" className="text-[#494fdf] hover:text-[#6b70e8]">
+              /request
+            </Link>
+            , then check any verdict at{" "}
+            <Link href="/verify" className="text-[#494fdf] hover:text-[#6b70e8]">
+              /verify
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* Honest note on posting */}
       <section className="px-6 py-[72px]">
         <div className="max-w-6xl mx-auto">
