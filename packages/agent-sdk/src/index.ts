@@ -153,6 +153,14 @@ export {
 } from "./data/source-registry.js";
 export { discoverAssets, categoryOf, RWA_CATEGORIES } from "./data/discover.js";
 export type { DiscoverFilter, DiscoveredAsset, RwaCategory } from "./data/discover.js";
+export {
+  pipelineFor,
+  runGates,
+  freshnessGate,
+  boundsGate,
+  CATEGORY_GATES,
+} from "./data/pipeline.js";
+export type { Pipeline, GateResult, GateConfig, StepKind } from "./data/pipeline.js";
 export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";

@@ -71,4 +71,17 @@ describe("computeDecisiveAttestation (D11 decisive path)", () => {
     expect(r.sources).toHaveLength(2);
     expect(r.sources[0]?.source).toMatch(/^stub:/);
   });
+
+  it("a bounds gate forces ABSTAIN on an absurd yield, with a gate node + reason", async () => {
+    // mETH (liquid-staking) caps plausible yield at 2000 bps; 90000 bps (900%) is a
+    // misparse and must abstain even though the legs agree and match the assertion.
+    const r = await run([90_000, 90_010], 90_000);
+    expect(r.decision.verdict).toBe("ABSTAIN");
+    expect(r.trace.final.decision).toBe("ABSTAIN");
+    expect(r.trace.final.reasons).toContain("GATE_ABSTAIN(bounds)");
+    expect(r.trace.final.rationaleSummary).toMatch(/verification gate/i);
+    const gateNode = r.trace.provenance?.nodes.find((n) => n.type === "gate");
+    expect(gateNode?.id).toMatch(/^gate:/);
+    expect(() => TraceSchema.parse(r.trace)).not.toThrow();
+  });
 });

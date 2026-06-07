@@ -88,12 +88,15 @@ export const SCHEME_FETCHERS: Record<SourceScheme, SchemeFetcher> = {
       valueBps = a.valueBps;
       windowDays = a.windowDays;
     }
+    const last = points[points.length - 1] ?? null;
+    const asOf = last?.timestamp ? Date.parse(last.timestamp) : undefined;
     return {
       name: d.legName,
       valueBps,
       windowDays,
       sourceRef: `https://yields.llama.fi/chart/${d.ref}`,
-      raw: { scheme: d.scheme, poolId: d.ref, lastPoint: points[points.length - 1] ?? null },
+      asOf: Number.isFinite(asOf) ? asOf : undefined,
+      raw: { scheme: d.scheme, poolId: d.ref, lastPoint: last },
     };
   },
 
@@ -114,11 +117,13 @@ export const SCHEME_FETCHERS: Record<SourceScheme, SchemeFetcher> = {
       throw new DefiLlamaError("no usable APY field in Mantle mETH API response");
     }
     const windowDays = requestedWindowDays <= 1 ? 1 : requestedWindowDays <= 7 ? 7 : 30;
+    const ts = typeof latest.TimeStamp === "string" ? Date.parse(latest.TimeStamp) : Number.NaN;
     return {
       name: d.legName,
       valueBps: apyFrac * 10_000,
       windowDays,
       sourceRef: d.ref,
+      asOf: Number.isFinite(ts) ? ts : undefined,
       raw: { scheme: d.scheme, methToEth: latest.METHtoETH ?? null, apyFrac, windowDays },
     };
   },
@@ -139,6 +144,7 @@ export const FEATURED: AssetSpec[] = [
     name: "Mantle Staked ETH",
     verified: true,
     chain: "Mantle",
+    category: "liquid-staking",
     sources: [
       {
         scheme: "defillama",
@@ -163,6 +169,7 @@ export const FEATURED: AssetSpec[] = [
     name: "Ondo US Dollar Yield (tokenized US T-bills, on Mantle)",
     verified: true,
     chain: "Mantle",
+    category: "tokenized-treasury",
     sources: [
       {
         scheme: "defillama",
@@ -179,6 +186,7 @@ export const FEATURED: AssetSpec[] = [
     name: "Ethena Staked USDe (synthetic-dollar yield, on Mantle)",
     verified: true,
     chain: "Mantle",
+    category: "synthetic-dollar",
     sources: [
       {
         scheme: "defillama",
@@ -195,6 +203,7 @@ export const FEATURED: AssetSpec[] = [
     name: "BlackRock USD Institutional Digital Liquidity Fund (tokenized US Treasuries)",
     verified: true,
     chain: "Ethereum",
+    category: "tokenized-treasury",
     sources: [
       {
         scheme: "defillama",
@@ -211,6 +220,7 @@ export const FEATURED: AssetSpec[] = [
     name: "Ondo Short-Term US Government Bond Fund (tokenized US Treasuries)",
     verified: true,
     chain: "Ethereum",
+    category: "tokenized-treasury",
     sources: [
       {
         scheme: "defillama",
