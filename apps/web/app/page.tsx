@@ -99,55 +99,77 @@ export default function LandingPage() {
                 AI attestors that <span style={{ color: "#494fdf" }}>can&apos;t lie.</span>
               </h1>
 
-              {/* Sub-headline */}
+              {/* Sub-headline: outcome first, then the mechanism, jargon glossed inline */}
               <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] tracking-[-0.09px] max-w-[36rem] mb-12 pretty">
-                Bombe is an autonomous AI attestor network for real-world-asset claims on Mantle.
-                Agents attest{" "}
+                An autonomous network of AI agents that verify real-world-asset yield claims against
+                on-chain data on Mantle, then sign each verdict so{" "}
+                <strong className="text-[rgba(255,255,255,0.92)] font-semibold">
+                  anyone can recheck it
+                </strong>
+                . They attest{" "}
                 <strong className="text-[rgba(255,255,255,0.92)] font-semibold">
                   only to falsifiable claims
                 </strong>
-                . Safety is enforced at the{" "}
-                <strong className="text-[rgba(255,255,255,0.92)] font-semibold">
-                  contract layer
-                </strong>{" "}
-                , proven live by Plugboard, an external agent Bombe&apos;s team did not write.
+                , the kind you can prove false with data, not opinions. Replace trust me with verify
+                it yourself.
               </p>
 
-              {/* CTAs */}
+              {/* CTAs: one primary action, then audience-segmented paths */}
               <div className="flex flex-wrap gap-4">
                 <Link href="/live">
-                  <Button variant="primary">Watch Live Race →</Button>
+                  <Button variant="primary">Watch it live →</Button>
                 </Link>
                 <Link href="/leaderboard">
-                  <Button variant="outline-dark">View Leaderboard</Button>
+                  <Button variant="outline-dark">View leaderboard</Button>
+                </Link>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-6 text-[14px]">
+                <Link
+                  href="/integrate"
+                  className="text-[rgba(255,255,255,0.55)] hover:text-[#ffffff] transition-colors"
+                >
+                  Developers and agents, start here →
+                </Link>
+                <Link
+                  href="/issuers"
+                  className="text-[rgba(255,255,255,0.55)] hover:text-[#ffffff] transition-colors"
+                >
+                  Issuers, attest your claims →
                 </Link>
               </div>
             </div>
 
-            {/* Right stat cluster, subtle elevated panel, visible on lg+ */}
-            <aside className="hidden lg:flex flex-col gap-4" aria-label="Protocol statistics">
+            {/* Right cluster: the proof leads (verify-yourself), then supporting stats */}
+            <aside className="hidden lg:flex flex-col gap-4" aria-label="Verify it yourself">
+              {/* Proof card: the thesis made checkable */}
+              <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                <p className="text-[12px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-2">
+                  Don&apos;t trust. Verify.
+                </p>
+                <p className="text-[15px] text-[rgba(255,255,255,0.82)] leading-[1.5] mb-3">
+                  Every verdict is signed on-chain with a reasoning hash, a fingerprint you can
+                  recompute from the trace and check yourself.
+                </p>
+                <p className="text-[11px] text-[#8d969e] font-mono break-all mb-3">
+                  0xf2473a0a55D997233C8fBF987c197e7d2180470A
+                </p>
+                <a
+                  href="https://sepolia.mantlescan.xyz/address/0xf2473a0a55D997233C8fBF987c197e7d2180470A"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[13px] text-[#494fdf] hover:text-[#6b70e8] font-medium transition-colors"
+                >
+                  View the contract on Mantle explorer →
+                </a>
+              </div>
               {/* Stat card: attestors */}
               <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                 <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-2">
-                  Attestors racing
+                  Attestors
                 </p>
                 <p className="text-[48px] font-semibold leading-[1.0] tracking-[-1px] tabular">4</p>
                 <p className="text-[13px] text-[rgba(255,255,255,0.50)] mt-2">
                   Reflector · Rotor · Stator · Plugboard
-                </p>
-              </div>
-              {/* Stat card: tiers */}
-              <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-2">
-                  Claim tiers
-                </p>
-                <div className="flex gap-2 mt-1">
-                  <Badge variant="tier-1" label="T1" />
-                  <Badge variant="tier-2" label="T2" />
-                  <Badge variant="tier-3" label="T3" />
-                </div>
-                <p className="text-[13px] text-[rgba(255,255,255,0.50)] mt-3">
-                  T3 always ABSTAIN, contract enforced
                 </p>
               </div>
               {/* Stat card: chain */}
@@ -181,9 +203,9 @@ export default function LandingPage() {
             The attestation network that knows its limits.
           </h2>
           <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] max-w-2xl mb-14 pretty">
-            Existing attestation networks attest to any claim, including subjective valuations that
-            no agent can verify. When wrong, there&apos;s no economic consequence. Bombe changes the
-            game.
+            Most attestation networks will sign any claim, including subjective valuations no agent
+            can verify, and pay no price when they are wrong. Bombe attests only to what can be
+            proven false, and stakes real money on being right.
           </p>
 
           {/* Asymmetric layout: large feature card left, 2-stack right */}
@@ -222,7 +244,8 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-[14px] text-[rgba(255,255,255,0.60)] leading-[1.56]">
                   Three tiers: deterministic on-chain math (Tier 1), document cross-check (Tier 2),
-                  and judgment, where the only valid answer is ABSTAIN.
+                  and judgment, where the only valid answer is ABSTAIN, declining to rule rather
+                  than guess.
                 </p>
               </Card>
 
