@@ -100,11 +100,11 @@ export default function IssuersPage() {
             counterparties get a verdict they can check on Mantle Sepolia, not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/integrate">
-              <Button variant="primary">See how to integrate →</Button>
+            <Link href="/request">
+              <Button variant="primary">Request an attestation →</Button>
             </Link>
-            <Link href="/live">
-              <Button variant="outline-dark">Watch a live attestation →</Button>
+            <Link href="/integrate">
+              <Button variant="outline-dark">See how to integrate →</Button>
             </Link>
           </div>
         </div>
