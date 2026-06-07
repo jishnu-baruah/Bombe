@@ -53,6 +53,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-07, Public agent-read API + board restructure (D17)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D17, the public read API (v1) ships as the first v3 agent-access surface, ahead of the credential- or council-gated v3 items.** `apps/web/app/api/v1/{assets,claims/[claimId],verify/[claimId]}` reads the live AgentAttestation contract directly (no keys, CORS-open) and is deployed to production at https://bombe-web.vercel.app/api/v1. A context-less consumer (`scripts/test-public-api.mjs`, zero Bombe imports) verifies it end-to-end. `/verify` honestly returns `trace_unavailable` until durable trace storage lands (gated on OP-5). The TODO board is restructured klink-style: active tasks at the top, completed tasks condensed into a dated `## Done (archive)` section. | The read path is permissionless and safe to expose now (it only re-serves what any agent could read from the chain), so it does not need to wait on the x402 / MCP / trace-storage decisions that the external council still owns. Shipping it early gives integrators a real endpoint to build against and makes the "agents can use our service" claim substantiated by working code, not a promise. The board restructure keeps the active surface legible as the done list grew past 60 entries. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

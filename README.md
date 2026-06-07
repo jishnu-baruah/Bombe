@@ -42,37 +42,38 @@ Full guide: [docs/INTEGRATION.md](docs/INTEGRATION.md). Where the project honest
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-06_
+_Generated: 2026-06-07_
 
 ### Overall
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 69 | 0 | 0 | 10 | 79 | 87% |
+| 74 | 1 | 4 | 9 | 88 | 84% |
 
 ### Per-Range Breakdown
 
 | Area | Done | Total |
 |------|------|-------|
-| Ops | 14 | 14 |
-| Contracts (M1) | 10 | 10 |
-| shared + agent-sdk (M2) | 14 | 14 |
-| reference agents (M2/M4) | 6 | 6 |
-| runner + indexer + gateway + DB (M3) | 6 | 6 |
-| Plugboard mock path (M4) | 5 | 5 |
-| web app (M5) | 9 | 10 |
-| autonomous testing (M6) | 3 | 4 |
-| live seams + ship (M8) | 1 | 7 |
-| STRETCH (M7) | 1 | 3 |
+| T-0xx, ops / workflow / CI | 19 | 19 |
+| T-1xx, contracts | 9 | 9 |
+| T-2xx, shared + agent-sdk | 14 | 14 |
+| T-3xx, reference agents | 4 | 4 |
+| T-4xx, runner + indexer + gateway + DB | 6 | 6 |
+| T-5xx, Plugboard | 5 | 5 |
+| T-6xx, web app | 7 | 8 |
+| T-7xx, testing | 3 | 4 |
+| T-8xx, live seams + ship | 1 | 7 |
+| T-9xx, stretch | 0 | 3 |
+| T-Jxx, submission gates | 6 | 9 |
 
 ### Test Counts
 
-- 77 forge tests
-- 668 vitest tests
+- forge tests: run `pnpm run ci` for live count
+- vitest tests: run `pnpm run ci` for live count
 
 ### Operator Items
 
-5 open, 4 resolved (tracked in OPERATOR_TODO.md).
+4 open, 4 resolved (tracked in OPERATOR_TODO.md).
 <!-- PROGRESS:END -->
 
 Refresh the dashboard with `pnpm progress`.

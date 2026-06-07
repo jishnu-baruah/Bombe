@@ -2,9 +2,11 @@
 
 The file is the board; every status change is a visible commit.
 
-> **Hackathon submission gates live in `## T-Jxx` (bottom of this file).** They layer the Mantle
-> Turing Test Hackathon judging/award requirements on top of the PRD milestones. Full rubric and
-> requirement→task map: [`HACKATHON.md`](HACKATHON.md). **Mandate: ship live on-chain, not a mock.**
+> **Active work is at the top. Completed tasks are condensed into `## Done (archive)` at the bottom**, newest areas last, one line each with the merge date. Open the git history of a task ID for its full acceptance notes.
+>
+> **Current source of truth is the v2/v3 PRDs**, not the original M1-M8 milestone framing. The M1-M8 build (contracts, SDK, agents, runner, web, tests, live seams) is complete and live on Mantle Sepolia. What remains is a short tail of polish/ship tasks plus the v3 agent-access surface (some of which is gated on operator credentials or external-council decisions).
+>
+> Hackathon submission gates live in the `T-Jxx` blocks. Full rubric and requirement→task map: [`HACKATHON.md`](HACKATHON.md). **Mandate: ship live on-chain, not a mock.**
 
 ## Status legend
 
@@ -12,7 +14,7 @@ The file is the board; every status change is a visible commit.
 - `in-progress YYYY-MM-DD`, picked up, being built.
 - `review`, code complete, PR open, awaiting merge.
 - `blocked, <reason | see OP-N>`, cannot proceed; cites the reason or the `OPERATOR_TODO.md` entry that gates it.
-- `done YYYY-MM-DD`, Acceptance criteria pass and the merge landed.
+- `done YYYY-MM-DD`, Acceptance criteria pass and the merge landed (archived below).
 
 ## Numbering legend (range → area → PRD milestone)
 
@@ -28,6 +30,7 @@ The file is the board; every status change is a visible commit.
 | T-7xx | Autonomous testing harness | M6 |
 | T-8xx | Live seams + ship (README/DEMO/DECISIONS) | M8 |
 | T-9xx | Stretch (M7: Discord, `/turing`, Telegram bot) | M7 |
+| T-Jxx | Hackathon submission & judging gates | submission |
 
 ## Task block format
 
@@ -40,485 +43,9 @@ The file is the board; every status change is a visible commit.
 - Notes: none
 ```
 
-Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reason or see OP-N>` / `done YYYY-MM-DD`. Every Acceptance line cites the PRD section + the §14 acceptance-criteria number it satisfies. `Depends-on: none` means no dependencies.
-
-> **Bootstrap note:** Setup tasks T-001–T-008 are completed by the bootstrap pass and marked `done` in a follow-up commit (T-000). They are seeded here as `pending`; the T-000 commit flips them.
-
 ---
 
-## T-0xx, Ops
-
-### T-001, .gitattributes line-ending normalization
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: ops
-- Acceptance: `* text=auto eol=lf`, binary rules for images, lockfile marked `-diff linguist-generated`; git stops warning about CRLF. (PRD §5)
-- Notes: done by this plan.
-
-### T-002, docs restructure (PRD→docs/, DECISIONS, DEMO, runbook)
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: docs
-- Acceptance: PRD relocated to `docs/bombe-prd.md`; `docs/DECISIONS.md` (D1–D6 + ESCALATIONS), `docs/DEMO.md` (A→D stub), `docs/runbooks/workflow.md` created. (PRD §5, §15.3)
-- Notes: done by this plan.
-
-### T-003, CLAUDE.md agent operating manual
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: docs
-- Acceptance: auto-loaded manual with the 8 required sections (one-liner, start-of-session checklist, conventions, merge policy D6, fix-loop, OPERATOR_TODO protocol, guardrails, definition of done). (PRD §15.3, §15.4)
-- Notes: done by this plan.
-
-### T-004, CONTEXT.md strategic framing
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: docs
-- Acceptance: locked framing with the 6 required sections (thesis, claim taxonomy, the four attestors, non-goals, definition of done, determinism contract). (PRD §2, §14)
-- Notes: done by this plan.
-
-### T-005, TODO.md board
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: docs
-- Acceptance: header (legend + numbering table + block template) plus every task block T-0xx…T-9xx, each with Status/Depends-on/Scope/Acceptance/Notes; board parses. (PRD §5)
-- Notes: done by this plan.
-
-### T-006, OPERATOR_TODO.md human-in-the-loop queue
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: docs
-- Acceptance: purpose, `OP-N` entry format, agent protocol, `## Open` and `## Resolved` sections; OP-1 (GitHub remote/auth) recorded. (PRD §15.4)
-- Notes: done by this plan.
-
-### T-007, CI workflow + PR template
-- Status: done 2026-06-05
-- Depends-on: none
-- Scope: ops
-- Acceptance: `.github/workflows/ci.yml` runs `pnpm run ci` on PRs + non-main pushes (Foundry + pnpm + Node 22); `.github/pull_request_template.md` enforces task-ID + acceptance checklist; YAML valid. (PRD §8)
-- Notes: done by this plan.
-
-### T-008, GitHub remote create + push
-- Status: done 2026-06-05
-- Depends-on: T-007
-- Scope: ops
-- Acceptance: `origin` set, `main` pushed, Actions tab shows CI. (PRD §8)
-- Notes: OP-1 resolved, `origin` = https://github.com/jishnu-baruah/Bombe.git, `main` pushed. CI runs on the next branch/PR push.
-
-### T-009, pnpm workspace bootstrap
-- Status: done 2026-06-05
-- Depends-on: T-008
-- Scope: ops
-- Acceptance: root `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.env.example` (every PRD §7 var, no values), Biome (lint+format) config, vitest config; root scripts `test`/`test:agent`/`test:demo`/`demo`/`ci`/`deploy:testnet` exist as wired stubs that exit non-zero with a "not implemented" message; `pnpm install` succeeds. (PRD §5, §8)
-- Notes: none
-
-### T-010, Foundry init in contracts/
-- Status: done 2026-06-05
-- Depends-on: T-009
-- Scope: ops
-- Acceptance: `foundry.toml`, `remappings.txt`, OZ v5 dep, YieldProof git submodule under `contracts/lib/yieldproof` with the vendored `IYieldProofAttestor.sol` fallback recorded in DECISIONS.md; `forge build` succeeds on an empty src. (PRD §5, §6.2)
-- Notes: none
-
-### T-011, CI gate hardening
-- Status: done 2026-06-05
-- Depends-on: T-009
-- Scope: ops
-- Acceptance: `.github/workflows/ci.yml` no longer double-specifies the pnpm version (reads it from `package.json` `packageManager`); `main` branch protection requires the `ci` status check so auto-merge actually gates on green CI (D6 enforceable, not just declared). (PRD §8, §15.4)
-- Notes: fixes a bug where PR #1 auto-merged before CI passed because `main` had no required-check protection. See D8.
-
-### T-012, README progress dashboard + YieldProof reference submodule
-- Status: done 2026-06-06
-- Depends-on: none
-- Scope: ops
-- Acceptance: progress generator (`scripts/update-progress.mjs`) + `pnpm progress` script; dashboard in `README.md` between `<!-- PROGRESS:START/END -->`; YieldProof submodule wired as reference at `contracts/lib/yieldproof` (or documented as removed if incompatible); `IYieldProofAttestor.sol` NatSpec note added; OP-2 resolved; D15 in DECISIONS.md. (PRD §5, §12)
-- Notes: resolves OP-2. Submodule kept, forge build unaffected (Hardhat project, nothing imported). Vendored interface retained per PRD §6.2 fallback. T-805 will expand the README with architecture diagram, env table, etc.
-
-### T-013, integrate live-ship mandate + reference docs into workflow
-- Status: done 2026-06-06
-- Depends-on: none
-- Scope: docs
-- Acceptance: D16 recorded in `docs/DECISIONS.md`; `CLAUDE.md` and `CONTEXT.md` reference `HACKATHON.md` (submission spec) + `DESIGN.md` (web design system) and state the live-ship mandate; `README.md` has a "Shipping target" section referencing `HACKATHON.md` and OP-3..OP-6; OP-3, OP-4, OP-5, OP-6 raised in `OPERATOR_TODO.md`.
-- Notes: operator mandate 2026-06-06 (Jishnu Baruah). D16 is a scoped reframing of PRD §13, "demo must not depend on network" now applies to the offline fallback, not the live submission demo.
-
-### T-014, auto-update README progress dashboard on every PR
-- Status: done 2026-06-06
-- Depends-on: T-012
-- Scope: ops
-- Acceptance: `.github/workflows/progress.yml` regenerates the dashboard via `scripts/update-progress.mjs` on each PR and commits it back to the PR branch (authored as the owner), so every merge to `main` carries a fresh dashboard; self-terminating; generator gains a `--no-tests` fast path. (PRD §8)
-- Notes: requested by operator, track performance at a glance on every push to main.
-
----
-
-## T-1xx, Contracts (M1)
-
-### T-101, IYieldProofAttestor interface + vendored fallback
-- Status: done 2026-06-05
-- Depends-on: T-010
-- Scope: contracts
-- Acceptance: interface compiles; fallback path documented. (PRD §6.2)
-- Notes: interface delivered in T-010 (contracts/src/interfaces/IYieldProofAttestor.sol); compiles, fallback documented in D10.
-
-### T-102, AgentRegistry
-- Status: done 2026-06-05
-- Depends-on: T-010
-- Scope: contracts
-- Acceptance: `registerAgent`/`registerHuman` (MIN_BOND 0.1e), `topUpBond`/`withdrawBond` (blocked during pending dispute, stays ≥MIN_BOND or full exit), reputation int256 role-gated; tests: min-bond revert, human registration, withdraw-blocked-during-dispute. (PRD §6.2, §14.2)
-- Notes: contracts/src/AgentRegistry.sol + contracts/test/AgentRegistry.t.sol; 13/13 tests pass; forge fmt clean; contracts:test added to CI gate.
-
-### T-103, AgentAttestation storage + postClaim
-- Status: done 2026-06-05
-- Depends-on: T-010, T-101
-- Scope: contracts
-- Acceptance: `postClaim` emits `ClaimPosted`; `Decision{VALID,REJECTED,ABSTAIN}` enum. (PRD §6.2)
-- Notes: contracts/src/AgentAttestation.sol + contracts/test/AgentAttestation.t.sol; 21/21 tests pass; forge fmt clean; D11 in DECISIONS.md.
-
-### T-104, AgentAttestation.attest + tier-3 revert
-- Status: done 2026-06-05
-- Depends-on: T-103
-- Scope: contracts
-- Acceptance: happy path; reverts `NotRegistered`/`AlreadyAttested`/`ClaimAlreadyClosed`/`JudgmentTierRequiresAbstain` (tier 3 + non-ABSTAIN); ABSTAIN locks 0 + never slashable; VALID/REJECTED locks 0.02e; cap 16; `forge fmt` clean. (PRD §6.2, §14.5, §14.6)
-- Notes: Combined delivery with T-103. ClaimClosed renamed ClaimAlreadyClosed to avoid identifier collision with the ClaimClosed event (Solidity 0.8.24 does not allow an error and event to share a name).
-
-### T-105, TuringLeaderboard.settleTier1 + stats/views
-- Status: done 2026-06-06
-- Depends-on: T-104
-- Scope: contracts
-- Acceptance: updates epoch stats, releases/forwards locked stake; `epochStats`/`lifetimeStats` views; tests: settle correct. (PRD §6.2, §14.7)
-- Notes: contracts/src/TuringLeaderboard.sol + contracts/test/Settlement.t.sol; co-delivered with T-106; 15 settlement tests pass (49 total forge). D12 in DECISIONS.md. Added SETTLER_ROLE + seizeStake to AgentAttestation (Part A) and fixed ZeroRegistry nit.
-
-### T-106, AgentSlashing Tier 1
-- Status: done 2026-06-06
-- Depends-on: T-105
-- Scope: contracts
-- Acceptance: wrong → burn 50% / redistribute 50% pro-rata via pull payments; reputation wrong −10 / correct +1 / abstain ±0; reentrancy guards; tests: settle-wrong slash math, pro-rata across 2 correct, reputation deltas, no ABSTAIN in any slash. (PRD §6.2, §9, §14.6)
-- Notes: contracts/src/AgentSlashing.sol; co-delivered with T-105. Burn = ETH retained forever in contract (totalBurned). Reputation applied by Leaderboard (D12), not here. Conservation seized==burn+distributed asserted; full fuzz deferred to T-108.
-
-### T-107, AgentSlashing Tier 2 disputes
-- Status: done 2026-06-06
-- Depends-on: T-106
-- Scope: contracts
-- Acceptance: `openDispute` (0.05e bond) / `vote` (one per attestor, weight=bond, window) / `resolveDispute` (stake-weighted; agent-wrong vs agent-right economics); tests: both verdicts, withdrawal blocked during dispute. (PRD §6.2)
-- Notes: AgentSlashing constructor gains `disputeWindowSeconds` immutable param; AgentRegistry.adjustReputation/setDisputePending now guard NotRegistered; D13 in DECISIONS.md; 17 new tests pass (66 total). Settlement.t.sol constructor call updated to pass 4 args.
-
-### T-108, Fuzz + deep-test wiring
-- Status: done 2026-06-06
-- Depends-on: T-106
-- Scope: contracts
-- Acceptance: `testFuzz_SlashConservation(uint96,uint8)` asserts distributed+burned==locked; `pnpm test:contracts:deep` runs long fuzz outside the fast loop. (PRD §6.2, §14.2)
-- Notes: contracts/test/SlashConservation.t.sol; fuzz passes 256 runs default / 10 000 runs deep profile; `[profile.deep.fuzz] runs = 10_000` in foundry.toml; `test:contracts:deep` + `contracts:test:deep` added to root package.json.
-
-### T-109, Deploy.s.sol
-- Status: done 2026-06-06
-- Depends-on: T-107
-- Scope: contracts
-- Acceptance: env-driven `epochSeconds`/`disputeWindowSeconds` (demo 300/60), deploys all four contracts wired with roles; anvil deploy succeeds. (PRD §6.2)
-- Notes: contracts/script/Deploy.s.sol; dry-run `forge script script/Deploy.s.sol` logs all 4 addresses and runs successfully; D14 in DECISIONS.md documents canonical role topology. M1 complete: 4 contracts + 71 tests (incl. fuzz) all pass.
-
-### T-016, CLAIM_FEE reward model + 0-100 trust score
-- Status: done 2026-06-06
-- Depends-on: T-106, T-105
-- Scope: contracts
-- Acceptance: `CLAIM_FEE=0.01e` required on `postClaim`; `seizeClaimFee` role-gated to SETTLER_ROLE; `settleTier1` distributes fee pro-rata to correct attestors via `AgentSlashing.creditClaimable`; integer remainder + zero-correct-case burned via `burnFee`; `ClaimFeeDistributed` event; `trustScore(address)` view (accuracy 0-70 + experience 0-30, cap 100); conservation fuzz `testFuzz_FeeConservation`; all test callers updated to send `CLAIM_FEE`. (PRD §6.2, §9)
-- Notes: AgentAttestation: CLAIM_FEE constant, payable postClaim, seizeClaimFee, ClaimFeeSeized event, IncorrectClaimFee/NoClaimFeeToSeize/ClaimFeeTransferFailed errors. AgentSlashing: burnFee() LEADERBOARD_ROLE-gated. TuringLeaderboard: _distributeClaimFee, trustScore, TRUST_SCORE_EXP_CAP=15. 5 new tests in FeeAndTrustScore.t.sol; 77 total forge tests pass. ABI regenerated.
-
----
-
-## T-2xx, shared + agent-sdk (M2)
-
-### T-201, packages/shared taxonomy
-- Status: done 2026-06-06
-- Depends-on: T-009
-- Scope: shared
-- Acceptance: `ClaimSchema`, `ClaimTier`, pure `tierOf(claimType)`; zod; never trusts submitter tier. (PRD §6.1)
-- Notes: none
-
-### T-202, canonicalJson() + hashing
-- Status: done 2026-06-06
-- Depends-on: T-201
-- Scope: shared
-- Acceptance: recursively sorted keys; `reasoningHash=keccak256(canonicalJson(x))`; tests: two identical traces → identical hash. (PRD §6.3, §14.4)
-- Notes: packages/shared/src/canonical.ts; canonicalJson + hashCanonical + reasoningHash/sourcesHash convenience wrappers; viem keccak256/toBytes; 22 tests all pass.
-
-### T-203, test-report.ts + events.ts schemas
-- Status: done 2026-06-06
-- Depends-on: T-201
-- Scope: shared
-- Acceptance: `TestReport` interface (PRD §15.1) and all SSE event zod schemas (claim/agent-step/agent-done/human-queue/epoch/dispute). (PRD §6.5, §15.1, §14.17)
-- Notes: TestReportSchema + FailureCategory in test-report.ts; SseEventSchema discriminated union in events.ts; 75 tests all pass; biome + tsc clean.
-
-### T-204, fixtures loader + fixtures tree
-- Status: done 2026-06-06
-- Depends-on: T-201
-- Scope: shared
-- Acceptance: `loadOracleSnapshot`/`loadDocument`/`loadModelScript`/`loadHumanDecision` pure fns; `fixtures/` tree incl. stale meth (claim B) and mismatched docs (claim C), `documents/v1/`, `model-costs.json`, `human-decisions.json`. (PRD §5, §6.3)
-- Notes: none
-
-### T-205, agent-sdk seams
-- Status: done 2026-06-06
-- Depends-on: T-203
-- Scope: agent-sdk
-- Acceptance: `ModelSeam`/`BlobSeam`/`WalletSeam`/`ClockSeam`/`HumanQueueSeam` interfaces with `live`/`mock`/`stub` impls selected by `MODE`/`TEST_MODE`. (PRD §6.3)
-- Notes: packages/agent-sdk created; config.ts is the sole process.env reader (PRD §15.4); live seams are skeletons (T-801/802); 53 tests pass; pnpm run ci green.
-
-### T-206, ModelRouter
-- Status: done 2026-06-06
-- Depends-on: T-205
-- Scope: agent-sdk
-- Acceptance: primary→FALLBACK_MODEL→mock; 429/5xx/timeout triggers in-step fallback; trace records `{modelSwitched,from,to,reason}`; test: stubbed 429 → fallback → `modelSwitched:true`. (PRD §6.3.1, §14.14)
-- Notes: ModelError class + ModelRouter + createModelRouter factory in packages/agent-sdk/src/model-router.ts; 29 tests pass; switch records exposed via router.switches array + onSwitch callback.
-
-### T-207, cost circuit breaker
-- Status: done 2026-06-06
-- Depends-on: T-206
-- Scope: agent-sdk
-- Acceptance: cumulative tokens×model-costs > `MAX_COST_USD_PER_RUN` (0.05) forces ABSTAIN(COST_CAPPED); test with burning stub. (PRD §6.3.1, §14.15)
-- Notes: CostBreaker class in packages/agent-sdk/src/cost-breaker.ts; AbstainReason union in reasons.ts; 17 tests pass; unknown model cost treated as 0 (flagged in unknownModels set).
-
-### T-208, tool error recovery
-- Status: done 2026-06-06
-- Depends-on: T-205
-- Scope: agent-sdk
-- Acceptance: throw → `{error,recoverable}`; recoverable → 1 retry; else ABSTAIN(TOOL_FAILURE) + `errors` row; loop never crashes; test with throwing stub. (PRD §6.3.1, §14.15)
-- Notes: runToolWithRecovery in packages/agent-sdk/src/tool-recovery.ts; never throws; ToolErrorRow emitted for every failure; 23 tests pass.
-
-### T-209, router.ts TOOL_MAP
-- Status: done 2026-06-06
-- Depends-on: T-201
-- Scope: agent-sdk
-- Acceptance: per-claimType tool map; unmapped tool request → structured refusal observation; FAIR_VALUE → no tools. (PRD §6.3.2)
-- Notes: TOOL_MAP + allowedTools/isToolAllowed/refusalObservation in packages/agent-sdk/src/router.ts; 29 tests pass; FAIR_VALUE=[] enforced at compile time.
-
-### T-210, tools: price/yield feeds + snapshots
-- Status: done 2026-06-06
-- Depends-on: T-204, T-209
-- Scope: agent-sdk
-- Acceptance: `fetch_chainlink_price`/`fetch_meth_yield`(stale fixture)/`fetch_usdy_yield`; zod I/O `{value,source,fetchedAt,confidence}`; deterministic snapshot tests. (PRD §6.3)
-- Notes: tools/feeds.ts; stale→confidence 2000 bps+value.stale:true; 85 tool tests + 9 snapshots written; all 332 tests pass; pnpm run ci exit 0.
-
-### T-211, tools: chain-state + compute
-- Status: done 2026-06-06
-- Depends-on: T-204
-- Scope: agent-sdk
-- Acceptance: `query_chain_state` DSL (`balanceOf`,`eventOccurred`) + `compute_expected` (pure, ±2bps); snapshot tests. (PRD §6.3)
-- Notes: tools/chain-compute.ts; DSL backed by fixtures/chain/state.json; compute_expected ±2bps tolerance validated with boundary tests.
-
-### T-212, tools: document + history
-- Status: done 2026-06-06
-- Depends-on: T-204
-- Scope: agent-sdk
-- Acceptance: `read_document` (servicer report + statement, mismatched pair for C) + `cross_check_history` (Postgres); snapshot tests. (PRD §6.3)
-- Notes: tools/doc-history.ts; cashflow mismatch 50000 vs 45000 exposed; HistorySource seam + MockHistorySource for tests; real DB wired in T-403.
-
-### T-213, loop.ts ReAct + hard rules
-- Status: done 2026-06-06
-- Depends-on: T-206, T-207, T-208, T-209, T-210, T-211, T-212
-- Scope: agent-sdk
-- Acceptance: model proposes thought+action; SDK executes to finalize/maxSteps; hard rules tier3→ABSTAIN(overridden), BELOW_THRESHOLD, STALE_SINGLE_SOURCE, STEP_BUDGET; trace v1.0 shape; tests for each ABSTAIN path. (PRD §6.3, §14.6)
-- Notes: T-214 cleanup nits applied: staleSourceCount dead var removed, MODEL_ABSTAIN added to AbstainReason, import fixed to `import type`.
-
-### T-214, attest.ts builder
-- Status: done 2026-06-06
-- Depends-on: T-213, T-202
-- Scope: agent-sdk
-- Acceptance: assembles `{claimId,tier,decision,confidenceBps,sourcesHash,reasoningHash,traceURI}`, signs via WalletSeam, writes `agent_runs`/`attestations` row w/ latency+cost; payload-shape test. (PRD §6.3)
-- Notes: M2 SDK core complete. Source sort key: (name ASC, source ASC). Decision enum: VALID=0, REJECTED=1, ABSTAIN=2. InMemoryAttestationRepository for tests. 268 agent-sdk tests pass; 364 total; pnpm run ci exit 0.
-
----
-
-## T-3xx, reference agents (M2/M4)
-
-### T-301, Reflector (conservative 8500/8)
-- Status: done 2026-06-06
-- Depends-on: T-214
-- Scope: agent-reference
-- Acceptance: requires 2 independent sources; scripted run on claim B → ABSTAIN(STALE_SINGLE_SOURCE) with stable hash. (PRD §6.4, M2 checkpoint)
-- Notes: packages/agent-reference/src/agents.ts REFLECTOR_CONFIG; temperament thresholdBps=8500/maxSteps=8/requiresTwoSources=true/abstainOnStale=true; M2 stable hash 0xc3cef617d4e63c8b71d45ce5c0f0226fbbe92cd696404107019fd6dde0831669.
-
-### T-302, Rotor (aggressive 6500/5)
-- Status: done 2026-06-06
-- Depends-on: T-214
-- Scope: agent-reference
-- Acceptance: commits above threshold; never abstains for staleness alone. (PRD §6.4)
-- Notes: ROTOR_CONFIG thresholdBps=6500/maxSteps=5/requiresTwoSources=false/abstainOnStale=false; claim B → VALID confirmed.
-
-### T-303, Stator (cost-optimized 7000/4)
-- Status: done 2026-06-06
-- Depends-on: T-214
-- Scope: agent-reference
-- Acceptance: shortest path; abstains when tools disagree. (PRD §6.4)
-- Notes: STATOR_CONFIG thresholdBps=7000/maxSteps=4/requiresTwoSources=false/abstainOnStale=false; model-abstains on stale single-source (MODEL_ABSTAIN path).
-
-### T-304, mock model-scripts A–D for the three SDK agents
-- Status: done 2026-06-06
-- Depends-on: T-301, T-302, T-303
-- Scope: agent-reference
-- Acceptance: `fixtures/model-scripts/{agent}/{claimId}.json` produce the §6.7 outcomes deterministically. (PRD §6.4, §6.7)
-- Notes: 12 model-script JSON files (reflector/rotor/stator × A/B/C/D); fixtures/claims.json added; all 13 vitest tests pass; pnpm run ci exit 0.
-
-### T-015, agent prompt tool-schema + few-shot improvements
-- Status: done 2026-06-06
-- Depends-on: T-213, T-301, T-302, T-303
-- Scope: agent-sdk
-- Acceptance: `buildToolSpecs(claimType)` embeds exact zod-derived input schemas in system prompt; one worked few-shot example per tier; stricter JSON-only framing; per-tier user-prompt guidance; tool schemas re-injected on parse/tool-failure; Rotor prompt softened to avoid stalling; all 648 existing tests pass; `pnpm run ci` exit 0. (PRD §6.3, §6.4)
-- Notes: Root cause of 5/12 benchmark match-rate: model received tool names but no input schemas, causing TOOL_FAILURE → ABSTAIN. Fixed in `packages/agent-sdk/src/loop.ts` (buildToolSpecs, buildSystemPrompt, buildUserPrompt, invalidResponseObservation, toolFailureObservation) and `packages/agent-reference/src/agents.ts` (Rotor systemPrompt). Benchmark re-run pending live Ollama access.
-
-### T-017, multi-run benchmark harness + free-model tuning
-- Status: done 2026-06-06
-- Depends-on: T-015
-- Scope: agent-sdk, agent-reference, ops
-- Acceptance: `scripts/benchmark-llm-multi.ts` runs N=3 passes per (agent × claim), reports modal decision, stability (stable/flaky), mean latency/steps, dominant failure reason; Stator maxSteps 4→6; temperature 0.15 wired through LiveModelSeam; BUDGET_RULE prompt nudge in buildSystemPrompt; tool-failure 1-retry in loop.ts; all existing tests (648+) pass; `pnpm run ci` exit 0; `pnpm benchmark:llm:multi` script wired. (PRD §6.3, §6.4)
-- Notes: Tuning stack: (1) Stator 4→6 maxSteps (STEP_BUDGET fix for claim C); (2) temp=0.15 (steady JSON tool-calling); (3) BUDGET_RULE prompt (finalize early, no repeat calls); (4) tool-failure 1-retry (corrective turn on bad input). SCRIPTED demo 100% deterministic unchanged. Live benchmark output recorded in commit message.
-
----
-
-## T-4xx, runner + indexer + gateway + DB (M3)
-
-### T-401, DB schema + migrations + pglite
-- Status: done 2026-06-06
-- Depends-on: T-009
-- Scope: runner
-- Acceptance: drizzle tables claims/attestations/agents/epoch_stats/events/errors; committed migrations; pglite boots zero-dep. (PRD §6.5)
-- Notes: none
-
-### T-402, indexer
-- Status: done 2026-06-06
-- Depends-on: T-401, T-109
-- Scope: indexer
-- Acceptance: subscribe (mock EventEmitter / live viem), idempotent upsert on (txHash,logIndex). (PRD §6.5)
-- Notes: apps/indexer; startIndexer(bus,db); idempotent on idx:txHash:logIndex; 5/5 tests pass.
-
-### T-403, runner
-- Status: done 2026-06-06
-- Depends-on: T-213, T-401
-- Scope: runner
-- Acceptance: subscribes `ClaimPosted`, runs 3 SDK agents via `Promise.allSettled` w/ 15s timeout; failures isolated; every failure → `errors` row + structured event. (PRD §4, §6.3.1)
-- Notes: apps/runner; runClaim via Promise.allSettled; HangingModelSeam+agentTimeoutMs for failure isolation; 2/2 runner tests pass.
-
-### T-404, human queue seam
-- Status: done 2026-06-06
-- Depends-on: T-403
-- Scope: runner
-- Acceptance: simulated human attestor; `human-queue` SSE w/ sampled wait; submits `human-decisions.json` via standard `attest()`. (PRD §6.9)
-- Notes: apps/runner/src/human-queue.ts; seeded LCG wait; forceElapse for tests; 3/3 human-queue tests pass.
-
-### T-405, tool-gateway
-- Status: done 2026-06-06
-- Depends-on: T-210, T-211, T-212
-- Scope: tool-gateway
-- Acceptance: `POST /tools/:name` bearer auth + 60/min rate limit, same zod schemas, thin wrapper (never a rewrite); round-trip test green. (PRD §6.8, §9, M3 checkpoint)
-- Notes: none
-
-### T-406, anvil integration
-- Status: done 2026-06-06
-- Depends-on: T-403, T-402, T-109
-- Scope: runner
-- Acceptance: `pnpm demo --headless` seeds claim A → 4 attestation rows + on-chain records. (PRD §11 M3)
-- Notes: ABI bridge (scripts/gen-abis.mjs + packages/shared/src/abis/), LiveWalletSeam (viem), scripts/demo.ts, vitest.integration.config.ts; 618 fast tests pass + 71 contract tests pass.
-
----
-
-## T-5xx, Plugboard mock path (M4)
-
-### T-501, transcript replay engine
-- Status: done 2026-06-06
-- Depends-on: T-405, T-403
-- Scope: plugboard
-- Acceptance: replays `fixtures/model-scripts/plugboard/{claimId}.json` through gateway+wallet, no model API; validator test `keccak256(canonicalJson(steps))==traceHash` for every transcript. (PRD §6.8, §14.11)
-- Notes: packages/plugboard/src/replay.ts; replayTranscript + validateTranscriptHash; 36 tests pass.
-
-### T-502, claim-D revert flow
-- Status: done 2026-06-06
-- Depends-on: T-501
-- Scope: plugboard
-- Acceptance: `contractRevert` step → send tx → expect `JudgmentTierRequiresAbstain` → `blockedByProtocol:true` in agent-done → resubmit ABSTAIN; anvil integration test. (PRD §6.8, §14.11)
-- Notes: ContractRevertError + MockRevertingWalletSeam; revert flow tested with simulated revert wallet (full anvil integration in T-406+). 36 tests pass.
-
-### T-503, skill snapshot plumbing
-- Status: done 2026-06-06
-- Depends-on: T-501
-- Scope: plugboard
-- Acceptance: pre-settlement copy skill → `epoch-snapshots/epoch-N.skill.md`, keccak256 in `agents.skill_hash`; every attestation row carries active hash; mock pins epoch-0 skill. (PRD §6.8, §14.12)
-- Notes: packages/plugboard/src/skill.ts; skillHash + makeEpochSnapshot; epoch-0 pinned; hash attached to every ReplayResult.
-
-### T-504, live fallback + isolation
-- Status: done 2026-06-06
-- Depends-on: T-501
-- Scope: plugboard
-- Acceptance: Hermes offline → auto replay + "RUNTIME OFFLINE" badge; killing Plugboard process leaves SDK agents + settlement unaffected (claim A with Plugboard disabled test). (PRD §6.8, §14.13)
-- Notes: packages/plugboard/src/fallback.ts; resolvePlugboardStatus/shouldReplay/RUNTIME_OFFLINE_BADGE; runtimeOffline flag on ReplayResult; isolation test confirms no shared state.
-
-### T-505, plugboard fixtures
-- Status: done 2026-06-06
-- Depends-on: T-501
-- Scope: plugboard
-- Acceptance: transcripts A–D + `epoch-0.skill.md` (taxonomy, tool catalog, Tier3→ABSTAIN rule, wallet usage). (PRD §6.8)
-- Notes: fixtures/model-scripts/plugboard/{A,B,C,D}.json; agents/plugboard/{bombe-attestor.skill.md,docker-compose.yml,epoch-snapshots/epoch-0.skill.md}; traceHash generated via generate-hashes.ts (not hand-typed).
-
----
-
-## T-6xx, web app (M5)
-
-### T-601, app shell + SSE
-- Status: done 2026-06-06
-- Depends-on: T-403, T-401, T-203
-- Scope: web
-- Acceptance: Next.js 16 App Router, Tailwind v4, dark theme, monospace hashes; `/api/stream` `text/event-stream`; `EventSource` routes by `kind`. (PRD §6.6, §6.5)
-- Notes: apps/web (@bombe/web); DESIGN.md token system as Tailwind v4 @theme; Button/Card/Badge/Mono/ExplorerLink components; Nav+Footer+layout; parseEvent+useEventStream SSE infra; landing page + stub /live /leaderboard /operator; 24 vitest tests pass; root typecheck excludes apps/web; ci gate: pnpm --filter @bombe/web typecheck.
-
-### T-018, UI taste-skill redesign + TASTE-CONTEXT.md
-- Status: done 2026-06-06
-- Depends-on: T-601
-- Scope: web
-- Acceptance: TASTE-CONTEXT.md created; slop audit run; landing asymmetric layout, ambient hero gradient, glassmorphism nav, Button/Card hover+active+focus states, tabular-nums, text-wrap balance/pretty, off-black section alternation, no cobalt-violet full-band; data surfaces (/live, /leaderboard) light-polished; all existing web tests pass; `pnpm run ci` exit 0; `pnpm --filter @bombe/web build` compiles all routes. (PRD §6.6)
-- Notes: DESIGN_VARIANCE 7 / MOTION_INTENSITY 5 / VISUAL_DENSITY 4 (landing ~3, data ~5). Revolut-style premium-fintech within existing token system.
-
-### T-602, / landing
-- Status: done 2026-06-06
-- Depends-on: T-601
-- Scope: web
-- Acceptance: thesis, delta table, taxonomy explainer, CTAs. (PRD §6.6)
-- Notes: Built in T-018 (taste-skill redesign) and refined in T-019. Landing is live at https://bombe-web.vercel.app with hero, delta table, taxonomy, Plugboard section, CTAs.
-
-### T-019, fix landing layout (Tailwind v4 spacing/size token collision)
-- Status: done 2026-06-06
-- Depends-on: T-018
-- Scope: web
-- Acceptance: every `.pretty` paragraph renders as prose (not one word per line); hero headline reads "AI attestors that can't lie." with cobalt punchline intact; operator form full width; `landing.test.tsx` (9) + web typecheck + biome green; deployed to production.
-- Notes: Root cause, DESIGN.md `--spacing-{sm,md,lg,xl}` in `@theme` share Tailwind v4's size-scale namespace, so `max-w-xl` resolved to 24px (=`--spacing-xl`). Fix: explicit `max-w-[36rem|32rem|28rem]`; removed dead `inline-block` on headline span; documented landmine in globals.css; added playwright + `scripts/shoot.mjs` for visual QA. PR #43.
-
-### T-603, /live race view
-- Status: done 2026-06-06
-- Depends-on: T-601
-- Scope: web
-- Acceptance: 5 columns/stacked cards, streams agent-step, decision chips incl **BLOCKED BY PROTOCOL**, guided-demo auto-advance A→D <90s w/ toasts. (PRD §6.6, §6.7)
-- Notes: /api/stream enhanced with A→D CLAIM_POSTED→AGENT_STEP*→AGENT_DONE→HUMAN_QUEUE_UPDATE replay; @bombe-events alias added for browser-safe SSE schema imports; 20 new tests (94 total pass); build clean.
-
-### T-604, /leaderboard
-- Status: done 2026-06-06
-- Depends-on: T-601
-- Scope: web
-- Acceptance: interleaved human/AI, accuracy excludes abstentions, sortable, all §6.6 columns. (PRD §6.6, §14.8)
-- Notes: none
-
-### T-605, /claim/[id] trace viewer
-- Status: done 2026-06-06
-- Depends-on: T-601, T-202
-- Scope: web
-- Acceptance: per-agent tabs, step render, source hashes, **verify-hash button** recomputes `keccak256(canonicalJson(trace))` client-side; Plugboard skill_hash + epoch-snapshot diff. (PRD §6.6, §14.4, §14.12)
-- Notes: none
-
-### T-606, /operator + operator API
-- Status: done 2026-06-06
-- Depends-on: T-601
-- Scope: web
-- Acceptance: all endpoints (seed-claim/advance/settle/register-agent/human-attest/freeze-plugboard) gated by `x-operator-key`; "Attest as Human" form. (PRD §6.6, §9, §14.8)
-- Notes: 7 API routes (seed-claim/advance/settle/register-agent/human-attest/freeze-plugboard/unfreeze-plugboard), all gated by x-operator-key header; pure-TS schema validation (no zod dep); mock operator state; /operator page with key-entry gate + all 6 forms incl. "Attest as Human"; 29 unit tests pass.
-
-### T-607, /operator/health
-- Status: done 2026-06-06
-- Depends-on: T-606
-- Scope: web
-- Acceptance: reads `.test-reports/` summaries, model latency/error/failover counts, demo readiness, mode, Plugboard status. (PRD §6.6, §10)
-- Notes: server component reads .test-reports/ (falls back to stubs when absent); pure health-summary derivation module with 27 unit tests; stub agent stats for mock mode; Plugboard status (replaying/frozen/online/offline).
+## Active
 
 ### T-608, responsive ≤380px
 - Status: pending
@@ -527,31 +54,6 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 - Acceptance: all routes usable at 380px; race view stacks w/ tap-to-expand. (PRD §6.6)
 - Notes: none
 
----
-
-## T-7xx, autonomous testing (M6)
-
-### T-701, JSON reporters
-- Status: done 2026-06-06
-- Depends-on: T-203, T-108
-- Scope: testing
-- Acceptance: `forge test --json` + vitest `--reporter=json` write `.test-reports/*` conforming to `test-report.ts`. (PRD §15.1, §14.17)
-- Notes: `scripts/lib/normalize.ts` converts forge/vitest raw JSON → TestReport (TestReportSchema-conforming). `.test-reports/forge.json` and `.test-reports/vitest.json` validated against schema. 14 unit tests pass (normalize.test.ts).
-
-### T-702, scripts/test-agent.ts
-- Status: done 2026-06-06
-- Depends-on: T-701
-- Scope: testing
-- Acceptance: runs all suites, normalizes+categorizes (heuristic, `unknown` ok) into one machine-readable summary. (PRD §15.1, §14.16)
-- Notes: `pnpm test:agent` wired (`node --import tsx/esm`); aggregateReports() pure fn; exits 0 on all-green, 1 on any failure; 8 aggregation unit tests pass (test-agent.test.ts). Counts parsed from real reporter output, never fabricated. 560 total (71 forge + 489 vitest) all green on first real run.
-
-### T-703, scripts/test-demo.ts golden path
-- Status: done 2026-06-06
-- Depends-on: T-406, T-502, T-304
-- Scope: testing
-- Acceptance: boots mock headless, advances A→D, waits 4 attestations/claim (5s each), asserts §6.7 matrix + hash stability, <30s. (PRD §15.2, §14.3, §14.16)
-- Notes: `pnpm test:demo` runs A→D in 0.43s (<<30s); 16/16 matrix assertions pass; hash stable (0xc3cef617…); .test-reports/demo.json written. 24 unit tests for assertion logic in scripts/test/test-demo.test.ts. CI exit 0 (648+71 tests).
-
 ### T-704, scripts/seed-bug.ts drill
 - Status: pending
 - Depends-on: T-702
@@ -559,45 +61,32 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 - Acceptance: injects inverted contract-test assertion + a tool type error; builder detects both via reports and fixes within the protocol. (PRD §15.3, M6)
 - Notes: none
 
----
-
-## T-8xx, live seams + ship (M8)
-
-> **CRITICAL PATH for live submission (D16).** T-801–T-804 are elevated above their original M8 ordering and are required for the hackathon submission demo. Each is OP-gated: T-801 → OP-3; T-802 → OP-5 + OP-4; T-803 → OP-6; T-804 → OP-4.
-
-### T-801, live ModelSeam (AI gateway)
-- Status: done 2026-06-06
-- Depends-on: T-205
-- Scope: agent-sdk
-- Acceptance: compiles/typechecks; live call best-effort. (PRD §8 M8, §14.9)
-- Notes: LiveModelSeam (OpenAI-compatible chat-completions) fully implemented; 6 unit tests (mocked fetch) pass; real benchmark: 5/12 match (42%) against Ollama Cloud gpt-oss:20b, model calls tools but input schemas often fail validation; TIER3 always correct; OP-3 resolved.
-
 ### T-802, live Blob + Wallet seams (viem)
-- Status: pending
+- Status: blocked, see OP-5
 - Depends-on: T-205
 - Scope: agent-sdk
-- Acceptance: compiles/typechecks. (PRD §14.9)
-- Notes: **OP:** BLOB_RW_TOKEN, *_KEYs.
+- Acceptance: compiles/typechecks; live trace storage writes a durable artifact whose URL the verify-hash path can fetch. (PRD §14.9)
+- Notes: Wallet seam is live (used by every on-chain attestation). The remaining piece is durable trace storage (BlobSeam), which gates stranger-verifiable `/verify`. Needs `BLOB_RW_TOKEN` (OP-5).
 
 ### T-803, live DB (Neon)
-- Status: pending
+- Status: blocked, see OP-6
 - Depends-on: T-401
 - Scope: runner
 - Acceptance: `DATABASE_URL` wiring; compiles. (PRD §6.5)
-- Notes: **OP:** DATABASE_URL.
+- Notes: drizzle schema + live client skeleton ready; pglite used in mock and tests. Needs `DATABASE_URL` (OP-6).
 
-### T-804, pnpm deploy:testnet
+### T-804, pnpm deploy:testnet script
 - Status: pending
 - Depends-on: T-109
 - Scope: ops
-- Acceptance: deploys to Mantle Sepolia (chain 5003); boot fail-fast w/ named error on any missing live var. (PRD §5, §7, §14.9)
-- Notes: **OP:** RPC_URL + keys.
+- Acceptance: `pnpm deploy:testnet` wraps the Mantle Sepolia (chain 5003) deploy with fail-fast named errors on any missing live var. (PRD §5, §7, §14.9)
+- Notes: the live deploy itself is DONE (see T-J01, 4 contracts live + verified). This task is only the convenience npm wrapper around the forge script, which is still a stub.
 
 ### T-805, README
 - Status: pending
 - Depends-on: none
 - Scope: docs
-- Acceptance: 10-line quickstart, architecture diagram, env table, Plugboard trust model, "Why not LangGraph/CrewAI/ElizaOS?" rationale; quickstart works as written. (PRD §12, §14.10)
+- Acceptance: 10-line quickstart, architecture diagram, env table, live address block + public read API, Plugboard trust model, "Why not LangGraph/CrewAI/ElizaOS?" rationale; quickstart works as written. (PRD §12, §14.10)
 - Notes: none
 
 ### T-806, DEMO.md + DECISIONS.md final pass
@@ -609,16 +98,31 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 
 ### T-807, ship gate
 - Status: pending
-- Depends-on: all above
+- Depends-on: T-805, T-806, T-608, T-704
 - Scope: ops
 - Acceptance: `pnpm run ci` exits 0 from fresh clone w/ submodules, no creds; `pnpm demo` cold-start <60s; A→D deterministic twice. (PRD §14.1, §14.3, §11 M8)
 - Notes: none
 
----
+### T-J05, Demo video (≥ 2 min) of the live core use case
+- Status: blocked, operator-only (screen recording)
+- Depends-on: T-J04, T-806
+- Scope: docs
+- Acceptance: ≥2-minute screen recording walking the A→D claim flow on the **live** deployment, narrated for non-technical viewers; public link in HACKATHON.md §8. (Deployment Award §Product; Best UI/UX; Community Voting)
+- Notes: script is ready at `docs/DEMO-SCRIPT.md`; only the operator can record + publish.
 
-## T-9xx, STRETCH (M7)
+### T-J06, DoraHacks submission package
+- Status: review 2026-06-07
+- Depends-on: T-J01, T-J02, T-J03, T-J04, T-J05, T-805
+- Scope: docs
+- Acceptance: DoraHacks submission filled, track nomination, one-line pitch, three "Tell us" answers, 4 deployed addresses, verified links, the live attest tx hash, public frontend URL, demo-video link, repo URL. (Grand Champion + AI & RWA)
+- Notes: Package drafted at `docs/SUBMISSION.md`. Remaining are operator-owned: demo video (T-J05), confirm deadline + hit submit.
 
-> STRETCH tasks run only after §14.1–17 pass and must not modify earlier-milestone packages. They never gate acceptance.
+### T-J07, Community Voting asset (X thread + shareable demo)
+- Status: blocked, operator-only (posting)
+- Depends-on: T-J05
+- Scope: stretch
+- Acceptance: a shareable X thread linking the demo video + public URL, framing the pain point and the falsifiable-attestation thesis. (Community Voting)
+- Notes: STRETCH; draft ready at `docs/X-THREAD.md`; operator posts.
 
 ### T-901, Telegram bot (/race, /leaderboard, /subscribe)
 - Status: pending
@@ -643,66 +147,111 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 
 ---
 
-## T-Jxx, Hackathon submission & judging gates
+## Done (archive)
 
-> These are **submission gates**, not PRD milestones, they encode the Mantle Turing Test Hackathon
-> award/judging requirements (see [`HACKATHON.md`](HACKATHON.md)). **Operator mandate: the demo the
-> judges click runs in `MODE=live` against real Mantle with real on-chain txs. Mock/Plugboard-replay
-> is the offline fallback only (T-504), never the submission path.** The 20-Project Deployment Award
-> is first-come-first-served (20 spots), treat T-J01→T-J05 as time-critical.
+One line per landed task, grouped by area. The full acceptance notes live in the merge commit for each task ID.
 
-### T-J01, Live Mantle Sepolia deployment + canonical addresses
-- Status: done 2026-06-06
-- Depends-on: T-804, T-802
-- Scope: ops
-- Acceptance: run `pnpm deploy:testnet` against Mantle Sepolia (5003) with real `RPC_URL`/`DEPLOYER_KEY`; all 4 contracts deployed and wired with roles per D14; record the 4 addresses + deploy tx hashes in `docs/DEPLOYMENTS.md` and the README address block. (Deployment Award §Technical; PRD §7, §14.9)
-- Notes: **OP:** RPC_URL + DEPLOYER_KEY + AGENT_KEYS + PLUGBOARD_WALLET_KEY + HUMAN_WALLET_KEY. Blocks → open an OP-N if creds missing. Builds on T-804.
+### T-0xx, Ops / workflow / CI
+- T-001 done 2026-06-05 — .gitattributes line-ending normalization
+- T-002 done 2026-06-05 — docs restructure (PRD→docs/, DECISIONS, DEMO, runbook)
+- T-003 done 2026-06-05 — CLAUDE.md agent operating manual
+- T-004 done 2026-06-05 — CONTEXT.md strategic framing
+- T-005 done 2026-06-05 — TODO.md board
+- T-006 done 2026-06-05 — OPERATOR_TODO.md human-in-the-loop queue
+- T-007 done 2026-06-05 — CI workflow + PR template
+- T-008 done 2026-06-05 — GitHub remote create + push
+- T-009 done 2026-06-05 — pnpm workspace bootstrap
+- T-010 done 2026-06-05 — Foundry init in contracts/
+- T-011 done 2026-06-05 — CI gate hardening (required status check, D8)
+- T-012 done 2026-06-06 — README progress dashboard + YieldProof reference submodule (OP-2, D15)
+- T-013 done 2026-06-06 — integrate live-ship mandate + reference docs (D16, OP-3..OP-6)
+- T-014 done 2026-06-06 — auto-update README progress dashboard on every PR
 
-### T-J02, Verify all 4 contracts on Mantle Explorer
-- Status: done 2026-06-07
-- Depends-on: T-J01
-- Scope: ops
-- Acceptance: `forge verify-contract` (or explorer flow) succeeds for AgentRegistry, AgentAttestation, TuringLeaderboard, AgentSlashing on the Mantle Sepolia explorer; verified source visible; verified URLs recorded in `docs/DEPLOYMENTS.md`. (Deployment Award §Technical: "verified on Mantle Explorer"; Grand Champion: Mantle Ecosystem Contribution)
-- Notes: needs the explorer API key/verifier URL for Mantle Sepolia, capture in `.env.example` if a new var is required; OP-N if blocked.
+### T-1xx, Contracts (M1)
+- T-101 done 2026-06-05 — IYieldProofAttestor interface + vendored fallback
+- T-102 done 2026-06-05 — AgentRegistry (bond, reputation, dispute guards)
+- T-103 done 2026-06-05 — AgentAttestation storage + postClaim (D11)
+- T-104 done 2026-06-05 — AgentAttestation.attest + tier-3 revert
+- T-105 done 2026-06-06 — TuringLeaderboard.settleTier1 + stats/views (D12)
+- T-106 done 2026-06-06 — AgentSlashing Tier 1 (burn/redistribute, reputation)
+- T-107 done 2026-06-06 — AgentSlashing Tier 2 disputes (D13)
+- T-108 done 2026-06-06 — Fuzz + deep-test wiring (conservation)
+- T-109 done 2026-06-06 — Deploy.s.sol (4 contracts wired, D14)
+- T-016 done 2026-06-06 — CLAIM_FEE reward model + 0-100 trust score
 
-### T-J03, Prove an AI function is callable on-chain (live attest tx)
-- Status: done 2026-06-06
-- Depends-on: T-J01, T-403, T-802
-- Scope: runner
-- Acceptance: a scripted live run where an SDK agent's inference result is written on-chain via `attest()` on Mantle Sepolia; capture the resulting tx hash + explorer link; assert the on-chain `ClaimPosted`/attestation records match the agent trace. (Deployment Award §Technical: "AI-powered function callable on-chain")
-- Notes: this is the headline proof for the AI×on-chain criterion. Must be a real tx, not a mock EventEmitter.
+### T-2xx, shared + agent-sdk (M2)
+- T-201 done 2026-06-06 — packages/shared taxonomy
+- T-202 done 2026-06-06 — canonicalJson() + hashing
+- T-203 done 2026-06-06 — test-report.ts + events.ts schemas
+- T-204 done 2026-06-06 — fixtures loader + fixtures tree
+- T-205 done 2026-06-06 — agent-sdk seams (Model/Blob/Wallet/Clock/HumanQueue)
+- T-206 done 2026-06-06 — ModelRouter (fallback + switch trace)
+- T-207 done 2026-06-06 — cost circuit breaker
+- T-208 done 2026-06-06 — tool error recovery
+- T-209 done 2026-06-06 — router.ts TOOL_MAP
+- T-210 done 2026-06-06 — tools: price/yield feeds + snapshots
+- T-211 done 2026-06-06 — tools: chain-state + compute
+- T-212 done 2026-06-06 — tools: document + history
+- T-213 done 2026-06-06 — loop.ts ReAct + hard rules
+- T-214 done 2026-06-06 — attest.ts builder (M2 SDK core complete)
 
-### T-J04, live on-chain data layer (web)
-- Status: done 2026-06-06
-- Depends-on: T-608, T-803, T-J01
-- Scope: web
-- Acceptance: `apps/web/lib/live-data.ts` reads `TuringLeaderboard.lifetimeStats`/`trustScore`, `AgentRegistry.getAgent`, `AgentAttestation.getClaim`/`getClaimAttestors`/`getAttestation` via viem against Mantle Sepolia; `data-source.ts` selector routes MODE=live → live-data / MODE=mock → demo-data; `/leaderboard` and `/claim/[id]` converted to server+client split (server wrapper calls data-source async getters); `/api/trace/[claimId]/[agent]` route serves fixture traces (mock) or 404+message (live, T-803 follow-up); unit tests for selector + mapper shapes; `pnpm run ci` exit 0; `pnpm --filter @bombe/web build` compiles all routes.
-- Notes: Remaining T-J04 follow-ups: (1) Vercel deploy (OP-gated, hosting account + production env vars); (2) SSE via Redis (Upstash) for live /live page (currently on SSE replay). `/live` kept on SSE demo replay per task note. Vercel deploy + SSE-via-Redis are the remaining T-J04 follow-ups.
+### T-3xx, reference agents (M2/M4)
+- T-301 done 2026-06-06 — Reflector (conservative 8500/8)
+- T-302 done 2026-06-06 — Rotor (aggressive 6500/5)
+- T-303 done 2026-06-06 — Stator (cost-optimized 7000/4)
+- T-304 done 2026-06-06 — mock model-scripts A–D for the three SDK agents
+- T-015 done 2026-06-06 — agent prompt tool-schema + few-shot improvements
+- T-017 done 2026-06-06 — multi-run benchmark harness + free-model tuning
 
-### T-J05, Demo video (≥ 2 min) of the live core use case
-- Status: pending
-- Depends-on: T-J04, T-806
-- Scope: docs
-- Acceptance: ≥2-minute screen recording walking the A→D claim flow on the **live** deployment (post claim → 4 attestors → on-chain settlement → verify-hash), narrated to be clear to non-technical viewers; public link recorded in HACKATHON.md §8. (Deployment Award §Product; Best UI/UX; Community Voting)
-- Notes: follows the exact click-path documented in T-806/`docs/DEMO.md`.
+### T-4xx, runner + indexer + gateway + DB (M3)
+- T-401 done 2026-06-06 — DB schema + migrations + pglite
+- T-402 done 2026-06-06 — indexer (idempotent upsert)
+- T-403 done 2026-06-06 — runner (3 agents, Promise.allSettled, isolation)
+- T-404 done 2026-06-06 — human queue seam
+- T-405 done 2026-06-06 — tool-gateway (bearer auth + rate limit)
+- T-406 done 2026-06-06 — anvil integration (pnpm demo --headless)
 
-### T-J06, DoraHacks submission package
-- Status: review 2026-06-07
-- Depends-on: T-J01, T-J02, T-J03, T-J04, T-J05, T-805
-- Scope: docs
-- Acceptance: DoraHacks submission filled, track nomination (AI & RWA + Grand Champion eligibility), one-line pitch, the three "Tell us" answers (RWA type / AI role / Mantle realization, HACKATHON.md §3), all 4 deployed addresses, Mantle Explorer verified links, the live attest tx hash (T-J03), public frontend URL, demo-video link, open-source repo URL. Final submission checklist (HACKATHON.md §8) fully checked. (Grand Champion + AI & RWA requirements)
-- Notes: Package drafted at `docs/SUBMISSION.md` (pitch + three "Tell us" answers + 4 addresses + live attest tx + public URL + repo; no task IDs / no em-dashes per public-copy rules). Remaining before final submit are operator-owned or in other tasks: explorer verification (T-J02), demo video (T-J05), confirm deadline + hit submit on DoraHacks.
+### T-5xx, Plugboard mock path (M4)
+- T-501 done 2026-06-06 — transcript replay engine
+- T-502 done 2026-06-06 — claim-D revert flow
+- T-503 done 2026-06-06 — skill snapshot plumbing
+- T-504 done 2026-06-06 — live fallback + isolation (RUNTIME OFFLINE)
+- T-505 done 2026-06-06 — plugboard fixtures (transcripts A–D + epoch-0 skill)
 
-### T-J07, Community Voting asset (X thread + shareable demo)
-- Status: pending
-- Depends-on: T-J05
-- Scope: stretch
-- Acceptance: a shareable X thread linking the demo video + public URL, framing the pain point and the falsifiable-attestation thesis for a general audience. (Community Voting)
-- Notes: STRETCH, never gates acceptance; maximizes the auto-eligible Community Voting prize.
+### T-6xx, web app (M5)
+- T-601 done 2026-06-06 — app shell + SSE
+- T-018 done 2026-06-06 — UI taste-skill redesign + TASTE-CONTEXT.md
+- T-602 done 2026-06-06 — / landing
+- T-019 done 2026-06-06 — fix landing layout (Tailwind v4 spacing/size collision)
+- T-603 done 2026-06-06 — /live race view
+- T-604 done 2026-06-06 — /leaderboard
+- T-605 done 2026-06-06 — /claim/[id] trace viewer (client verify-hash)
+- T-606 done 2026-06-06 — /operator + operator API
+- T-607 done 2026-06-06 — /operator/health
 
-### T-J08, issuer page + integrate page + integration guide
-- Status: done 2026-06-06
-- Depends-on: T-602
-- Scope: web + docs
-- Acceptance: `/issuers` (why pay, economics, falsifiable-only), `/issuers` reachable from nav; `/integrate` (how-easy + benefits, 4-step read path, honest operator-posting note); `docs/INTEGRATION.md` runnable reference grounded in live contracts; pages render + linked; copy carries no em-dashes and no internal task IDs; tests + typecheck + biome green; deployed to production.
-- Notes: Split by intent so /integrate is not redundant with /issuers. Also applied two standing rules across the public surface: removed all em-dashes from site + public docs, and stripped internal task IDs (T-XXX / OP-N) from rendered copy and public docs. Spec: docs/superpowers/specs/2026-06-06-issuer-integration-design.md.
+### T-7xx, autonomous testing (M6)
+- T-701 done 2026-06-06 — JSON reporters (forge + vitest → .test-reports/)
+- T-702 done 2026-06-06 — scripts/test-agent.ts
+- T-703 done 2026-06-06 — scripts/test-demo.ts golden path
+
+### T-8xx, live seams + ship (M8)
+- T-801 done 2026-06-06 — live ModelSeam (AI gateway, OpenAI-compatible)
+
+### T-Jxx, hackathon submission & judging gates
+- T-J01 done 2026-06-06 — live Mantle Sepolia deployment + canonical addresses
+- T-J02 done 2026-06-07 — verify all 4 contracts on Mantle Explorer
+- T-J03 done 2026-06-06 — prove an AI function is callable on-chain (live attest tx)
+- T-J04 done 2026-06-06 — live on-chain data layer (web reads chain via viem)
+- T-J08 done 2026-06-06 — issuer page + integrate page + integration guide
+- T-J09 done 2026-06-07 — public agent-read API (v1) live + deployed (see below)
+
+---
+
+## v2 / v3 notes (current source of truth: the v2/v3 PRDs)
+
+These are tracked outside the T-number board; they layer on top of the completed M1-M8 build.
+
+- **v2 decisive-reconciler attestation layer: shipped and live.** Deterministic Tier-1 verdict, both mETH + USDY headline attestations on-chain, daily streak GitHub Action, all 4 contracts verified. See `docs/BOMBE-V2-PRD.md`, `docs/STREAK.md`, `docs/DEPLOYMENTS.md`.
+- **Public agent-read API (v1): shipped + deployed** (tracked as T-J09 in the archive). `apps/web/app/api/v1/{assets,claims/[claimId],verify/[claimId]}` + `apps/web/lib/public-api.ts`, CORS, no keys. Context-less consumer test `pnpm test:api` passes against production at https://bombe-web.vercel.app/api/v1.
+- **Durable trace storage + stranger-verifiable `/verify`: blocked on OP-5** (`BLOB_RW_TOKEN`). Live attestations currently store a placeholder traceURI, so `/verify` returns `trace_unavailable`. This is the #1 remaining v3 item.
+- **MCP server / SKILL.md / SSE feed / npx verify / x402: pending external-council decisions** on the v3.2 PRD (`docs/BOMBE-V3-AGENT-ACCESS-PRD.md`, `docs/BOMBE-V3-PRD-FOLLOWUP.md`). x402 is an explicit pending decision (`docs/X402-MANTLE-STACK.md`). Do not build ahead of the council; new feature ideas go to `docs/V3-BACKLOG.md`.
