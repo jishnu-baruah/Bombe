@@ -92,3 +92,15 @@ by the reconciler, not a model; the reasoning hash stored on-chain equals the lo
 Key model used for this capture: the deployer key posts (operator-authorized, it holds
 OPERATOR_ROLE) and Reflector attests. Reflector was topped up 0.1 MNT from the deployer for gas. Tx
 explorer base: https://sepolia.mantlescan.xyz/tx
+
+### USDY (same capture, 2026-06-07)
+
+| Field | Value |
+|-------|-------|
+| Claim ID | `USDY-V2-1780795067` (USDY annualized yield) |
+| Observed / asserted | 355.00 / 355 bps (window 1d) |
+| Decision | VALID, confidence 10000 bps, 0.02 MNT staked (Reflector) |
+| postClaim tx | `0x3df430b5fee7643766582355adb89b0932c95c0ba009c6830bb5cd221eb69b5e` |
+| attest tx | `0x86fe2ceb78a52514b764dd07a17f312337b14f4a707bba5447c640491bd1440f` |
+| reasoningHash (on-chain == local) | `0x0cd7a4b4ab182a6e2b3d1c95aef65c11205666d952752d01c48ae3dec6b29cbd` |
+| Source | DefiLlama reported APY; labeled single source, full transparency (D4a) |
