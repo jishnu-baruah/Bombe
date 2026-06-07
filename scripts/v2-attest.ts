@@ -28,6 +28,7 @@ import {
   MockDataSource,
   buildAndSubmitAttestation,
   computeDecisiveAttestation,
+  createLiveModelSeam,
   createSeams,
 } from "@bombe/agent-sdk";
 import type { DataAsset } from "@bombe/agent-sdk";
@@ -169,6 +170,17 @@ async function runLive(): Promise<void> {
     ? Number(process.env.ASSERTED_BPS)
     : Math.round(observedBps);
   const claimId = `${ASSET}-V2-${Math.floor(Date.now() / 1000).toString()}`;
+  const aiKey = process.env.AI_GATEWAY_KEY ?? ENV.AI_GATEWAY_KEY;
+  const narrator = aiKey
+    ? createLiveModelSeam({
+        aiGatewayKey: aiKey,
+        aiGatewayBaseUrl: process.env.AI_GATEWAY_BASE_URL ?? ENV.AI_GATEWAY_BASE_URL,
+        aiGatewayModels: process.env.AI_GATEWAY_MODELS ?? ENV.AI_GATEWAY_MODELS,
+      })
+    : undefined;
+  const modelId =
+    (process.env.AI_GATEWAY_MODELS ?? ENV.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() ||
+    "default";
   const { observation, decision, trace, sources } = await computeDecisiveAttestation(
     {
       claimId,
@@ -181,6 +193,7 @@ async function runLive(): Promise<void> {
     ds,
     clock,
     "reflector",
+    narrator ? { narrator, modelId } : undefined,
   );
   console.log(
     `[v2-attest] observed=${observedBps.toFixed(2)} asserted=${assertedValueBps} -> ${decision.verdict} (window ${observation.windowDays.toString()}d)`,
