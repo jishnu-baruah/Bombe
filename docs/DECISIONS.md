@@ -61,6 +61,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-07, Self-serve issuer paid flow architecture (D18)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D18, the self-serve issuer paid flow is non-custodial in payment and operator-side in posting.** The issuer connects their own wallet and pays the fee directly (both rails: a direct MNT transfer and Mantle x402, ship whichever lands first as primary and the other as fallback); we never custody issuer funds. The platform then posts the claim and attests on the issuer's behalf, because `postClaim` is `onlyRole(OPERATOR_ROLE)` on the deployed `AgentAttestation` and the v2 lock forbids changing the contract before 2026-06-15. Auto-attestation is limited to claim types Bombe can falsifiably verify (mETH/USDY yield today). The live post path requires a dedicated, minimally-funded posting key (not the deployer key), a receiving address, per-issuer rate limiting, and fail-closed dedupe (OP-9). | Operator decision 2026-06-07: build the paid flow, non-custodial payment, both rails. The contract gate makes operator-side posting unavoidable now; calling it "custodial" only in the posting sense (not fund custody) keeps the description honest. Permissionless issuer posting (issuer's own wallet calls `postClaim`) is a v4 contract change after June 15. The falsifiability limit is the thesis: Bombe cannot auto-attest a claim it has no data source to check. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:
