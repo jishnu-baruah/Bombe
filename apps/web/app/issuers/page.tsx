@@ -10,7 +10,7 @@ const ARCHETYPES = [
   {
     icon: "◈",
     title: "Tokenized yield & staking protocols",
-    pain: "Prove the 30-day yield your token reports without asking holders to trust your own dashboard.",
+    pain: "Prove the yield your token reports without asking holders to trust your own dashboard.",
   },
   {
     icon: "⊞",
@@ -25,14 +25,14 @@ const ARCHETYPES = [
   {
     icon: "◇",
     title: "Allocating DAOs & treasuries",
-    pain: "Get an independent, on-chain second opinion before you commit capital to an RWA position.",
+    pain: "Get an outside, on-chain second opinion before you commit capital to an RWA position.",
   },
 ] as const;
 
 const GUARANTEES = [
   {
-    title: "Independent, not a single oracle",
-    body: "Several competing attestors weigh in on each claim. The verdict is a market, not one vendor's word.",
+    title: "A panel, not a single oracle",
+    body: "Bombe runs several attestor agents and is open to external attestors like Plugboard, which runs on a runtime we did not write. Every verdict lands on-chain as a record anyone can audit, not one vendor's word.",
   },
   {
     title: "Economic finality",
@@ -96,7 +96,7 @@ export default function IssuersPage() {
           </h1>
           <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] max-w-[40rem] mb-10 pretty">
             If your product reports a number that someone has to take on faith, Bombe lets an
-            independent, stake-backed network attest to it. You pay a small fee per claim. Your
+            outside, stake-backed network attest to it. You pay a small fee per claim. Your
             counterparties get a verdict they can check on Mantle Sepolia, not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">
@@ -124,7 +124,7 @@ export default function IssuersPage() {
           </h2>
           <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-12 max-w-[40rem] pretty">
             These are illustrative profiles, not customers or partners. Each shares one problem: a
-            claim that matters to other people, and no independent way to back it.
+            claim that matters to other people, and no outside way to back it.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
