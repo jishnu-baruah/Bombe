@@ -33,3 +33,16 @@ Phased design:
 - **Phase 3, open onboarding for arbitrary assets (v4, post-June-15).** Needs the `IAssetAdapter` plugin interface (already in this backlog) so a new asset is config + a small adapter, plus the assisted-onboarding intake (form to adapter-config PR, already in this backlog). This is what makes "any issuer, any asset" real, and the right home for genuinely-open self-serve. Promote in the shadow-mode v4 batch.
 
 Sequencing: T-610 now; T-611 next pending OP-9; T-612 after the x402 decision + custodial authorization; Phase 3 with the v4 adapter work after June 15.
+
+Update 2026-06-07: T-610, T-611, and T-612 are all DONE and live. The full autonomous paid flow works end-to-end (pay from your own wallet, the agent posts + attests + stores the trace, the result is stranger-verifiable). What remains of this vision is the breadth, captured below.
+
+### Expansion roadmap: adaptability, document verification, more RWA types, headless (operator vision 2026-06-07)
+
+The operator wants to use the testnet faucet allowance (about 1000 MNT/day) to run many real attestations across a growing set of RWA yields, with an adaptability model that keeps adding supported types, plus document verification, all fully end-to-end, and to showcase headless agent integration.
+
+- **Adapter registry (the adaptability model).** Build the `IAssetAdapter` interface (declareClaimTypes / getDataSource / computeExpected) so a new asset is config plus a small adapter, not a core enum change. The deterministic reconciler stays the verdict authority; an adapter only supplies the data source and the expected-value computation. Today mETH and USDY are effectively hard-wired adapters; generalize them, then add assets (more LSTs, more tokenized treasuries, RWA pools) one adapter at a time. This is the single highest-leverage item for "more supported RWA types."
+- **Document verification (Tier-2).** Wire the document-falsifiable path for real: fetch a referenced document (servicer report, statement, audit), extract the claimed figures, cross-check, and attest CASHFLOW_MATCH / ENCUMBRANCE_ABSENT. This is where AI does more than gather numbers (it reads documents), so it lifts the AI x RWA depth materially. Slashing for Tier-2 goes through the dispute path, which already exists in the contracts.
+- **Volume + budget.** A scheduler that posts many attestations per day within a configured MNT/day budget guard (pause + alert before the allowance is exhausted); settle claims to release locked stake so the attestor balance is not the bottleneck.
+- **Headless integration showcase.** Make "an agent can use Bombe with no human" concrete: an MCP server + a SKILL.md describing the read/verify/attest tools over the existing public API and the contract, so an external agent can read a verdict, verify a hash, or request a paid attestation entirely headlessly. The public read API (/api/v1) and the paid-request endpoint are the substrate; this packages them for agents.
+
+Each of these is its own workstream; the adapter registry and document verification are contract-or-pipeline depth, the headless showcase is packaging. None require a contract redeploy except the adapter interface if it touches storage (after June 15).
