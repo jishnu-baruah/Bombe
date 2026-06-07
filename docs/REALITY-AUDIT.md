@@ -2,7 +2,7 @@
 
 An honest, current inventory of every part of Bombe: what runs for real on live data
 and on-chain, what is partial, and what is still mock/scripted/fixture, with the path
-to making each real. Updated 2026-06-07. The rule: never claim in copy what this file
+to making each real. Updated 2026-06-08. The rule: never claim in copy what this file
 marks partial or mock.
 
 ## Real (live, on-chain, not mock)
@@ -10,8 +10,22 @@ marks partial or mock.
 - **Contracts.** Four contracts deployed + verified on Mantle Sepolia (5003). `postClaim`,
   `attest`, the Tier-3 abstain revert, slashing, and the leaderboard are real Solidity,
   deep-tested + fuzzed.
-- **Live data fetch.** `LiveDataSource` fetches the real DefiLlama yield for mETH and USDY
-  (real HTTP, real numbers), with the source chart URL recorded in the trace.
+- **Open source resolver.** `LiveDataSource` resolves an `AssetSpec` over a pluggable
+  scheme registry (`source-registry.ts`): a new asset within a known scheme (defillama,
+  mantle-meth-api) is pure data; a new kind of source is one new fetcher. The featured
+  set is real and live: mETH, USDY, sUSDe (Ethena on Mantle), BUIDL, OUSG (tokenized US
+  Treasuries). Each leg records its auditable source URL in the trace.
+- **mETH: two real computation paths.** mETH reconciles a DefiLlama aggregator
+  (pricePerShare-derived) leg against the Mantle protocol API (METHtoETH rate +
+  reported APY) leg, resilient if one source is down. One ground truth, two
+  computation paths, both live.
+- **Discovery.** `GET /api/v1/discover` (+ MCP `bombe_discover_assets`) enumerates the
+  live DefiLlama yield/RWA universe as ready-to-attest descriptors; any descriptor can
+  be attested via the open `spec` on `POST /api/v1/request`. The scope is any RWA yield,
+  not a fixed list.
+- **Provenance graph.** Each attestation's trace carries a `provenance` DAG
+  (source -> evidence -> reconcile -> verdict, with source URLs) so a verifier can walk
+  the reasoning. It is part of the canonical trace, so it is covered by `reasoningHash`.
 - **Deterministic verdict.** `decideTier1` is real arithmetic (reconcile, compare to the
   asserted value). The verdict is never a model's opinion.
 - **Real LLM reasoning.** `narrate.ts` has a real model (gpt-oss:20b via the AI gateway)
@@ -29,12 +43,10 @@ marks partial or mock.
 
 ## Partial (real but not the full claim yet)
 
-- **mETH "two computation paths" is currently one path.** The DefiLlama leg is live; the
-  second leg (on-chain mETHToETH exchange-rate, computed from scratch) is NOT yet wired
-  (`live-source.ts` notes it is "pending sample history"). So today mETH reconciles over a
-  single real leg, like USDY. The "one ground truth, two computation paths" claim is the
-  target, not the current state. Path to real: implement the on-chain rate leg (read the
-  mETH contract rate, annualize from persisted daily samples), then reconcile the two.
+- **Issuer-specified ("unverified") sources are accepted but not independently vetted.**
+  The open `spec` path attests any source an issuer supplies; the verdict + provenance are
+  real and rerunnable, but a `verified:false` source's trustworthiness is the issuer's, not
+  Bombe's. Labeled as such. The featured set is the curated/verified showcase.
 - **Single attestor, single run, not "triple-run".** The live attestation is one
   deterministic computation posted by one attestor (Reflector). The "single-model triple-run
   redundancy" and the three reference agents (Reflector/Rotor/Stator) are the demo/benchmark,
@@ -69,14 +81,15 @@ marks partial or mock.
 
 ## Make-it-real backlog (priority order)
 
-1. **Source registry / `IAssetAdapter`.** Each asset declares its sources (name, URL, fetch,
-   computeBps); the data layer fetches all and reconciles; adding a source/asset is config,
-   with auditable links into the trace. Unblocks mETH's second leg + "more RWA types."
-2. **mETH on-chain second leg** (the real two-path cross-check).
+1. ~~**Source registry / `IAssetAdapter`.**~~ DONE: the open scheme registry +
+   discovery + provenance graph (`source-registry.ts`, `discover.ts`, D20).
+2. ~~**mETH on-chain second leg.**~~ DONE: mETH reconciles a DefiLlama leg against the
+   Mantle protocol API leg (two computation paths, resilient).
 3. **Tier-2 document verification** over a real document source.
 4. **Settlement automation** so the leaderboard/slashing run live.
 5. **Multi-attestor / N-run** so redundancy is real, or relabel live as single-attestor.
 6. **Live /live** (real event stream) instead of the scripted replay.
+7. **`custom-http` scheme** (the any-URL issuer lane), always labeled unverified.
 
 These are tracked in docs/V3-BACKLOG.md. The constitution rule still holds: understate, and
 never write a claim in copy that this audit marks partial or mock.

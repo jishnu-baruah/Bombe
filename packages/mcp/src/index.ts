@@ -34,6 +34,27 @@ server.tool(
 );
 
 server.tool(
+  "bombe_discover_assets",
+  "Discover the full open universe of attestable RWA yields (not just the curated set) as ready-to-attest source descriptors. Filter by chain, symbol query, RWA-only, or min TVL. Each result's `descriptor` can be passed as `spec` to bombe_request_attestation.",
+  {
+    chain: z.string().optional().describe("e.g. Mantle"),
+    query: z.string().optional().describe("symbol or project substring"),
+    rwaOnly: z.boolean().optional().describe("restrict to known RWA/treasury/staking issuers"),
+    minTvl: z.number().optional(),
+    limit: z.number().int().positive().optional(),
+  },
+  async ({ chain, query, rwaOnly, minTvl, limit }) => {
+    const qs = new URLSearchParams();
+    if (chain) qs.set("chain", chain);
+    if (query) qs.set("query", query);
+    if (rwaOnly) qs.set("rwaOnly", "1");
+    if (typeof minTvl === "number") qs.set("minTvl", String(minTvl));
+    if (typeof limit === "number") qs.set("limit", String(limit));
+    return text(await getText(`/api/v1/discover?${qs.toString()}`));
+  },
+);
+
+server.tool(
   "bombe_get_claim",
   "Read a claim and its on-chain attestations (decision, confidence, reasoning hash) by claim id.",
   { claimId: z.string().describe("e.g. mETH-2026-06-07") },
@@ -51,7 +72,7 @@ server.tool(
   "bombe_request_attestation",
   "Request a paid attestation of a supported yield claim. Pay the fee from your own wallet first (non-custodial), then pass the payment tx hash. Returns the on-chain claim id and verdict.",
   {
-    asset: z.enum(["mETH", "USDY"]),
+    asset: z.enum(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG"]),
     assertedBps: z.number().int().positive().describe("the yield you assert, in basis points"),
     windowDays: z.number().int().positive(),
     payer: z.string().describe("the address you paid from"),

@@ -10,6 +10,7 @@
 
 import { recordRequest } from "@/lib/db";
 import { fulfillAttestation, paidFlowLive } from "@/lib/fulfill";
+import type { AssetSpec, DataAsset } from "@bombe/agent-sdk";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
@@ -27,7 +28,7 @@ const PAYMENT_ADDRESS = (
 ).toLowerCase();
 const PRICE_MNT =
   process.env.ATTEST_PRICE_MNT ?? process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
-const SUPPORTED_ASSETS = new Set(["mETH", "USDY"]);
+const SUPPORTED_ASSETS = new Set(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG"]);
 
 // Best-effort in-process dedupe of payment tx hashes (a DB-backed store is the
 // durable version, gated on OP-6).
@@ -40,6 +41,26 @@ interface RequestBody {
   windowDays?: number;
   payer?: string;
   paymentTxHash?: string;
+  /**
+   * Open path: an issuer-specified/discovered source spec for a non-featured asset.
+   * Its `symbol` must equal `asset`. Attested but labeled unverified.
+   */
+  spec?: AssetSpec;
+}
+
+/** Shallow validation of an issuer-supplied open AssetSpec. */
+function validSpec(spec: unknown, asset: string): spec is AssetSpec {
+  if (!spec || typeof spec !== "object") return false;
+  const s = spec as Partial<AssetSpec>;
+  return (
+    s.symbol === asset &&
+    Array.isArray(s.sources) &&
+    s.sources.length > 0 &&
+    s.sources.every(
+      (src) => src && typeof src.ref === "string" && typeof src.scheme === "string",
+    ) &&
+    typeof s.independenceLabel === "string"
+  );
 }
 
 function bad(message: string, status = 400) {
@@ -58,10 +79,19 @@ export async function POST(req: Request) {
     return bad("Invalid JSON body.");
   }
 
-  const { asset, claimType, assertedBps, windowDays, payer, paymentTxHash } = body;
+  const { asset, claimType, assertedBps, windowDays, payer, paymentTxHash, spec } = body;
 
-  if (!asset || !SUPPORTED_ASSETS.has(asset)) {
-    return bad("Unsupported asset. Supported today: mETH, USDY.");
+  if (!asset) {
+    return bad("asset is required.");
+  }
+  // Featured assets resolve automatically; a non-featured asset is allowed only with
+  // a valid open `spec` describing its sources (attested but labeled unverified).
+  const isFeatured = SUPPORTED_ASSETS.has(asset);
+  const openSpec = !isFeatured && validSpec(spec, asset) ? (spec as AssetSpec) : undefined;
+  if (!isFeatured && !openSpec) {
+    return bad(
+      "Unsupported asset. Featured: mETH, USDY, sUSDe, BUIDL, OUSG. For any other asset, include a valid `spec` (see GET /api/v1/discover).",
+    );
   }
   if (claimType !== "YIELD_BPS") {
     return bad("Unsupported claim type. Self-serve supports YIELD_BPS today.");
@@ -139,9 +169,10 @@ export async function POST(req: Request) {
     try {
       const result = await fulfillAttestation({
         claimId,
-        asset: asset as "mETH" | "USDY",
+        asset: asset as DataAsset,
         assertedBps: assertedBps as number,
         windowDays: windowDays as number,
+        spec: openSpec,
       });
       return NextResponse.json(
         {

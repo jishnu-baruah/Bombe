@@ -87,11 +87,17 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Date: 2026-06-07
 - Blocks: T-43 (mETH second on-chain leg), T-44 (Tier-2 document verification), T-45 (settlement automation). The source-adapter registry (T-40) is built, so each becomes a small wiring once the input below is provided. Documented honestly in docs/REALITY-AUDIT.md.
 - Need (any one unblocks its workstream):
-  1. mETH second leg (so mETH is genuinely "two computation paths", not one): an **Ethereum L1 archive RPC URL** plus the **mETH/mETHToETH staking contract address** (the exchange rate lives on L1, not Mantle). With these the agent reads the rate at two points in time, computes the annualized yield from scratch, and reconciles it against the DefiLlama leg.
+  1. mETH second leg: ~~an **Ethereum L1 archive RPC URL** plus the **mETH/mETHToETH staking contract address**~~ NO LONGER NEEDED. Resolved 2026-06-08 without operator input: Mantle's own protocol API (`https://meth.mantle.xyz/api/stats/apy`) publishes the live `METHtoETH` exchange rate plus `OneDay/Week/MonthAPY`. This is a real second computation path (protocol-reported) to reconcile against the DefiLlama aggregator leg, "one ground truth, two computation paths". Being wired in T-43 via a new registry source kind; no L1 archive RPC required.
   2. Tier-2 document verification: a **real document source/URL** (servicer report, statement, audit) to fetch, extract, and cross-check, so a CASHFLOW_MATCH attestation is real, not fixture.
   3. Settlement automation (live leaderboard + slashing): a **ground-truth source** to settle against (settling against our own attestation is circular); this is an oracle/design decision the operator owns.
 - Half-done state: registry + reconciler + deterministic verdict + real LLM reasoning + trace storage are all live; these three only lack their external input/decision. Multi-attestor "N-run" is intentionally NOT pursued for a deterministic computation (the real redundancy is multiple legs, i.e. item 1).
 - To resolve: provide any of the three above and tell the agent which; it wires the corresponding real workstream.
+
+## OP-11, triage asset-coverage requests   [open]
+- Date: 2026-06-08
+- Blocks: nothing (additive). The open resolver attests any RWA yield with a public source; users request anything not yet wired via POST /api/v1/asset-request (UI on /issuers).
+- Need: periodically read the `asset_requests` Neon table; for each, if a public data source exists (DefiLlama pool, a protocol API), add a featured AssetSpec or confirm it is already discoverable, and tell the requester. Categories without a real source (e.g. real estate, gold on Mantle) stay on request until one exists. Never fabricate a source.
+- To resolve: ongoing operator triage; no credential needed.
 
 ## Resolved
 

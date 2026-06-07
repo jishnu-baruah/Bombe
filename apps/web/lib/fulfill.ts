@@ -11,7 +11,7 @@
  */
 
 import { LiveDataSource, computeDecisiveAttestation, createLiveModelSeam } from "@bombe/agent-sdk";
-import type { DataAsset } from "@bombe/agent-sdk";
+import type { AssetSpec, DataAsset } from "@bombe/agent-sdk";
 import { AgentAttestationAbi, type Claim, hashCanonical } from "@bombe/shared";
 import { http, createPublicClient, createWalletClient, encodeFunctionData, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -44,15 +44,18 @@ export interface FulfillResult {
 
 /**
  * Post + attest a supported-type yield claim on behalf of a paying issuer.
- * Deterministic verdict; only mETH/USDY YIELD_BPS today.
+ * Deterministic verdict over YIELD_BPS for any registered DataAsset (mETH, USDY,
+ * sUSDe, BUIDL, OUSG today; the asset registry is the single extension point).
  */
 export async function fulfillAttestation(params: {
   claimId: string;
   asset: DataAsset;
   assertedBps: number;
   windowDays: number;
+  /** Open path: an issuer-specified/discovered source spec for a non-featured asset. */
+  spec?: AssetSpec;
 }): Promise<FulfillResult> {
-  const { claimId, asset, assertedBps, windowDays } = params;
+  const { claimId, asset, assertedBps, windowDays, spec } = params;
 
   const posting = privateKeyToAccount(process.env.POSTING_KEY as `0x${string}`);
   const attestor = privateKeyToAccount(process.env.ATTESTOR_KEY as `0x${string}`);
@@ -77,6 +80,7 @@ export async function fulfillAttestation(params: {
     {
       claimId,
       asset,
+      spec,
       assertedValueBps: assertedBps,
       reconcileToleranceBps: 50,
       verdictToleranceBps: 50,
@@ -91,8 +95,10 @@ export async function fulfillAttestation(params: {
   // 2. Post the claim (posting key, OPERATOR_ROLE).
   const claimObj: Claim = {
     id: claimId,
+    // Featured symbols are in the taxonomy enum; open/discovered symbols are carried
+    // verbatim (the deterministic verdict + trace, not the symbol string, are the safety).
+    asset: asset as Claim["asset"],
     tier: 1,
-    asset,
     claimType: "YIELD_BPS",
     payload: {
       assertedValueBps: assertedBps,

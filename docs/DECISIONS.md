@@ -69,6 +69,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, June-15 lock override + Mantle-RWA asset expansion (D19)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D19, the v2 "no third asset / no new features before 2026-06-15" locks are lifted with explicit in-session operator approval, and the asset set expands to prioritize Mantle-native RWA.** Added via the source-adapter registry (one entry each, no new control flow): **sUSDe** (Ethena staked USDe on Mantle, the largest Mantle yield pool), **BUIDL** (BlackRock tokenized US Treasuries), **OUSG** (Ondo tokenized US Treasuries). All are issuer-reported single sources, labeled honestly ("does not catch issuer fraud", D4a-style); the word "independent" is not used. **cmETH is deliberately deferred**: no clean yield series exists on DefiLlama (the venue pools report 0% or noise), and attesting garbage data violates the be-real mandate; it returns once a Mantle-native restaking-APR source is wired. Deployed contract addresses and their attestation history are untouched (no redeploy). | Operator override 2026-06-08 ("override all june 15 lock") in response to "prioritize all mantle rwa assets". The locks existed to protect a focused two-asset story and the deployed history; the operator explicitly chose breadth of real Mantle RWA over the lock. The registry (T-40) makes each asset a data-only addition, so the expansion adds zero attack surface to the contract or the deterministic reconciler. Honesty rules (D10/D4a) still bind every new label. The mETH second-leg input (OP-10 item 1) was independently mooted: Mantle's protocol API publishes the METHtoETH rate + APY, giving a real second computation path with no L1 archive RPC. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

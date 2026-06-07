@@ -72,20 +72,45 @@ describe("HttpDefiLlamaClient (mocked fetch)", () => {
 });
 
 describe("LiveDataSource", () => {
-  it("mETH: single DefiLlama leg, honest label, no 'independent'", async () => {
+  // A canned Mantle mETH API response (fields are fractions: 0.0199 = 1.99%).
+  const mantleApiJson = {
+    data: [{ METHtoETH: "1.0931", OneDayAPY: "0.0193", WeekAPY: "0.0203", MonthAPY: "0.0199" }],
+  };
+
+  it("mETH: two computation paths (DefiLlama + Mantle API), honest label, no 'independent'", async () => {
     const points = [
       ppsPoint("2026-01-01T00:00:00Z", 1.09),
       ppsPoint("2026-01-08T00:00:00Z", 1.09042),
     ];
-    const src = new LiveDataSource({ defiLlama: new StubClient(points) });
+    const src = new LiveDataSource({
+      defiLlama: new StubClient(points),
+      fetchJson: async () => mantleApiJson,
+    });
+    const obs = await src.getYieldObservation({ asset: "mETH", requestedWindowDays: 7 }, clock);
+    expect(obs.legs).toHaveLength(2);
+    expect(obs.legs.map((l) => l.name)).toContain("defillama-meth");
+    expect(obs.legs.map((l) => l.name)).toContain("mantle-meth-api");
+    expect(obs.metric).toBe("annualized_yield_bps");
+    expect(obs.fetchedAt).toBe(1_700_000_000_000);
+    expect(obs.independenceLabel).toMatch(/two computation paths/i);
+    expect(obs.independenceLabel).not.toMatch(/\bindependent\b/i);
+  });
+
+  it("mETH: resilient when the Mantle API leg fails (still one DefiLlama leg)", async () => {
+    const points = [
+      ppsPoint("2026-01-01T00:00:00Z", 1.09),
+      ppsPoint("2026-01-08T00:00:00Z", 1.09042),
+    ];
+    const src = new LiveDataSource({
+      defiLlama: new StubClient(points),
+      fetchJson: async () => {
+        throw new Error("mantle api down");
+      },
+    });
     const obs = await src.getYieldObservation({ asset: "mETH", requestedWindowDays: 7 }, clock);
     expect(obs.legs).toHaveLength(1);
     expect(obs.legs[0]?.name).toBe("defillama-meth");
-    expect(obs.windowDays).toBe(7);
-    expect(obs.metric).toBe("annualized_yield_bps");
-    expect(obs.fetchedAt).toBe(1_700_000_000_000);
-    expect(obs.independenceLabel).not.toMatch(/\bindependent\b/i);
-    // The single leg reconciles trivially with itself.
+    expect(obs.independenceLabel).toMatch(/degraded/i);
     const r = reconcileLegs([obs.legs[0]?.valueBps ?? Number.NaN], 50);
     expect(r.agree).toBe(true);
   });
@@ -100,5 +125,29 @@ describe("LiveDataSource", () => {
     expect(obs.windowDays).toBe(30);
     expect(obs.independenceLabel).toMatch(/single source/i);
     expect(obs.independenceLabel).not.toMatch(/\bindependent\b/i);
+  });
+
+  it("open path: attests an issuer-specified spec with no code change", async () => {
+    const points: DefiLlamaChartPoint[] = [
+      { timestamp: "2026-01-08T00:00:00Z", apy: 4.2, apyBase: 4.2 },
+    ];
+    const src = new LiveDataSource({ defiLlama: new StubClient(points) });
+    const obs = await src.getYieldObservation(
+      {
+        asset: "ISSUER-XYZ-NOTE",
+        requestedWindowDays: 30,
+        spec: {
+          symbol: "ISSUER-XYZ-NOTE",
+          verified: false,
+          sources: [
+            { scheme: "defillama", ref: "some-pool", kind: "reportedApy", legName: "issuer-leg" },
+          ],
+          independenceLabel: "Issuer-specified source; verify the ref. Single source.",
+        },
+      },
+      clock,
+    );
+    expect(obs.asset).toBe("ISSUER-XYZ-NOTE");
+    expect(obs.legs[0]?.valueBps).toBeCloseTo(420, 5);
   });
 });
