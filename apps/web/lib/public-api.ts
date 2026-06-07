@@ -66,6 +66,22 @@ interface RawAttestation {
   lockedStake: bigint;
 }
 
+/**
+ * The bounded set of claim IDs we probe for aggregate reads and reverse lookups:
+ * the A-D demo claims plus the daily streak pattern (mETH/USDY) for the last N days.
+ * There is no global on-chain index of claim IDs yet, so this is the honest scope.
+ */
+export function candidateClaimIds(days = 21): string[] {
+  const ids = ["A", "B", "C", "D"];
+  const today = new Date();
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today.getTime() - i * 86_400_000);
+    const ymd = d.toISOString().slice(0, 10);
+    ids.push(`mETH-${ymd}`, `USDY-${ymd}`);
+  }
+  return ids;
+}
+
 export interface NetworkStats {
   attestations: number;
   claims: number;
@@ -83,15 +99,7 @@ let _statsCache: { data: NetworkStats; expiresAt: number } | undefined;
 export async function getNetworkStats(): Promise<NetworkStats | null> {
   if (_statsCache && Date.now() < _statsCache.expiresAt) return _statsCache.data;
 
-  // Candidate claim IDs: the A-D demo claims plus mETH/USDY for the last 21 days.
-  const ids = ["A", "B", "C", "D"];
-  const today = new Date();
-  for (let i = 0; i < 21; i++) {
-    const d = new Date(today.getTime() - i * 86_400_000);
-    const ymd = d.toISOString().slice(0, 10);
-    ids.push(`mETH-${ymd}`, `USDY-${ymd}`);
-  }
-
+  const ids = candidateClaimIds();
   const c = client();
   let attestations = 0;
   let claims = 0;
@@ -179,4 +187,95 @@ export async function readClaim(claimId: string): Promise<PublicClaim> {
     attestorCount: claim.attestorCount,
     attestations,
   };
+}
+
+export type LookupKind = "claimId" | "reasoningHash" | "txHash" | "empty";
+
+export interface LookupResult {
+  query: string;
+  kind: LookupKind;
+  found: boolean;
+  claim?: PublicClaim;
+  matchedAttestor?: string;
+  explorerUrl?: string;
+  message?: string;
+}
+
+const EXPLORER = "https://sepolia.mantlescan.xyz";
+
+/** Scan the bounded recent claim set for an attestation whose reasoningHash matches. */
+async function findByReasoningHash(
+  hash: string,
+): Promise<{ claim: PublicClaim; attestor: string } | null> {
+  const target = hash.toLowerCase();
+  const ids = candidateClaimIds();
+  const claims = await Promise.allSettled(ids.map((id) => readClaim(id)));
+  for (const r of claims) {
+    if (r.status !== "fulfilled" || !r.value.posted) continue;
+    const hit = r.value.attestations.find((a) => a.reasoningHash.toLowerCase() === target);
+    if (hit) return { claim: r.value, attestor: hit.attestor };
+  }
+  return null;
+}
+
+/**
+ * Resolve a free-text lookup: a claim ID, a reasoning hash (0x, 32 bytes), or a
+ * tx hash. A 32-byte hash is first reverse-matched against recent reasoning
+ * hashes; if none matches it is shown as a transaction on the explorer. Read-only.
+ */
+export async function lookup(q: string): Promise<LookupResult> {
+  const query = q.trim();
+  if (!query) {
+    return {
+      query,
+      kind: "empty",
+      found: false,
+      message: "Enter a claim ID, a reasoning hash, or a transaction hash.",
+    };
+  }
+
+  const is32ByteHex = /^0x[0-9a-fA-F]{64}$/.test(query);
+  if (is32ByteHex) {
+    const match = await findByReasoningHash(query);
+    if (match) {
+      return {
+        query,
+        kind: "reasoningHash",
+        found: true,
+        claim: match.claim,
+        matchedAttestor: match.attestor,
+      };
+    }
+    return {
+      query,
+      kind: "txHash",
+      found: true,
+      explorerUrl: `${EXPLORER}/tx/${query}`,
+      message:
+        "No attestation in the recent set matches this as a reasoning hash. Showing it as a transaction on the Mantle explorer.",
+    };
+  }
+
+  try {
+    const claim = await readClaim(query);
+    if (claim.posted) return { query, kind: "claimId", found: true, claim };
+    return {
+      query,
+      kind: "claimId",
+      found: false,
+      message: "No posted claim with that ID was found on-chain.",
+    };
+  } catch {
+    return {
+      query,
+      kind: "claimId",
+      found: false,
+      message: "Could not read that claim from the chain. Check the ID and try again.",
+    };
+  }
+}
+
+/** Convenience for building explorer links in the UI. */
+export function explorerAddressUrl(addr: string): string {
+  return `${EXPLORER}/address/${addr}`;
 }

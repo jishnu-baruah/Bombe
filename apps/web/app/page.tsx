@@ -139,14 +139,22 @@ export default async function LandingPage() {
                 <p className="text-[11px] text-[#8d969e] font-mono break-all mb-3">
                   0xf2473a0a55D997233C8fBF987c197e7d2180470A
                 </p>
-                <a
-                  href="https://sepolia.mantlescan.xyz/address/0xf2473a0a55D997233C8fBF987c197e7d2180470A"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[13px] text-[#494fdf] hover:text-[#6b70e8] font-medium transition-colors"
-                >
-                  View the contract on Mantle explorer →
-                </a>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/verify"
+                    className="text-[13px] text-[#494fdf] hover:text-[#6b70e8] font-medium transition-colors"
+                  >
+                    Verify a claim or hash →
+                  </Link>
+                  <a
+                    href="https://sepolia.mantlescan.xyz/address/0xf2473a0a55D997233C8fBF987c197e7d2180470A"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[13px] text-[rgba(255,255,255,0.5)] hover:text-[#ffffff] font-medium transition-colors"
+                  >
+                    View the contract on Mantle explorer →
+                  </a>
+                </div>
               </div>
               {/* Live stats card: real on-chain counts (cached); renders only when
                   the chain read succeeds, so the hero never shows fabricated numbers. */}

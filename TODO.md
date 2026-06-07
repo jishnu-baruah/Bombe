@@ -54,6 +54,27 @@ The file is the board; every status change is a visible commit.
 - Acceptance: all routes usable at 380px; race view stacks w/ tap-to-expand. (PRD §6.6)
 - Notes: none
 
+### T-610, public /verify lookup page (paste a claim ID, hash, or tx, get the on-chain proof)
+- Status: pending
+- Depends-on: none (builds on the shipped public read API)
+- Scope: web
+- Acceptance: a `/verify` page with a single search box that accepts a claim ID, a reasoning hash (0x, 32 bytes), or a tx hash; resolves it server-side via `lib/public-api.ts` (claim ID -> claim + attestations; reasoning hash -> reverse-match across the bounded recent claim set; tx hash -> explorer link + receipt decode best-effort); renders a proof panel (verdict, confidence, on-chain reasoning hash, explorer links, verify-hash status) with honest `not_found` / `trace_unavailable` states; CORS-free read-only; no keys. Reachable from the nav and the landing hero. Tests + web typecheck + biome green.
+- Notes: read-only, decision-free, directly user-requested. Surfaces "verify it yourself" as a first-class page. The reasoning-hash reverse lookup scans the same bounded claim-ID set as `getNetworkStats` (no global index yet); say so honestly when not found.
+
+### T-611, issuer self-serve request intake (submit a claim, no in-platform payment yet)
+- Status: blocked, see OP-9 (product decision: build intake now vs wait for the payment rail)
+- Depends-on: T-610
+- Scope: web
+- Acceptance: a "Request an attestation" form for a supported claim type (yield for a supported asset, or a generic request with a document/source pointer for Tier-2); validates falsifiability scope client-side; records the request (storage TBD: committed queue file via the scoped repo-write token, or a DB row); shows the issuer the exact claim payload + the CLAIM_FEE + an honest "the operator reviews falsifiability and posts it on-chain; you get the claim ID and on-chain attestation back" note. No payment automation, no custodial keys.
+- Notes: honest interim of the self-serve vision while the payment rail (x402) is undecided and the v2 lock holds. Constrained by the core thesis: Bombe only attests claims it can falsifiably verify (today: mETH/USDY yield with wired data sources). Arbitrary new assets need the `IAssetAdapter` path (T-612 / v4 backlog).
+
+### T-612, custodial paid attestation flow (in-platform pay -> auto-post -> on-chain attestation back)
+- Status: blocked, see OP-9 (x402 payment-rail decision + operator authorization of custodial posting/attestor keys)
+- Depends-on: T-611, x402 decision
+- Scope: web + runner + payments
+- Acceptance: an issuer pays in-platform (rail per OP-9); on confirmed payment a custodial backend posts the claim (posting key, OPERATOR_ROLE), runs the deterministic attestor (attestor key) for a supported claim type, and returns the on-chain attestation + trace + verify link in the platform; fail-closed dedupe; never double-post; only supported (falsifiable, data-wired) claim types are auto-attested, everything else abstains/declines honestly.
+- Notes: this is the v3.2 "custodial paid requests" item. Gated on the pending x402 decision and explicit operator key authorization (the constitution forbids improvising key/payment flows). Open onboarding for arbitrary assets is the v4 adapter-registry path (see docs/V3-BACKLOG.md), promoted post-June-15.
+
 ### T-704, scripts/seed-bug.ts drill
 - Status: pending
 - Depends-on: T-702
