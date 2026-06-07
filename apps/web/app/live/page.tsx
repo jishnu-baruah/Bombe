@@ -696,7 +696,8 @@ export default function LivePage() {
           </h1>
           <p className="text-[rgba(255,255,255,0.60)] text-[16px] max-w-2xl leading-[1.5] mb-6 pretty">
             Watch four attestors race on each claim, Reflector, Rotor, Stator (SDK agents),
-            Plugboard (external runtime), and a Human Queue. Outcomes match §6.7 exactly.
+            Plugboard (external runtime), and a Human Queue. Outcomes are deterministic and
+            reproducible.
           </p>
 
           {/* Controls */}
@@ -801,7 +802,7 @@ export default function LivePage() {
               className="text-center text-[13px] text-[rgba(255,255,255,0.72)] py-2"
               data-testid="guided-done"
             >
-              Guided demo finished. All 4 claims processed per PRD §6.7.
+              Guided demo finished. All 4 claims processed.
             </div>
           )}
         </div>

@@ -15,6 +15,7 @@
 import { ExplorerLink } from "@/components/ExplorerLink";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { GLOSSARY, Gloss } from "@/components/ui/Gloss";
 import { Mono } from "@/components/ui/Mono";
 import {
   ALL_AGENT_IDS,
@@ -232,11 +233,15 @@ function OnChainRecord({
       <p className="text-[#8d969e] text-[12px] uppercase tracking-[0.24px] mb-4">On-Chain Record</p>
       <div className="space-y-3">
         <div>
-          <p className="text-[#505a63] text-[12px] mb-1">reasoningHash</p>
+          <p className="text-[#505a63] text-[12px] mb-1">
+            <Gloss def={GLOSSARY.reasoningHash}>reasoningHash</Gloss>
+          </p>
           <Mono value={attestation.reasoningHash} truncate truncateChars={10} />
         </div>
         <div>
-          <p className="text-[#505a63] text-[12px] mb-1">sourcesHash</p>
+          <p className="text-[#505a63] text-[12px] mb-1">
+            <Gloss def={GLOSSARY.sourcesHash}>sourcesHash</Gloss>
+          </p>
           <Mono value={attestation.sourcesHash} truncate truncateChars={10} />
         </div>
         <div>

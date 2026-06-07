@@ -47,13 +47,6 @@ The file is the board; every status change is a visible commit.
 
 ## Active
 
-### T-608, responsive ≤380px
-- Status: pending
-- Depends-on: T-603
-- Scope: web
-- Acceptance: all routes usable at 380px; race view stacks w/ tap-to-expand. (PRD §6.6)
-- Notes: none
-
 ### T-611, issuer paid attestation flow, part 1: connect wallet + compose + pay (non-custodial)
 - Status: in-progress 2026-06-07 (build the no-live-key parts; live post path gated on OP-9 inputs)
 - Depends-on: T-610
@@ -213,6 +206,8 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 
 ### T-6xx, web app (M5)
 - T-601 done 2026-06-06 — app shell + SSE
+- T-608 done 2026-06-07 — responsive ≤380px verified (all 8 routes, no horizontal overflow, race view stacks)
+- T-38 done 2026-06-07 — inline-gloss component + glossary; applied on /verify, /leaderboard, /claim; internal spec refs (§6.7) removed from /live public copy
 - T-018 done 2026-06-06 — UI taste-skill redesign + TASTE-CONTEXT.md
 - T-602 done 2026-06-06 — / landing
 - T-019 done 2026-06-06 — fix landing layout (Tailwind v4 spacing/size collision)
