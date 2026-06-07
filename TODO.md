@@ -47,13 +47,6 @@ The file is the board; every status change is a visible commit.
 
 ## Active
 
-### T-612, issuer paid attestation flow, part 2: verify payment -> post + attest -> return proof
-- Status: blocked, see OP-9 (receiving address + dedicated posting-key authorization + hackathon-timing OK)
-- Depends-on: T-611
-- Scope: web + runner + payments
-- Acceptance: a backend that verifies the issuer's on-chain payment (or x402 settlement), then posts the claim with the platform posting key (OPERATOR_ROLE) and runs the deterministic attestor (attestor key) for the supported claim type, and returns the on-chain attestation + trace + verify link in the platform; per-issuer rate limit; fail-closed dedupe; never double-post; only supported, data-wired claim types auto-attest, everything else declines/abstains honestly.
-- Notes: the v3.2 "custodial paid requests" item, but custodial only in the POSTING sense (operator key calls the contract), not custody of issuer funds. Needs a dedicated minimally-funded posting key (not the deployer key), a receiving address, and explicit operator authorization (OP-9). Open permissionless issuer posting is a v4 contract change post-June-15 (docs/V3-BACKLOG.md).
-
 ### T-J05, Demo video (≥ 2 min) of the live core use case
 - Status: blocked, operator-only (screen recording)
 - Depends-on: T-J04, T-806
@@ -202,6 +195,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 - T-J09 done 2026-06-07 — public agent-read API (v1) live + deployed (see below)
 - T-610 done 2026-06-07 — public /verify lookup page (claim ID / reasoning hash / tx -> on-chain proof), live
 - T-611 done 2026-06-07 — self-serve paid flow part 1: /request connect-wallet + compose + pay (non-custodial), live
+- T-612 done 2026-06-07 — autonomous paid flow part 2: on verified payment the agent posts + attests + stores the trace and returns a verifiable claim, fully live (dedicated posting key 0x6A17…4D20 w/ OPERATOR_ROLE; POSTING_KEY/ATTESTOR_KEY/PAID_FLOW_LIVE in Vercel). Proven e2e: claim mETH-REQ-c70c98b858 VALID, /verify recomputed == on-chain hash
 
 ---
 
