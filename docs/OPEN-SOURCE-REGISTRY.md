@@ -96,9 +96,14 @@ and can force ABSTAIN (never an opinion):
 `pipelineFor(spec)` picks the gate config by category, so a newly discovered asset
 inherits a sensible pipeline with no code; a protocol that needs special handling
 registers an override. Gate outcomes are nodes in the provenance DAG and
-`GATE_ABSTAIN(...)` reasons in the trace. The **Tier-2 document step** (pin+hash a doc,
-LLM-extract with citations, deterministic cross-check) plugs in here as a `document`
-step for asset types that need a report checked.
+`GATE_ABSTAIN(...)` reasons in the trace.
+
+The **Tier-2 document step** is built (`document.ts`, D22): fetch + pin (hash) a
+document, extract the target figure with a citation (deterministic json-path, or an LLM
+whose quote must appear verbatim in the pinned bytes), and deterministically cross-check
+it against the asserted value. Live at `GET /api/v1/document-check` and MCP
+`bombe_check_document`, first against the authoritative US Treasury bill rate
+(fiscaldata.treasury.gov). The verdict is the cross-check; the model only reads.
 
 ## Safety / honesty (unchanged)
 

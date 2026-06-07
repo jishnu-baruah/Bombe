@@ -55,6 +55,21 @@ server.tool(
 );
 
 server.tool(
+  "bombe_check_document",
+  "Tier-2 document verification: cross-check an asserted tokenized-treasury yield (bps) against the live, hashed US Treasury bill rate. Returns the verdict, the pinned document hash, the cited figure, and the provenance. Deterministic; re-fetch the document to verify.",
+  {
+    asset: z.string().describe("e.g. USDY, BUIDL, OUSG"),
+    assertedBps: z.number().int().positive().describe("the yield you assert, in basis points"),
+    toleranceBps: z.number().int().positive().optional(),
+  },
+  async ({ asset, assertedBps, toleranceBps }) => {
+    const qs = new URLSearchParams({ asset, assertedBps: String(assertedBps) });
+    if (typeof toleranceBps === "number") qs.set("toleranceBps", String(toleranceBps));
+    return text(await getText(`/api/v1/document-check?${qs.toString()}`));
+  },
+);
+
+server.tool(
   "bombe_get_claim",
   "Read a claim and its on-chain attestations (decision, confidence, reasoning hash) by claim id.",
   { claimId: z.string().describe("e.g. mETH-2026-06-07") },
