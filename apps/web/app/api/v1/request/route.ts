@@ -8,6 +8,7 @@
  * custodied; posting is operator-side because postClaim is OPERATOR_ROLE-gated (D18).
  */
 
+import { recordRequest } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
@@ -111,6 +112,19 @@ export async function POST(req: Request) {
     );
   }
 
+  // Durable dedupe + record in Neon (survives serverless cold starts); the
+  // in-memory set is the fallback when the DB is not configured.
+  const isNew = await recordRequest({
+    paymentTxHash,
+    payer,
+    asset,
+    claimType: "YIELD_BPS",
+    assertedBps: assertedBps as number,
+    windowDays: windowDays as number,
+  });
+  if (!isNew) {
+    return bad("This payment has already been used for a request.", 409);
+  }
   usedTxHashes.add(txKey);
 
   // Payment verified. The deterministic post + attest (T-612 layer 2) runs only

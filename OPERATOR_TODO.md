@@ -19,6 +19,8 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 > OP-5 through OP-7 unblock the live submission (D16); build proceeds mock-tested and cuts over to live when each resolves.
 
+> **2026-06-07 env status.** OP-6 (Neon `DATABASE_URL`) and OP-7 (Upstash Redis) are RESOLVED, present in `.env.local` and Vercel prod. Wired (T-803): Neon (`@neondatabase/serverless`) persists paid-flow requests + payment dedupe durably; Redis (Upstash REST, no SDK dep) caches the on-chain read paths (`getNetworkStats`, `readClaim`) so the homepage and `/verify` fetch fast across serverless instances. The paid-flow payment address defaults to the deployer `0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83` (operator decision, "for now"). **OP-5 (BLOB_RW_TOKEN, T-802) is still NOT present** in `.env.local` under any name (BLOB / BLOB_READ_WRITE_TOKEN / VERCEL_BLOB_* all absent), so live attestation traces are still not stored and `/verify` returns `trace_unavailable` on live claims. Provide the blob token (or confirm its env var name) to unblock durable trace storage.
+
 ## OP-5, Blob storage token   [open]
 - Date: 2026-06-06
 - Blocks: T-802 live BlobSeam (real trace storage for the verify-hash artifact)
