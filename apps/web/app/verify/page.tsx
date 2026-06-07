@@ -6,6 +6,7 @@
  * links. Read-only, no keys; resolves server-side via lib/public-api.ts.
  */
 
+import { GLOSSARY, Gloss } from "@/components/ui/Gloss";
 import { type LookupResult, explorerAddressUrl, lookup } from "@/lib/public-api";
 import Link from "next/link";
 
@@ -84,9 +85,13 @@ function ClaimProof({ result }: { result: LookupResult }) {
                   </a>
                 </div>
                 <dl className="grid sm:grid-cols-[140px_1fr] gap-y-1.5 gap-x-4 text-[13px]">
-                  <dt className="text-[#505a63]">reasoning hash</dt>
+                  <dt className="text-[#505a63]">
+                    <Gloss def={GLOSSARY.reasoningHash}>reasoning hash</Gloss>
+                  </dt>
                   <dd className="font-mono text-[#8d969e] break-all">{a.reasoningHash}</dd>
-                  <dt className="text-[#505a63]">sources hash</dt>
+                  <dt className="text-[#505a63]">
+                    <Gloss def={GLOSSARY.sourcesHash}>sources hash</Gloss>
+                  </dt>
                   <dd className="font-mono text-[#8d969e] break-all">{a.sourcesHash}</dd>
                   <dt className="text-[#505a63]">trace</dt>
                   <dd className="font-mono text-[#8d969e] break-all">
