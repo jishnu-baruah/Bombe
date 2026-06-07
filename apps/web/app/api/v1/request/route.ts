@@ -8,6 +8,7 @@
  * custodied; posting is operator-side because postClaim is OPERATOR_ROLE-gated (D18).
  */
 
+import { recordRequest } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
@@ -17,7 +18,7 @@ const RPC_URL = process.env.RPC_URL ?? "https://rpc.sepolia.mantle.xyz";
 const PAYMENT_ADDRESS = (
   process.env.PAYMENT_ADDRESS ??
   process.env.NEXT_PUBLIC_PAYMENT_ADDRESS ??
-  ""
+  "0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83"
 ).toLowerCase();
 const PRICE_MNT =
   process.env.ATTEST_PRICE_MNT ?? process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
@@ -111,6 +112,19 @@ export async function POST(req: Request) {
     );
   }
 
+  // Durable dedupe + record in Neon (survives serverless cold starts); the
+  // in-memory set is the fallback when the DB is not configured.
+  const isNew = await recordRequest({
+    paymentTxHash,
+    payer,
+    asset,
+    claimType: "YIELD_BPS",
+    assertedBps: assertedBps as number,
+    windowDays: windowDays as number,
+  });
+  if (!isNew) {
+    return bad("This payment has already been used for a request.", 409);
+  }
   usedTxHashes.add(txKey);
 
   // Payment verified. The deterministic post + attest (T-612 layer 2) runs only

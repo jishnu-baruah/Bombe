@@ -10,6 +10,7 @@
 import { AgentAttestationAbi } from "@bombe/shared";
 import { http, createPublicClient } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
+import { cacheGetJson, cacheSetJson } from "./cache";
 
 export const ATTESTATION_ADDRESS = (process.env.ATTESTATION_ADDRESS ??
   "0xf2473a0a55D997233C8fBF987c197e7d2180470A") as `0x${string}`;
@@ -88,16 +89,15 @@ export interface NetworkStats {
   assets: number;
 }
 
-let _statsCache: { data: NetworkStats; expiresAt: number } | undefined;
-
 /**
  * Aggregate live network stats, read robustly from a bounded set of known claim
  * IDs (the daily streak pattern plus the demo claims) rather than a full-chain
- * log scan, which is slow and flaky on the public RPC. Cached for 5 minutes.
- * Returns null if every read fails, so callers can fall back gracefully.
+ * log scan, which is slow and flaky on the public RPC. Cached in Redis (shared
+ * across serverless instances). Returns null if every read fails.
  */
 export async function getNetworkStats(): Promise<NetworkStats | null> {
-  if (_statsCache && Date.now() < _statsCache.expiresAt) return _statsCache.data;
+  const cached = await cacheGetJson<NetworkStats>("v1:stats:network");
+  if (cached) return cached;
 
   const ids = candidateClaimIds();
   const c = client();
@@ -137,12 +137,16 @@ export async function getNetworkStats(): Promise<NetworkStats | null> {
     claims,
     assets: Math.max(assetSet.size, 0),
   };
-  _statsCache = { data, expiresAt: Date.now() + 300_000 };
+  await cacheSetJson("v1:stats:network", data, 120);
   return data;
 }
 
-/** Read a claim and every attestation on it, straight from the contract. */
+/** Read a claim and every attestation on it, straight from the contract (Redis-cached). */
 export async function readClaim(claimId: string): Promise<PublicClaim> {
+  const cacheKey = `v1:claim:${claimId}`;
+  const cached = await cacheGetJson<PublicClaim>(cacheKey);
+  if (cached) return cached;
+
   const id = toBytes32(claimId);
   const c = client();
   const claim = (await c.readContract({
@@ -179,7 +183,7 @@ export async function readClaim(claimId: string): Promise<PublicClaim> {
     });
   }
 
-  return {
+  const result: PublicClaim = {
     claimId,
     posted: claim.posted,
     tier: claim.tier,
@@ -187,6 +191,9 @@ export async function readClaim(claimId: string): Promise<PublicClaim> {
     attestorCount: claim.attestorCount,
     attestations,
   };
+  // Cache only posted claims (avoid caching a transient not-found).
+  if (result.posted) await cacheSetJson(cacheKey, result, 30);
+  return result;
 }
 
 export type LookupKind = "claimId" | "reasoningHash" | "txHash" | "empty";

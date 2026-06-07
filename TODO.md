@@ -61,13 +61,6 @@ The file is the board; every status change is a visible commit.
 - Acceptance: compiles/typechecks; live trace storage writes a durable artifact whose URL the verify-hash path can fetch. (PRD §14.9)
 - Notes: Wallet seam is live (used by every on-chain attestation). The remaining piece is durable trace storage (BlobSeam), which gates stranger-verifiable `/verify`. Needs `BLOB_RW_TOKEN` (OP-5).
 
-### T-803, live DB (Neon)
-- Status: blocked, see OP-6
-- Depends-on: T-401
-- Scope: runner
-- Acceptance: `DATABASE_URL` wiring; compiles. (PRD §6.5)
-- Notes: drizzle schema + live client skeleton ready; pglite used in mock and tests. Needs `DATABASE_URL` (OP-6).
-
 ### T-J05, Demo video (≥ 2 min) of the live core use case
 - Status: blocked, operator-only (screen recording)
 - Depends-on: T-J04, T-806
@@ -197,6 +190,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 
 ### T-8xx, live seams + ship (M8)
 - T-801 done 2026-06-06 — live ModelSeam (AI gateway, OpenAI-compatible)
+- T-803 done 2026-06-07 — Neon DATABASE_URL wired (@neondatabase/serverless; durable paid-flow request persistence + payment dedupe); the read paths are Redis-cached (Upstash) for speed (OP-6 + OP-7)
 - T-804 done 2026-06-07 — deploy:testnet wrapper (fail-fast env validation + redeploy guard honoring the v2 lock)
 - T-805 done 2026-06-07 — README (architecture, env table, HTTP API, Plugboard trust model, why-not-frameworks)
 - T-806 done 2026-06-07 — DEMO.md final pass (live path + guided mode + operator click-path + fallback notes)
