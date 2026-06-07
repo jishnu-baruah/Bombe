@@ -96,7 +96,7 @@ _Generated: 2026-06-07_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 80 | 2 | 5 | 4 | 91 | 88% |
+| 81 | 2 | 5 | 3 | 91 | 89% |
 
 ### Per-Range Breakdown
 
@@ -110,14 +110,14 @@ _Generated: 2026-06-07_
 | T-5xx, Plugboard | 5 | 5 |
 | T-6xx, web app | 9 | 11 |
 | T-7xx, testing | 4 | 4 |
-| T-8xx, live seams + ship | 4 | 7 |
+| T-8xx, live seams + ship | 5 | 7 |
 | T-9xx, stretch | 0 | 3 |
 | T-Jxx, submission gates | 6 | 9 |
 
 ### Test Counts
 
-- 77 forge tests
-- 724 vitest tests
+- forge tests: run `pnpm run ci` for live count
+- vitest tests: run `pnpm run ci` for live count
 
 ### Operator Items
 
