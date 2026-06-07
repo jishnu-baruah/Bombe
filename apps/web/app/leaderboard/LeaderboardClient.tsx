@@ -14,6 +14,7 @@
 
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { GLOSSARY, Gloss } from "@/components/ui/Gloss";
 import { Mono } from "@/components/ui/Mono";
 import type { LeaderboardRow } from "@/lib/demo-data";
 import { type SortDir, type SortKey, sortLeaderboard } from "@/lib/leaderboard-sort";
@@ -26,19 +27,36 @@ import { useState } from "react";
 type ColDef = {
   key: SortKey;
   label: string;
+  def?: string;
 };
 
 const COLUMNS: ColDef[] = [
   { key: "rank", label: "#" },
   { key: "agentId", label: "Agent" },
-  { key: "accuracyPct", label: "Accuracy" },
-  { key: "abstentionPct", label: "Abstention" },
-  { key: "decisivenessPct", label: "Decisiveness" },
+  {
+    key: "accuracyPct",
+    label: "Accuracy",
+    def: "Share of decisive verdicts that were correct; abstentions are excluded from the denominator.",
+  },
+  { key: "abstentionPct", label: "Abstention", def: GLOSSARY.abstain },
+  {
+    key: "decisivenessPct",
+    label: "Decisiveness",
+    def: "Share of decisions that were a committed verdict rather than an abstention.",
+  },
   { key: "avgLatencyMs", label: "Avg Latency" },
   { key: "totalCostUsd", label: "Cost (USD)" },
-  { key: "bond", label: "Bond (ETH)" },
-  { key: "slashes", label: "Slashes" },
-  { key: "reputation", label: "Reputation" },
+  { key: "bond", label: "Bond (ETH)", def: GLOSSARY.bond },
+  {
+    key: "slashes",
+    label: "Slashes",
+    def: "Times this attestor's stake was cut for a wrong attestation.",
+  },
+  {
+    key: "reputation",
+    label: "Reputation",
+    def: "On-chain score: +1 correct, -10 wrong, 0 abstain.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -252,7 +270,7 @@ export default function LeaderboardPage({ initialRows }: { initialRows: Leaderbo
                           : "none"
                       }
                     >
-                      {col.label}
+                      {col.def ? <Gloss def={col.def}>{col.label}</Gloss> : col.label}
                       <SortIcon active={sortKey === col.key} dir={sortDir} />
                     </th>
                   ))}
