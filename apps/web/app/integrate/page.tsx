@@ -167,7 +167,11 @@ export default function IntegratePage() {
             {[
               {
                 t: "bombe_list_assets",
-                b: "Discover the RWA yields Bombe attests + the contract.",
+                b: "The curated, verified RWA yields + the contract.",
+              },
+              {
+                t: "bombe_discover_assets",
+                b: "Enumerate the full open universe of attestable yields, any chain.",
               },
               { t: "bombe_get_claim", b: "Read a claim and its on-chain verdicts." },
               { t: "bombe_verify_claim", b: "Re-derive the reasoning hash and compare to chain." },

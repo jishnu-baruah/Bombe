@@ -113,9 +113,39 @@ const TraceFinalSchema = z.object({
 });
 
 /**
+ * A provenance graph node: a source, a fetched evidence value, the reconciliation,
+ * or the verdict. `ref` points a source node at its auditable URL; `value` carries
+ * the evidence/verdict payload. (docs/OPEN-SOURCE-REGISTRY.md)
+ */
+const ProvNodeSchema = z.object({
+  id: z.string(),
+  type: z.enum(["source", "evidence", "reconcile", "verdict"]),
+  label: z.string(),
+  ref: z.string().optional(),
+  value: z.unknown().optional(),
+});
+
+/** A directed edge in the provenance graph: derivation flows from -> to. */
+const ProvEdgeSchema = z.object({ from: z.string(), to: z.string() });
+
+/**
+ * The provenance DAG: descriptor -> evidence -> reconcile -> verdict. Lets a verifier
+ * walk the reasoning from the verdict back to each source URL. Part of the canonical
+ * trace, so it is covered by reasoningHash and re-derivable at /verify.
+ */
+const ProvenanceSchema = z.object({
+  nodes: z.array(ProvNodeSchema),
+  edges: z.array(ProvEdgeSchema),
+});
+
+export type Provenance = z.infer<typeof ProvenanceSchema>;
+
+/**
  * TraceSchema — the full v1.0 trace shape. (PRD §6.3)
  *
  * traceVersion "1.0" is a literal — any shape change requires a version bump.
+ * `provenance` is an additive optional field (a derived view over the same evidence),
+ * so it does not change the version: traces without it still validate.
  */
 export const TraceSchema = z.object({
   traceVersion: z.literal("1.0"),
@@ -124,6 +154,7 @@ export const TraceSchema = z.object({
   docVersion: z.string().optional(),
   steps: z.array(TraceStepSchema),
   final: TraceFinalSchema,
+  provenance: ProvenanceSchema.optional(),
 });
 
 export type Trace = z.infer<typeof TraceSchema>;

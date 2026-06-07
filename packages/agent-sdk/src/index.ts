@@ -138,8 +138,21 @@ export type {
   YieldObservation,
   YieldQuery,
   ClockLike,
+  SourceDescriptor,
+  AssetSpec,
+  SourceScheme,
+  SourceKind,
 } from "./data/types.js";
 export { LiveDataSource, POOL_IDS } from "./data/live-source.js";
+export {
+  FEATURED,
+  FEATURED_BY_SYMBOL,
+  FEATURED_SYMBOLS,
+  SCHEME_FETCHERS,
+  resolveSpec,
+} from "./data/source-registry.js";
+export { discoverAssets, categoryOf, RWA_CATEGORIES } from "./data/discover.js";
+export type { DiscoverFilter, DiscoveredAsset, RwaCategory } from "./data/discover.js";
 export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";

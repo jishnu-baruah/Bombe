@@ -17,7 +17,7 @@ import type { Trace } from "../loop.js";
 import type { ModelSeam } from "../seams/types.js";
 import { narrateDecisive } from "./narrate.js";
 import { type DecisionResult, decideTier1 } from "./reconciler.js";
-import type { ClockLike, DataAsset, DataSource, YieldObservation } from "./types.js";
+import type { AssetSpec, ClockLike, DataAsset, DataSource, YieldObservation } from "./types.js";
 
 /** Optional real-LLM narration of the reasoning (the verdict stays deterministic). */
 export interface DecisiveOptions {
@@ -29,6 +29,11 @@ export interface DecisiveOptions {
 export interface DecisiveClaimInput {
   claimId: string;
   asset: DataAsset;
+  /**
+   * The open path: an explicit AssetSpec for issuer-specified or discovered sources.
+   * When absent, `asset` must be a featured symbol that resolves to a curated spec.
+   */
+  spec?: AssetSpec;
   /** The value the claim asserts, in the source's annualized basis points. */
   assertedValueBps: number;
   /** Max pairwise gap for the legs to be considered agreeing (D4). */
@@ -80,6 +85,63 @@ function reasonsFor(decision: DecisionResult): string[] {
 }
 
 /**
+ * Build the provenance DAG for the trace: one source node + one evidence node per
+ * leg, all feeding a reconcile node, which feeds the verdict node. A verifier walks
+ * verdict -> reconcile -> evidence -> source (with its URL). With multiple
+ * sources/schemes the graph branches; the cross-check is visible at the reconcile
+ * node. (docs/OPEN-SOURCE-REGISTRY.md)
+ */
+function buildProvenance(
+  input: DecisiveClaimInput,
+  obs: YieldObservation,
+  decision: DecisionResult,
+): Trace["provenance"] {
+  const nodes: NonNullable<Trace["provenance"]>["nodes"] = [];
+  const edges: NonNullable<Trace["provenance"]>["edges"] = [];
+
+  obs.legs.forEach((leg, i) => {
+    const srcId = `source:${leg.name}`;
+    const evId = `evidence:${leg.name}`;
+    nodes.push({ id: srcId, type: "source", label: leg.name, ref: leg.sourceRef });
+    nodes.push({
+      id: evId,
+      type: "evidence",
+      label: `${leg.valueBps.toFixed(2)} bps over ${leg.windowDays}d`,
+      value: { valueBps: leg.valueBps, windowDays: leg.windowDays, legIndex: i },
+    });
+    edges.push({ from: srcId, to: evId });
+    edges.push({ from: evId, to: "reconcile" });
+  });
+
+  nodes.push({
+    id: "reconcile",
+    type: "reconcile",
+    label: obs.legs.length > 1 ? "cross-check legs, then judge" : "single-source judge",
+    value: {
+      spreadBps: decision.reconcile.spreadBps,
+      agree: decision.reconcile.agree,
+      reconciledValue: decision.reconcile.reconciledValue,
+      reconcileToleranceBps: input.reconcileToleranceBps,
+      windowDays: obs.windowDays,
+      independenceLabel: obs.independenceLabel,
+    },
+  });
+  nodes.push({
+    id: "verdict",
+    type: "verdict",
+    label: decision.verdict,
+    value: {
+      decision: decision.verdict,
+      assertedValueBps: input.assertedValueBps,
+      verdictToleranceBps: input.verdictToleranceBps,
+    },
+  });
+  edges.push({ from: "reconcile", to: "verdict" });
+
+  return { nodes, edges };
+}
+
+/**
  * computeDecisiveAttestation — fetch live evidence, reconcile, and build a hashable trace.
  *
  * The returned trace.final.decision is the deterministic verdict. The trace
@@ -94,7 +156,7 @@ export async function computeDecisiveAttestation(
   options?: DecisiveOptions,
 ): Promise<DecisiveResult> {
   const observation = await dataSource.getYieldObservation(
-    { asset: input.asset, requestedWindowDays: input.requestedWindowDays },
+    { asset: input.asset, requestedWindowDays: input.requestedWindowDays, spec: input.spec },
     clock,
   );
 
@@ -176,6 +238,7 @@ export async function computeDecisiveAttestation(
       rationaleSummary,
       reasons,
     },
+    provenance: buildProvenance(input, observation, decision),
   };
 
   const sources: Source[] = observation.legs.map((l) => ({

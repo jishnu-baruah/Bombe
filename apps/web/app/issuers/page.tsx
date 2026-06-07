@@ -2,6 +2,23 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
+import { RequestAssetForm } from "./RequestAssetForm";
+
+// RWA categories the network can attest. `live` = a real source exists today (often on
+// Mantle); the rest are requestable the moment a public data source exists. Honest: we
+// do not render a category as live without a real source behind it.
+const COVERAGE = [
+  { name: "Tokenized treasuries", live: true, eg: "Ondo USDY, OUSG, BUIDL" },
+  { name: "Synthetic-dollar yield", live: true, eg: "Ethena sUSDe" },
+  { name: "Tokenized equities", live: true, eg: "Fluxion AAPLx, NVDAx, TSLAx" },
+  { name: "Private credit / loans", live: true, eg: "Maple/Syrup, Clearpool" },
+  { name: "Lending yield", live: true, eg: "Aave, Lendle on Mantle" },
+  { name: "Liquid staking", live: true, eg: "mETH (two computation paths)" },
+  { name: "BTC yield", live: true, eg: "Solv basis" },
+  { name: "Liquid restaking", live: false, eg: "cmETH (awaiting a clean APR source)" },
+  { name: "Tokenized commodities", live: false, eg: "gold (XAUT, PAXG) on request" },
+  { name: "Real estate", live: false, eg: "property tokens on request" },
+] as const;
 
 // Issuer-facing value page: who pays for attestations, why, and the economics.
 // Static server component. Copy stays honest: archetypes are illustrative, not partners.
@@ -269,11 +286,64 @@ export default function IssuersPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Coverage + request */}
       <section
         className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
         style={{ background: "#0a0a0a" }}
       >
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
+            What we cover
+          </p>
+          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+            Any RWA yield with a real source. Anything else, one request away.
+          </h2>
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
+            Coverage is open, not a fixed list. Any yield with a public data source is attestable
+            now (browse the live universe at{" "}
+            <Link href="/integrate" className="text-[#494fdf] hover:text-[#6b70e8]">
+              the discovery API
+            </Link>
+            ). Categories without a live source yet are not faked, they are requestable, and become
+            attestable the moment a real source exists.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-14">
+            {COVERAGE.map((c) => (
+              <div
+                key={c.name}
+                className="rounded-[14px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-4"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <h3 className="text-[14px] font-semibold tracking-[-0.1px]">{c.name}</h3>
+                  <span
+                    className={`text-[11px] font-semibold uppercase tracking-[0.6px] ${
+                      c.live ? "text-[#86c95f]" : "text-[#b09000]"
+                    }`}
+                  >
+                    {c.live ? "Live" : "On request"}
+                  </span>
+                </div>
+                <p className="text-[12.5px] text-[rgba(255,255,255,0.45)] leading-[1.5]">{c.eg}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="max-w-[44rem]">
+            <h3 className="text-[20px] font-semibold mb-2 tracking-[-0.2px]">
+              Can&apos;t find your asset? Request it.
+            </h3>
+            <p className="text-[15px] text-[rgba(255,255,255,0.55)] leading-[1.56] mb-6 pretty">
+              Tell us the token and where its yield is published. If a public source exists, it
+              becomes attestable as a source descriptor, often the same day.
+            </p>
+            <RequestAssetForm />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
         <div className="max-w-6xl mx-auto">
           <div className="max-w-[36rem]">
             <h2 className="font-semibold leading-[1.05] tracking-[-0.48px] mb-6 text-[#ffffff] text-[clamp(32px,5vw,56px)] balance">

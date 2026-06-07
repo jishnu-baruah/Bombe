@@ -16,8 +16,50 @@
  * underlying ground truth). Labels are set by the source, surfaced in the trace.
  */
 
-/** Which flagship asset this observation is for. v2 supports exactly these two. */
-export type DataAsset = "mETH" | "USDY";
+/**
+ * An asset symbol. Open by design (docs/OPEN-SOURCE-REGISTRY.md, D20): the network
+ * attests any RWA yield, not a fixed list. The curated/verified showcase lives in
+ * FEATURED_SYMBOLS (source-registry.ts); any other symbol is valid when accompanied
+ * by an AssetSpec describing its sources. Mantle-native RWA is prioritized in the
+ * featured set.
+ */
+export type DataAsset = string;
+
+/** How a source is fetched; a new kind of source is one new fetcher (source-registry). */
+export type SourceScheme = "defillama" | "mantle-meth-api" | "custom-http";
+
+/** How a fetched series becomes a windowed annualized yield. */
+export type SourceKind = "pricePerShare" | "reportedApy";
+
+/** One source (one computation path) for an asset. */
+export interface SourceDescriptor {
+  /** HOW to fetch. */
+  scheme: SourceScheme;
+  /** WHICH one: a DefiLlama poolId, an API URL, or a contract address. */
+  ref: string;
+  /** Computation: pricePerShare-derived windowed yield, or reported APY. */
+  kind: SourceKind;
+  /** Stable leg id, e.g. "defillama-meth". */
+  legName: string;
+  /** Optional human label for the source. */
+  label?: string;
+}
+
+/** An attestable asset: a symbol, its sources, and an honest source-relationship label. */
+export interface AssetSpec {
+  /** Open symbol, e.g. "mETH", "rETH", "ISSUER-XYZ-NOTE". */
+  symbol: string;
+  /** Display name. */
+  name?: string;
+  /** One or more computation paths. */
+  sources: SourceDescriptor[];
+  /** Honesty label (D10/D4a). Never the word "independent" for shared-ground-truth legs. */
+  independenceLabel: string;
+  /** Curated/featured (auto-attested on the streak) vs issuer-specified. */
+  verified: boolean;
+  /** Where the asset lives, for display/discovery. */
+  chain?: string;
+}
 
 /** A single source leg: one computation path to the asset's yield. */
 export interface SourceLeg {
@@ -57,6 +99,7 @@ export interface YieldObservation {
 
 /** What the caller asks a DataSource for. */
 export interface YieldQuery {
+  /** The asset symbol. Featured symbols resolve to a curated spec automatically. */
   asset: DataAsset;
   /**
    * Requested window in days. The live source clamps this to the number of
@@ -64,6 +107,12 @@ export interface YieldQuery {
    * returned observation's `windowDays` is the authoritative value.
    */
   requestedWindowDays: number;
+  /**
+   * The open path: an explicit AssetSpec describing the sources to fetch. When
+   * present it is used verbatim (issuer-specified or discovered sources); when
+   * absent, `asset` must be a featured symbol that resolves to a curated spec.
+   */
+  spec?: AssetSpec;
 }
 
 /** Minimal clock contract (matches ClockSeam) so sources never call Date.now. */

@@ -308,7 +308,7 @@ export async function getClaim(id: string): Promise<Claim | undefined> {
     // Unknown assets/claimTypes are cast — on-chain data may come from future claim types.
     type AssetEnum = Claim["asset"];
     type ClaimTypeEnum = Claim["claimType"];
-    const KNOWN_ASSETS: AssetEnum[] = ["mETH", "USDY", "PC-POOL-1"];
+    const KNOWN_ASSETS: AssetEnum[] = ["mETH", "USDY", "sUSDe", "BUIDL", "OUSG", "PC-POOL-1"];
     const KNOWN_CLAIM_TYPES: ClaimTypeEnum[] = [
       "YIELD_BPS",
       "DISTRIBUTION_PAID",

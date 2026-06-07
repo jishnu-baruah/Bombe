@@ -48,7 +48,7 @@ function buildClaimEvents(claimId: string): SseEvent[] {
     kind: "CLAIM_POSTED",
     claimId,
     tier: claim.tier as 1 | 2 | 3,
-    asset: claim.asset as "mETH" | "USDY" | "PC-POOL-1",
+    asset: claim.asset as "mETH" | "USDY" | "sUSDe" | "BUIDL" | "OUSG" | "PC-POOL-1",
     claimType: claim.claimType as
       | "YIELD_BPS"
       | "DISTRIBUTION_PAID"

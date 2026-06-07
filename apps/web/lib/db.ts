@@ -117,3 +117,47 @@ export async function getStoredTrace(claimId: string, attestor: string): Promise
     LIMIT 1`) as { trace_json: string }[];
   return rows[0]?.trace_json ?? null;
 }
+
+// ---------------------------------------------------------------------------
+// Asset requests ("can't find your asset? request it"). For RWA the network does
+// not yet have a live source for (a new protocol, a category like real estate or
+// gold with no Mantle pool yet). Recorded for the operator to triage into a new
+// source descriptor. Honest: we don't fake a route; we capture the ask.
+// ---------------------------------------------------------------------------
+
+let _assetReqInitialized = false;
+
+async function ensureAssetRequestsTable(): Promise<void> {
+  if (_assetReqInitialized) return;
+  await sql()`
+    CREATE TABLE IF NOT EXISTS asset_requests (
+      id SERIAL PRIMARY KEY,
+      symbol TEXT NOT NULL,
+      category TEXT,
+      source_url TEXT,
+      note TEXT,
+      contact TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  _assetReqInitialized = true;
+}
+
+export interface AssetRequest {
+  symbol: string;
+  category?: string;
+  sourceUrl?: string;
+  note?: string;
+  contact?: string;
+}
+
+/** Record an asset-coverage request. Returns true if stored (or DB disabled). */
+export async function recordAssetRequest(r: AssetRequest): Promise<boolean> {
+  if (!dbEnabled()) return true;
+  await ensureAssetRequestsTable();
+  const rows = (await sql()`
+    INSERT INTO asset_requests (symbol, category, source_url, note, contact)
+    VALUES (${r.symbol}, ${r.category ?? null}, ${r.sourceUrl ?? null},
+            ${r.note ?? null}, ${r.contact ?? null})
+    RETURNING id`) as unknown[];
+  return rows.length > 0;
+}
