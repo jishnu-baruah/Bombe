@@ -28,7 +28,10 @@ function getProvider(): Eip1193Provider | undefined {
   return (window as unknown as { ethereum?: Eip1193Provider }).ethereum;
 }
 
-const PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_PAYMENT_ADDRESS ?? "";
+// Defaults to the deployer/operator address (operator decision, "for now");
+// override with NEXT_PUBLIC_PAYMENT_ADDRESS.
+const PAYMENT_ADDRESS =
+  process.env.NEXT_PUBLIC_PAYMENT_ADDRESS ?? "0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83";
 const PRICE_MNT = process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
 const MANTLE_SEPOLIA_HEX = "0x138b"; // 5003
 

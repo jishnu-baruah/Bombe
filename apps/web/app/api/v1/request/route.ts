@@ -17,7 +17,7 @@ const RPC_URL = process.env.RPC_URL ?? "https://rpc.sepolia.mantle.xyz";
 const PAYMENT_ADDRESS = (
   process.env.PAYMENT_ADDRESS ??
   process.env.NEXT_PUBLIC_PAYMENT_ADDRESS ??
-  ""
+  "0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83"
 ).toLowerCase();
 const PRICE_MNT =
   process.env.ATTEST_PRICE_MNT ?? process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
