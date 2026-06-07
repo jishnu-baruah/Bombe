@@ -119,7 +119,7 @@ const TraceFinalSchema = z.object({
  */
 const ProvNodeSchema = z.object({
   id: z.string(),
-  type: z.enum(["source", "evidence", "reconcile", "verdict"]),
+  type: z.enum(["source", "evidence", "reconcile", "gate", "verdict"]),
   label: z.string(),
   ref: z.string().optional(),
   value: z.unknown().optional(),

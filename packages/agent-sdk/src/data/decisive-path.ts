@@ -16,7 +16,9 @@ import type { Source } from "../attest.js";
 import type { Trace } from "../loop.js";
 import type { ModelSeam } from "../seams/types.js";
 import { narrateDecisive } from "./narrate.js";
+import { type GateResult, type Pipeline, pipelineFor, runGates } from "./pipeline.js";
 import { type DecisionResult, decideTier1 } from "./reconciler.js";
+import { resolveSpec } from "./source-registry.js";
 import type { AssetSpec, ClockLike, DataAsset, DataSource, YieldObservation } from "./types.js";
 
 /** Optional real-LLM narration of the reasoning (the verdict stays deterministic). */
@@ -76,14 +78,6 @@ function rationale(
   return `Reconciled ${reconciled} bps over the ${win} differs from the asserted ${input.assertedValueBps} bps by more than ${input.verdictToleranceBps} bps. Verdict by deterministic reconciler.`;
 }
 
-function reasonsFor(decision: DecisionResult): string[] {
-  const reasons = ["DETERMINISTIC_RECONCILER"];
-  if (decision.verdict === "ABSTAIN") {
-    reasons.push(`SOURCE_DISAGREEMENT(spread=${decision.reconcile.spreadBps.toFixed(2)}bps)`);
-  }
-  return reasons;
-}
-
 /**
  * Build the provenance DAG for the trace: one source node + one evidence node per
  * leg, all feeding a reconcile node, which feeds the verdict node. A verifier walks
@@ -95,6 +89,7 @@ function buildProvenance(
   input: DecisiveClaimInput,
   obs: YieldObservation,
   decision: DecisionResult,
+  gates: GateResult[],
 ): Trace["provenance"] {
   const nodes: NonNullable<Trace["provenance"]>["nodes"] = [];
   const edges: NonNullable<Trace["provenance"]>["edges"] = [];
@@ -107,7 +102,7 @@ function buildProvenance(
       id: evId,
       type: "evidence",
       label: `${leg.valueBps.toFixed(2)} bps over ${leg.windowDays}d`,
-      value: { valueBps: leg.valueBps, windowDays: leg.windowDays, legIndex: i },
+      value: { valueBps: leg.valueBps, windowDays: leg.windowDays, legIndex: i, asOf: leg.asOf },
     });
     edges.push({ from: srcId, to: evId });
     edges.push({ from: evId, to: "reconcile" });
@@ -126,6 +121,21 @@ function buildProvenance(
       independenceLabel: obs.independenceLabel,
     },
   });
+
+  // Gate nodes sit between reconcile and verdict; a failed gate is visible here.
+  let upstream = "reconcile";
+  for (const g of gates) {
+    const id = `gate:${g.gate}`;
+    nodes.push({
+      id,
+      type: "gate",
+      label: `${g.gate}: ${g.passed ? "pass" : "FAIL"}`,
+      value: { passed: g.passed, detail: g.detail, forceAbstain: g.forceAbstain },
+    });
+    edges.push({ from: upstream, to: id });
+    upstream = id;
+  }
+
   nodes.push({
     id: "verdict",
     type: "verdict",
@@ -136,7 +146,7 @@ function buildProvenance(
       verdictToleranceBps: input.verdictToleranceBps,
     },
   });
-  edges.push({ from: "reconcile", to: "verdict" });
+  edges.push({ from: upstream, to: "verdict" });
 
   return { nodes, edges };
 }
@@ -161,12 +171,28 @@ export async function computeDecisiveAttestation(
   );
 
   const legValues = observation.legs.map((l) => l.valueBps);
-  const decision = decideTier1({
+  const reconcilerDecision = decideTier1({
     legValues,
     assertedValue: input.assertedValueBps,
     reconcileToleranceBps: input.reconcileToleranceBps,
     verdictToleranceBps: input.verdictToleranceBps,
   });
+
+  // Verification pipeline: auto-select by the asset's category and run its gates over
+  // the observation. A failed gate (stale data, out-of-range yield) forces ABSTAIN; the
+  // verdict otherwise stays the reconciler's. (D21)
+  let pipeline: Pipeline;
+  try {
+    const spec = input.spec ?? resolveSpec(input.asset);
+    pipeline = pipelineFor(spec);
+  } catch {
+    pipeline = pipelineFor({ symbol: input.asset, category: "other" });
+  }
+  const { results: gateResults, forceAbstain } = runGates(pipeline, observation, clock.now());
+  const decision: DecisionResult = forceAbstain
+    ? { ...reconcilerDecision, verdict: "ABSTAIN" }
+    : reconcilerDecision;
+  const failedGates = gateResults.filter((g) => !g.passed);
 
   // Real guided-LLM reasoning over the evidence (verdict stays deterministic).
   // When no narrator is provided (tests), the trace uses a plain factual
@@ -188,8 +214,20 @@ export async function computeDecisiveAttestation(
   const step1Thought = narration
     ? "Apply the deterministic reconciler verdict to the cross-checked evidence (reasoning above; rationale below)."
     : "Cross-check the legs against each other, then judge the reconciled value against the asserted value. The verdict is deterministic.";
-  const rationaleSummary = narration?.rationale ?? rationale(input, observation, decision);
-  const reasons = reasonsFor(decision);
+  // A gate-forced ABSTAIN is the decisive reason; say so plainly (do not let the
+  // narrator's evidence rationale imply a verdict the gate overruled).
+  const gateDetail = failedGates.map((g) => g.detail).join("; ");
+  const rationaleSummary = forceAbstain
+    ? `Abstaining on a verification gate (${observation.windowDays}-day window): ${gateDetail}.`
+    : (narration?.rationale ?? rationale(input, observation, decision));
+
+  const reasons = ["DETERMINISTIC_RECONCILER"];
+  if (reconcilerDecision.verdict === "ABSTAIN") {
+    reasons.push(
+      `SOURCE_DISAGREEMENT(spread=${reconcilerDecision.reconcile.spreadBps.toFixed(2)}bps)`,
+    );
+  }
+  for (const g of failedGates) reasons.push(`GATE_ABSTAIN(${g.gate})`);
   if (narration) reasons.push(`LLM_NARRATED(${narration.modelUsed})`);
 
   const trace: Trace = {
@@ -238,7 +276,7 @@ export async function computeDecisiveAttestation(
       rationaleSummary,
       reasons,
     },
-    provenance: buildProvenance(input, observation, decision),
+    provenance: buildProvenance(input, observation, decision, gateResults),
   };
 
   const sources: Source[] = observation.legs.map((l) => ({

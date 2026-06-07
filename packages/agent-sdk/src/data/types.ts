@@ -59,6 +59,8 @@ export interface AssetSpec {
   verified: boolean;
   /** Where the asset lives, for display/discovery. */
   chain?: string;
+  /** RWA category (a RwaCategory string), used to auto-select the verification pipeline. */
+  category?: string;
 }
 
 /** A single source leg: one computation path to the asset's yield. */
@@ -71,6 +73,8 @@ export interface SourceLeg {
   windowDays: number;
   /** A human- and machine-auditable pointer: a URL or an address+method string. */
   sourceRef: string;
+  /** When the underlying data point was produced (ms epoch), for the freshness gate. */
+  asOf?: number;
   /** The raw fetched payload, kept for the trace so a verifier can re-derive valueBps. */
   raw: unknown;
 }

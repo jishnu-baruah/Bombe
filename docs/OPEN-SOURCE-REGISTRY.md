@@ -82,6 +82,24 @@ canonical trace, so it is covered by `reasoningHash` and re-derivable at `/verif
 A scope visualization (assets ↔ schemes ↔ sources) on the site renders the same graph
 shape at the network level to *show* the breadth.
 
+## Verification pipeline (D21)
+
+Above the resolver sits a per-asset pipeline, auto-selected by category:
+`fetch -> freshness-gate -> bounds-gate -> reconcile -> judge`. Gates are deterministic
+and can force ABSTAIN (never an opinion):
+
+- **freshness gate** abstains when the freshest source leg is older than the category's
+  max staleness (each leg carries an `asOf` timestamp).
+- **bounds/sanity gate** abstains when a leg's annualized yield is outside the category's
+  plausible band (catches misparses like a 900% APY).
+
+`pipelineFor(spec)` picks the gate config by category, so a newly discovered asset
+inherits a sensible pipeline with no code; a protocol that needs special handling
+registers an override. Gate outcomes are nodes in the provenance DAG and
+`GATE_ABSTAIN(...)` reasons in the trace. The **Tier-2 document step** (pin+hash a doc,
+LLM-extract with citations, deterministic cross-check) plugs in here as a `document`
+step for asset types that need a report checked.
+
 ## Safety / honesty (unchanged)
 
 - The verdict is the deterministic reconciler over evidence values; never a model.

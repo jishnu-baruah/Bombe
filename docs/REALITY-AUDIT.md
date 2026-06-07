@@ -24,8 +24,13 @@ marks partial or mock.
   be attested via the open `spec` on `POST /api/v1/request`. The scope is any RWA yield,
   not a fixed list.
 - **Provenance graph.** Each attestation's trace carries a `provenance` DAG
-  (source -> evidence -> reconcile -> verdict, with source URLs) so a verifier can walk
-  the reasoning. It is part of the canonical trace, so it is covered by `reasoningHash`.
+  (source -> evidence -> gates -> reconcile -> verdict, with source URLs) so a verifier
+  can walk the reasoning. It is part of the canonical trace, so it is covered by
+  `reasoningHash`.
+- **Verification pipeline + gates.** Each asset runs a category-selected pipeline with
+  deterministic gates: a freshness gate (stale data abstains) and a bounds/sanity gate
+  (an absurd or misparsed yield abstains). Gates can only abstain, never invent a
+  verdict; they make every asset safer by default as coverage opens up (D21).
 - **Deterministic verdict.** `decideTier1` is real arithmetic (reconcile, compare to the
   asserted value). The verdict is never a model's opinion.
 - **Real LLM reasoning.** `narrate.ts` has a real model (gpt-oss:20b via the AI gateway)

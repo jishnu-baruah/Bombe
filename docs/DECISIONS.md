@@ -77,6 +77,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, Per-asset verification pipeline + gates (D21)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D21, a verification pipeline sits above the source resolver and is auto-selected by the asset's category.** The default pipeline is fetch -> freshness-gate -> bounds-gate -> reconcile -> judge. Gates are deterministic and can force ABSTAIN, never an opinion: the **freshness gate** abstains when the freshest source leg is older than the category's max staleness (legs carry an `asOf`); the **bounds/sanity gate** abstains when a leg's annualized yield is outside the category's plausible band (e.g. a misparsed 900% APY). `pipelineFor(spec)` picks the gate config by category (CATEGORY_GATES), so a newly discovered asset inherits a sensible pipeline with no code; protocol-specific overrides are a future keyed entry. Gate outcomes appear as nodes in the provenance DAG and as `GATE_ABSTAIN(...)` reasons; a gate-forced abstain overrides the reconciler verdict and is the stated rationale. Tier-2 document verification will plug in as a `document` step in the pipelines that need a report checked. | The single fetch-reconcile path was right for two curated assets but not for an open universe where data can be stale, misparsed, or protocol-specific. Gates make every asset safer by default (stale or absurd data abstains rather than attesting noise) while keeping the verdict deterministic. Auto-selection by category means breadth (any RWA) does not mean hand-writing a path per asset. Modeling Tier-2 as a pipeline step unifies document-checkable claims into one mental model instead of a parallel path. Operator answer 2026-06-08: framework + generic gates first; Tier-2 as a pipeline step. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:
