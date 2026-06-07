@@ -14,6 +14,9 @@ Contract model: `CLAIM_FEE=0.01 MNT` on `postClaim`, `ATTEST_LOCK=0.02 MNT` on V
 | AgentSlashing | [`0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864`](https://sepolia.mantlescan.xyz/address/0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864) |
 | TuringLeaderboard | [`0xE5A157c349A6540C300D6CEcbe391A81EEEec018`](https://sepolia.mantlescan.xyz/address/0xE5A157c349A6540C300D6CEcbe391A81EEEec018) |
 
+All four contracts are **verified on Mantlescan** (2026-06-07, via the Etherscan v2 multichain API,
+solc 0.8.24, optimizer 200 runs). Source is visible at the explorer address pages above.
+
 ### Registered attestors (each bonded 0.1 MNT)
 
 | Attestor | Address | Type |

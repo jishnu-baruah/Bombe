@@ -126,17 +126,18 @@ valuation and get reverted by the contract: blocked by protocol, not by our code
 ## Submission checklist
 
 Done:
-- Four contracts live on Mantle Sepolia and recorded.
+- Four contracts live on Mantle Sepolia, recorded, and **verified on Mantlescan**.
+- A real-data headline attestation on-chain for both flagship assets (mETH and USDY), deterministic
+  VALID, with the on-chain reasoning hash equal to the locally computed hash.
 - The full decisive pipeline (fetch, cross-check, deterministic verdict, hashable trace, attestation
-  build) runs end-to-end with a matching recomputable hash.
+  build) runs end-to-end.
 - A daily run script that records a public streak with self-test rejections.
 - Public frontend live, with a copy-paste consumer quickstart in the README.
 - Open-source repo, integration guide, benchmarks, and an honest readiness assessment.
 
 Operator to complete before submit:
-- Set up the posting and attestor keys and add them as repo secrets, then let the daily run capture
-  the live, real-data headline transaction and start the public streak.
-- Verify the four contracts on the Mantle explorer.
+- To start the unattended daily streak: add the posting and attestor keys as GitHub repo secrets and
+  enable the live path in the streak runner (the headline attestation above is already captured).
 - Record the demo video (see docs/DEMO-SCRIPT.md) and post the X thread (see docs/X-THREAD.md).
 - Confirm the deadline and timezone, then submit the BUIDL on DoraHacks with the pitch, answers, and
   addresses above.

@@ -659,7 +659,7 @@ Status values: `pending` / `in-progress YYYY-MM-DD` / `review` / `blocked, <reas
 - Notes: **OP:** RPC_URL + DEPLOYER_KEY + AGENT_KEYS + PLUGBOARD_WALLET_KEY + HUMAN_WALLET_KEY. Blocks → open an OP-N if creds missing. Builds on T-804.
 
 ### T-J02, Verify all 4 contracts on Mantle Explorer
-- Status: pending
+- Status: done 2026-06-07
 - Depends-on: T-J01
 - Scope: ops
 - Acceptance: `forge verify-contract` (or explorer flow) succeeds for AgentRegistry, AgentAttestation, TuringLeaderboard, AgentSlashing on the Mantle Sepolia explorer; verified source visible; verified URLs recorded in `docs/DEPLOYMENTS.md`. (Deployment Award §Technical: "verified on Mantle Explorer"; Grand Champion: Mantle Ecosystem Contribution)
