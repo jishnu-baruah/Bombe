@@ -75,13 +75,6 @@ The file is the board; every status change is a visible commit.
 - Acceptance: `DATABASE_URL` wiring; compiles. (PRD §6.5)
 - Notes: drizzle schema + live client skeleton ready; pglite used in mock and tests. Needs `DATABASE_URL` (OP-6).
 
-### T-807, ship gate
-- Status: pending
-- Depends-on: T-608, T-704
-- Scope: ops
-- Acceptance: `pnpm run ci` exits 0 from fresh clone w/ submodules, no creds; `pnpm demo` cold-start <60s; A→D deterministic twice. (PRD §14.1, §14.3, §11 M8)
-- Notes: none
-
 ### T-J05, Demo video (≥ 2 min) of the live core use case
 - Status: blocked, operator-only (screen recording)
 - Depends-on: T-J04, T-806
@@ -221,6 +214,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 - T-804 done 2026-06-07 — deploy:testnet wrapper (fail-fast env validation + redeploy guard honoring the v2 lock)
 - T-805 done 2026-06-07 — README (architecture, env table, HTTP API, Plugboard trust model, why-not-frameworks)
 - T-806 done 2026-06-07 — DEMO.md final pass (live path + guided mode + operator click-path + fallback notes)
+- T-807 done 2026-06-07 — ship gate verified (pnpm run ci green; test:demo 18/18, A→D deterministic, hash stable 0xc3cef617…, <60s cold start)
 
 ### T-Jxx, hackathon submission & judging gates
 - T-J01 done 2026-06-06 — live Mantle Sepolia deployment + canonical addresses
