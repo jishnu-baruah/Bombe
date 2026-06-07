@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
+import { RequestAttestationForm } from "../request/RequestAttestationForm";
 import { RequestAssetForm } from "./RequestAssetForm";
 
 // RWA categories the network can attest. `live` = a real source exists today (often on
@@ -129,11 +130,29 @@ export default function IssuersPage() {
         </div>
       </section>
 
-      {/* Who pays & why */}
+      {/* Pay and get your attestation (embedded, non-custodial) */}
       <section
-        className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
+        className="px-6 py-[72px] border-t border-[rgba(255,255,255,0.06)]"
         style={{ background: "#0a0a0a" }}
       >
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
+            Pay and get your attestation
+          </p>
+          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+            Do it right here, from your own wallet.
+          </h2>
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[40rem] pretty">
+            Pick an asset, connect your wallet, pay the fee. The network checks it against live
+            data, posts the claim, and signs the on-chain verdict you can verify yourself. We never
+            hold your funds.
+          </p>
+          <RequestAttestationForm />
+        </div>
+      </section>
+
+      {/* Who pays & why */}
+      <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
         <div className="max-w-6xl mx-auto">
           <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
             Who pays & why
