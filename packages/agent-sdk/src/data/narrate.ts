@@ -67,6 +67,41 @@ function userPrompt(
  * Ask the model to narrate the reasoning. Returns null if the model produced
  * nothing usable, so the caller can fall back to a factual statement.
  */
+/**
+ * Parse the model's reply into thoughts + rationale, salvaging values from
+ * imperfect or truncated JSON (small models do not always close the JSON). Never
+ * emits raw JSON as the rationale; returns null only if nothing is recoverable.
+ */
+function parseNarration(textRaw: string, modelUsed: string): Narration | null {
+  const block = textRaw.match(/\{[\s\S]*\}?/)?.[0] ?? textRaw;
+  let thoughts: string[] = [];
+  let rationale = "";
+
+  try {
+    const p = JSON.parse(block) as { thoughts?: unknown; rationale?: unknown };
+    if (Array.isArray(p.thoughts)) {
+      thoughts = p.thoughts
+        .filter((t): t is string => typeof t === "string" && t.trim() !== "")
+        .map((t) => t.trim());
+    }
+    if (typeof p.rationale === "string") rationale = p.rationale.trim();
+  } catch {
+    // Salvage from truncated/imperfect JSON via regex.
+    const tBlock = block.match(/"thoughts"\s*:\s*\[([\s\S]*?)(?:\]|$)/);
+    if (tBlock?.[1]) {
+      thoughts = [...tBlock[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)]
+        .map((m) => (m[1] ?? "").replace(/\\"/g, '"').replace(/\\n/g, " ").trim())
+        .filter((s) => s !== "");
+    }
+    const rBlock = block.match(/"rationale"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (rBlock?.[1]) rationale = rBlock[1].replace(/\\"/g, '"').replace(/\\n/g, " ").trim();
+  }
+
+  if (rationale === "" && thoughts.length > 0) rationale = thoughts[thoughts.length - 1] ?? "";
+  if (thoughts.length === 0 && rationale === "") return null;
+  return { thoughts, rationale, modelUsed };
+}
+
 export async function narrateDecisive(
   model: ModelSeam,
   args: {
@@ -79,42 +114,18 @@ export async function narrateDecisive(
   },
 ): Promise<Narration | null> {
   const { asset, assertedBps, observation, decision, modelId } = args;
-  let resp: { text: string; modelUsed: string };
   try {
-    resp = await model.complete({
+    const resp = await model.complete({
       model: modelId,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt(asset, assertedBps, observation, decision) },
       ],
-      maxTokens: args.maxTokens ?? 700,
+      maxTokens: args.maxTokens ?? 1000,
       temperature: 0.2,
     });
+    return parseNarration(resp.text, resp.modelUsed);
   } catch {
     return null;
   }
-
-  // Lenient JSON parse: pull the first {...} block.
-  const match = resp.text.match(/\{[\s\S]*\}/);
-  if (match) {
-    try {
-      const parsed = JSON.parse(match[0]) as { thoughts?: unknown; rationale?: unknown };
-      const thoughts = Array.isArray(parsed.thoughts)
-        ? parsed.thoughts.filter((t): t is string => typeof t === "string" && t.trim() !== "")
-        : [];
-      const rationale = typeof parsed.rationale === "string" ? parsed.rationale.trim() : "";
-      if (thoughts.length > 0 && rationale !== "") {
-        return { thoughts, rationale, modelUsed: resp.modelUsed };
-      }
-    } catch {
-      // fall through
-    }
-  }
-
-  // Model replied but not as JSON: keep its real text as the rationale.
-  const raw = resp.text.trim();
-  if (raw !== "") {
-    return { thoughts: [], rationale: raw.slice(0, 1200), modelUsed: resp.modelUsed };
-  }
-  return null;
 }
