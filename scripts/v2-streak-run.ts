@@ -149,36 +149,63 @@ function liveClients() {
 async function main(): Promise<void> {
   console.log(`\n[v2-streak] === daily run ${TODAY} (mode: ${MODE}) ===`);
 
-  // 1. Dedupe (D13). Committed marker is the available leg; fail-closed if both unreachable.
-  const { marker, reachable: markerReachable } = readMarker();
+  const live = IS_LIVE ? liveClients() : null;
+
+  // 1. Dedupe (D13). LIVE: the on-chain history is the source of truth, so we read
+  //    whether today's claim is already posted. MOCK: the committed marker. Either
+  //    way, fail-closed if the source is unreachable.
+  let chainReachable = false;
+  let chainHasRunToday = false;
+  let markerReachable = false;
+  let committedMarkerDate: string | null = null;
+  let runCount = 0;
+  if (live) {
+    try {
+      const c = (await live.pub.readContract({
+        address: live.attAddr,
+        abi: AgentAttestationAbi,
+        functionName: "getClaim",
+        args: [toBytes32(`mETH-${TODAY}`)],
+      })) as { posted: boolean };
+      chainReachable = true;
+      chainHasRunToday = c.posted;
+    } catch {
+      chainReachable = false;
+    }
+  } else {
+    const m = readMarker();
+    markerReachable = m.reachable;
+    committedMarkerDate = m.marker.lastRunDate;
+    runCount = m.marker.runCount;
+  }
   const runDecision = decideRun({
     today: TODAY,
-    chainReachable: false,
+    chainReachable,
     markerReachable,
-    chainHasRunToday: false,
-    committedMarkerDate: marker.lastRunDate,
+    chainHasRunToday,
+    committedMarkerDate,
   });
-  console.log(
-    `[v2-streak] dedupe -> ${runDecision} (marker lastRun=${marker.lastRunDate ?? "none"}, runCount=${marker.runCount})`,
-  );
+  console.log(`[v2-streak] dedupe -> ${runDecision}`);
   if (runDecision !== "run") {
-    console.log("[v2-streak] nothing to do today.");
+    console.log(
+      "[v2-streak] already ran today, or source unreachable (fail-closed). Nothing to do.",
+    );
     return;
   }
 
-  const selfTest = isSelfTestRun(marker.runCount);
+  // Self-test cadence (Q8): marker-driven in mock, date-derived in live (every 7th day).
+  const selfTest = live
+    ? Math.floor(Date.parse(TODAY) / 86_400_000) % 7 === 0
+    : isSelfTestRun(runCount);
   if (selfTest)
     console.log("[v2-streak] SELF-TEST run (asserts a wrong value -> expect REJECTED).");
 
-  const live = IS_LIVE ? liveClients() : null;
   if (live) {
-    // Low-balance guard: pause the whole run rather than improvise funding (D13/constitution).
+    // Low-balance guard: pause rather than improvise funding (D13/constitution).
     const attBal = await live.pub.getBalance({ address: live.attestor.address });
     console.log(`[v2-streak] attestor ${live.attestor.address} balance ${attBal.toString()} wei`);
     if (attBal < ATTEST_LOCK * 2n * BigInt(ASSETS.length)) {
-      console.error(
-        "::warning:: attestor balance low; pausing the streak. Top up and re-run. Marker not advanced.",
-      );
+      console.error("::warning:: attestor balance low; pausing the streak. Top up and re-run.");
       process.exit(0);
     }
   }
@@ -283,29 +310,35 @@ async function main(): Promise<void> {
     });
   }
 
-  // Append to the streak surfaces.
-  ensureFile(
-    STREAK_MD,
-    `# Bombe attestation streak\n\nEvery run is listed, including abstains, self-test rejections, and failures. Mock rows are labeled and are never on-chain.\n\n${streakTableHeader()}\n`,
-  );
-  ensureFile(STREAK_JSON, "[]\n");
+  if (live) {
+    // The on-chain attestations ARE the streak (D13); nothing to persist to git.
+    console.log(
+      `[v2-streak] posted ${records.length.toString()} on-chain attestations for ${TODAY}.`,
+    );
+  } else {
+    // Mock: write the local mirror + marker (used by the demo and the dedupe tests).
+    ensureFile(
+      STREAK_MD,
+      `# Bombe attestation streak\n\nEvery run is listed, including abstains, self-test rejections, and failures. Mock rows are labeled and are never on-chain.\n\n${streakTableHeader()}\n`,
+    );
+    ensureFile(STREAK_JSON, "[]\n");
 
-  const mdRows = `${records.map(streakRowMarkdown).join("\n")}\n`;
-  writeFileSync(STREAK_MD, readFileSync(STREAK_MD, "utf-8").replace(/\n*$/, "\n") + mdRows);
+    const mdRows = `${records.map(streakRowMarkdown).join("\n")}\n`;
+    writeFileSync(STREAK_MD, readFileSync(STREAK_MD, "utf-8").replace(/\n*$/, "\n") + mdRows);
 
-  const existing = JSON.parse(readFileSync(STREAK_JSON, "utf-8")) as ReturnType<
-    typeof streakJsonEntry
-  >[];
-  existing.push(...records.map(streakJsonEntry));
-  writeFileSync(STREAK_JSON, `${JSON.stringify(existing, null, 2)}\n`);
+    const existing = JSON.parse(readFileSync(STREAK_JSON, "utf-8")) as ReturnType<
+      typeof streakJsonEntry
+    >[];
+    existing.push(...records.map(streakJsonEntry));
+    writeFileSync(STREAK_JSON, `${JSON.stringify(existing, null, 2)}\n`);
 
-  const next: Marker = { lastRunDate: TODAY, runCount: marker.runCount + 1 };
-  ensureFile(MARKER_FILE, "{}");
-  writeFileSync(MARKER_FILE, `${JSON.stringify(next, null, 2)}\n`);
-
-  console.log(
-    `[v2-streak] wrote ${records.length.toString()} rows; runCount -> ${next.runCount.toString()}.`,
-  );
+    const next: Marker = { lastRunDate: TODAY, runCount: runCount + 1 };
+    ensureFile(MARKER_FILE, "{}");
+    writeFileSync(MARKER_FILE, `${JSON.stringify(next, null, 2)}\n`);
+    console.log(
+      `[v2-streak] wrote ${records.length.toString()} rows; runCount -> ${next.runCount.toString()}.`,
+    );
+  }
   console.log("[v2-streak] === done ===\n");
 }
 
