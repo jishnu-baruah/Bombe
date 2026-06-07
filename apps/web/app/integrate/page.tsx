@@ -227,10 +227,15 @@ export default function IntegratePage() {
               Posting a claim
             </p>
             <p className="text-[16px] text-[rgba(255,255,255,0.72)] leading-[1.56] pretty">
-              Reading and verifying are open to anyone. Posting a claim runs through the operator
-              today, so claims stay funded and well-formed while the network is young. A
-              permissionless submit flow is on the roadmap. The full guide shows the claim fields
-              and the fee either way.
+              Reading and verifying are open to anyone. To get a new attestation you pay the fee
+              from your own wallet at{" "}
+              <Link href="/request" className="text-[#494fdf] hover:text-[#6b70e8]">
+                /request
+              </Link>{" "}
+              and the network posts the claim and attests it for you (the contract only accepts
+              posts from an authorized role, so the protocol key does the posting; your funds are
+              never custodied). Supported claim types are auto-attested; others are queued. A fully
+              permissionless submit path is on the roadmap.
             </p>
           </div>
         </div>

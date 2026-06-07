@@ -31,9 +31,10 @@ describe("Integrate page", () => {
     expect(screen.getByText(/Verify the trace/i)).toBeTruthy();
   });
 
-  it("is honest that posting runs through the operator today", () => {
+  it("is honest about posting: pay, the protocol key posts, funds not custodied", () => {
     render(<IntegratePage />);
-    expect(screen.getByText(/through the operator/i)).toBeTruthy();
+    expect(screen.getByText(/the protocol key does the posting/i)).toBeTruthy();
+    expect(screen.getByText(/never custodied/i)).toBeTruthy();
   });
 
   it("links to the issuers page and the live race", () => {

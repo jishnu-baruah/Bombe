@@ -83,6 +83,16 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Still needed from the operator before the LIVE post path is wired (the UI + payment + verification are buildable without these): (1) a receiving wallet address for the issuer payments; (2) explicit authorization to auto-post with an OPERATOR_ROLE key on confirmed payment, ideally a DEDICATED minimally-funded posting key (not the deployer key) plus a per-issuer rate limit and fail-closed dedupe to prevent abuse; (3) confirm it is acceptable to ship this during the hackathon window despite the v2 "hold new features" guidance, or build it behind a flag / on a branch until after June 15.
 - RESOLVED 2026-06-07: operator authorized ("go ahead"). All three handled: (1) payment address defaults to the deployer 0xe415…7a83; (2) a DEDICATED posting key 0x6A177730A61fD44aB8e54C1e6668ca9CA0f94D20 was generated, granted OPERATOR_ROLE via the deployer, and funded 1 MNT (keypair in the gitignored .posting-key.json; private key only in Vercel env, never echoed); (3) shipped now per the operator's v4-override. POSTING_KEY/ATTESTOR_KEY/PAID_FLOW_LIVE/SITE_URL are set in Vercel prod (via the Vercel REST API; the `vercel env add` stdin pipe had failed silently, leaving empty values, now corrected). The full autonomous flow is live and proven e2e (claim mETH-REQ-c70c98b858, VALID, stranger-verifiable). Dedupe (one attestation per payment tx) + the minimally-funded testnet keys bound abuse; a stricter per-day cap is a follow-up.
 
+## OP-10, make-it-real inputs for the remaining backlog   [open]
+- Date: 2026-06-07
+- Blocks: T-43 (mETH second on-chain leg), T-44 (Tier-2 document verification), T-45 (settlement automation). The source-adapter registry (T-40) is built, so each becomes a small wiring once the input below is provided. Documented honestly in docs/REALITY-AUDIT.md.
+- Need (any one unblocks its workstream):
+  1. mETH second leg (so mETH is genuinely "two computation paths", not one): an **Ethereum L1 archive RPC URL** plus the **mETH/mETHToETH staking contract address** (the exchange rate lives on L1, not Mantle). With these the agent reads the rate at two points in time, computes the annualized yield from scratch, and reconciles it against the DefiLlama leg.
+  2. Tier-2 document verification: a **real document source/URL** (servicer report, statement, audit) to fetch, extract, and cross-check, so a CASHFLOW_MATCH attestation is real, not fixture.
+  3. Settlement automation (live leaderboard + slashing): a **ground-truth source** to settle against (settling against our own attestation is circular); this is an oracle/design decision the operator owns.
+- Half-done state: registry + reconciler + deterministic verdict + real LLM reasoning + trace storage are all live; these three only lack their external input/decision. Multi-attestor "N-run" is intentionally NOT pursued for a deterministic computation (the real redundancy is multiple legs, i.e. item 1).
+- To resolve: provide any of the three above and tell the agent which; it wires the corresponding real workstream.
+
 ## Resolved
 
 ## OP-4, Mantle Sepolia RPC + funded wallets   [done]
