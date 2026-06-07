@@ -10,7 +10,7 @@
  * Tier-1 yield is deterministic, so no AI gateway is needed at this layer.
  */
 
-import { LiveDataSource, computeDecisiveAttestation } from "@bombe/agent-sdk";
+import { LiveDataSource, computeDecisiveAttestation, createLiveModelSeam } from "@bombe/agent-sdk";
 import type { DataAsset } from "@bombe/agent-sdk";
 import { AgentAttestationAbi, type Claim, hashCanonical } from "@bombe/shared";
 import { http, createPublicClient, createWalletClient, encodeFunctionData, parseEther } from "viem";
@@ -61,9 +61,18 @@ export async function fulfillAttestation(params: {
   const postWallet = createWalletClient({ account: posting, chain, transport: http(RPC_URL) });
   const attWallet = createWalletClient({ account: attestor, chain, transport: http(RPC_URL) });
 
-  // 1. Deterministic decisive attestation over live data.
+  // 1. Deterministic verdict over live data, with a real guided-LLM train of
+  //    thought when the AI gateway is configured (the verdict stays deterministic).
   const ds = new LiveDataSource();
   const clock = { now: () => Date.now() };
+  const narrator = process.env.AI_GATEWAY_KEY
+    ? createLiveModelSeam({
+        aiGatewayKey: process.env.AI_GATEWAY_KEY,
+        aiGatewayBaseUrl: process.env.AI_GATEWAY_BASE_URL,
+        aiGatewayModels: process.env.AI_GATEWAY_MODELS,
+      })
+    : undefined;
+  const modelId = (process.env.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() || "default";
   const { observation, decision, trace, sources } = await computeDecisiveAttestation(
     {
       claimId,
@@ -76,6 +85,7 @@ export async function fulfillAttestation(params: {
     ds,
     clock,
     "reflector",
+    narrator ? { narrator, modelId } : undefined,
   );
 
   // 2. Post the claim (posting key, OPERATOR_ROLE).

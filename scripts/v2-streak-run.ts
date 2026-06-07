@@ -26,6 +26,7 @@ import {
   MockDataSource,
   type StreakRecord,
   computeDecisiveAttestation,
+  createLiveModelSeam,
   decideRun,
   isSelfTestRun,
   streakJsonEntry,
@@ -229,6 +230,15 @@ async function main(): Promise<void> {
     }
 
     const claimId = `${asset}-${TODAY}${selfTest ? "-selftest" : ""}`;
+    const aiKey = cfg("AI_GATEWAY_KEY");
+    const narrator = aiKey
+      ? createLiveModelSeam({
+          aiGatewayKey: aiKey,
+          aiGatewayBaseUrl: cfg("AI_GATEWAY_BASE_URL"),
+          aiGatewayModels: cfg("AI_GATEWAY_MODELS"),
+        })
+      : undefined;
+    const modelId = (cfg("AI_GATEWAY_MODELS") ?? "").split(",")[0]?.trim() || "default";
     const { observation, decision, trace, sources } = await computeDecisiveAttestation(
       {
         claimId,
@@ -241,6 +251,7 @@ async function main(): Promise<void> {
       dataSource,
       clock,
       "reflector",
+      narrator ? { narrator, modelId } : undefined,
     );
 
     let txHash = "mock";

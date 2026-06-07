@@ -14,8 +14,16 @@
 
 import type { Source } from "../attest.js";
 import type { Trace } from "../loop.js";
+import type { ModelSeam } from "../seams/types.js";
+import { narrateDecisive } from "./narrate.js";
 import { type DecisionResult, decideTier1 } from "./reconciler.js";
 import type { ClockLike, DataAsset, DataSource, YieldObservation } from "./types.js";
+
+/** Optional real-LLM narration of the reasoning (the verdict stays deterministic). */
+export interface DecisiveOptions {
+  narrator?: ModelSeam;
+  modelId?: string;
+}
 
 /** A Tier-1 yield claim to decide. assertedValueBps is in the same unit the source returns. */
 export interface DecisiveClaimInput {
@@ -83,6 +91,7 @@ export async function computeDecisiveAttestation(
   dataSource: DataSource,
   clock: ClockLike,
   agentId: string,
+  options?: DecisiveOptions,
 ): Promise<DecisiveResult> {
   const observation = await dataSource.getYieldObservation(
     { asset: input.asset, requestedWindowDays: input.requestedWindowDays },
@@ -97,6 +106,30 @@ export async function computeDecisiveAttestation(
     verdictToleranceBps: input.verdictToleranceBps,
   });
 
+  // Real guided-LLM reasoning over the evidence (verdict stays deterministic).
+  // When no narrator is provided (tests), the trace uses a plain factual
+  // description, never a fake reasoning template that pretends to be a model.
+  const narration = options?.narrator
+    ? await narrateDecisive(options.narrator, {
+        asset: input.asset,
+        assertedBps: input.assertedValueBps,
+        observation,
+        decision,
+        modelId: options.modelId ?? "default",
+      })
+    : null;
+
+  const step0Thought =
+    narration && narration.thoughts.length > 0
+      ? narration.thoughts.join(" ")
+      : `Fetch the live yield observation for ${input.asset} over ~${input.requestedWindowDays} days from all bound sources.`;
+  const step1Thought = narration
+    ? "Apply the deterministic reconciler verdict to the cross-checked evidence (reasoning above; rationale below)."
+    : "Cross-check the legs against each other, then judge the reconciled value against the asserted value. The verdict is deterministic.";
+  const rationaleSummary = narration?.rationale ?? rationale(input, observation, decision);
+  const reasons = reasonsFor(decision);
+  if (narration) reasons.push(`LLM_NARRATED(${narration.modelUsed})`);
+
   const trace: Trace = {
     traceVersion: "1.0",
     agentId,
@@ -104,7 +137,7 @@ export async function computeDecisiveAttestation(
     steps: [
       {
         step: 0,
-        thought: `Fetch the live yield observation for ${input.asset} over ~${input.requestedWindowDays} days from all bound sources.`,
+        thought: step0Thought,
         action: {
           tool: "getYieldObservation",
           input: { asset: input.asset, requestedWindowDays: input.requestedWindowDays },
@@ -119,8 +152,7 @@ export async function computeDecisiveAttestation(
       },
       {
         step: 1,
-        thought:
-          "Cross-check the legs against each other, then judge the reconciled value against the asserted value. The verdict is deterministic.",
+        thought: step1Thought,
         action: {
           reconcile: {
             assertedValueBps: input.assertedValueBps,
@@ -141,8 +173,8 @@ export async function computeDecisiveAttestation(
     final: {
       decision: decision.verdict,
       confidenceBps: confidenceFor(decision.verdict),
-      rationaleSummary: rationale(input, observation, decision),
-      reasons: reasonsFor(decision),
+      rationaleSummary,
+      reasons,
     },
   };
 
