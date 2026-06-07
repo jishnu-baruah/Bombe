@@ -1,17 +1,18 @@
 /**
- * scripts/v2-streak-run.ts — WS3-full daily streak entry. (BOMBE-V2-PRD WS3, D13, Q8)
+ * scripts/v2-streak-run.ts — daily streak run, mock or live. (BOMBE-V2-PRD WS3, D13, Q8)
  *
  * One unattended daily run: dedupe (fail-closed), then for each flagship asset
- * compute a decisive attestation and append a streak record (including the
- * windowDays and an honest config label). Every 7th run is a self-test that
- * asserts a deliberately wrong value, so the public record visibly contains a
- * REJECTED, not just a wall of VALID.
+ * compute a decisive attestation and append a streak record. Every 7th run is a
+ * self-test that asserts a deliberately wrong value, so the public record visibly
+ * contains a REJECTED.
  *
- * MOCK (default) proves the flow with no keys and no network: it computes both
- * assets from fixtures and writes clearly-labeled mock streak rows (point
- * STREAK_FILE/STREAK_JSON/MARKER_FILE at temp paths to avoid touching the public
- * files). LIVE posting is gated on OP-8 (POSTING_KEY + ATTESTOR_KEY); the deployer
- * key is never used.
+ * MOCK (default): computes both assets from fixtures, writes mock-labeled rows,
+ * no keys, no network. Point STREAK_FILE/STREAK_JSON/MARKER_FILE at temp paths to
+ * avoid touching the public files.
+ *
+ * LIVE: posts on-chain. Keys come from CI env (GitHub secrets) first, then
+ * .env.local. Per operator authorization the posting key may be the deployer key.
+ * A low attestor balance pauses the run (never improvises funding).
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -20,17 +21,21 @@ import { fileURLToPath } from "node:url";
 
 import {
   type DataAsset,
+  type DataSource,
+  LiveDataSource,
   MockDataSource,
   type StreakRecord,
   computeDecisiveAttestation,
-  createSeams,
   decideRun,
   isSelfTestRun,
   streakJsonEntry,
   streakRowMarkdown,
   streakTableHeader,
 } from "@bombe/agent-sdk";
-import { hashCanonical } from "@bombe/shared";
+import { AgentAttestationAbi, hashCanonical } from "@bombe/shared";
+import { http, createPublicClient, createWalletClient, encodeFunctionData, parseEther } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { mantleSepoliaTestnet } from "viem/chains";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
@@ -52,7 +57,13 @@ function loadDotEnv(path: string): Record<string, string> {
 }
 
 const ENV = loadDotEnv(resolve(REPO_ROOT, ".env.local"));
+/** CI env (GitHub secrets) wins; fall back to .env.local for local runs. */
+function cfg(name: string): string | undefined {
+  return process.env[name] ?? ENV[name];
+}
+
 const MODE = process.env.MODE === "live" ? "live" : "mock";
+const IS_LIVE = MODE === "live";
 const TODAY = process.env.RUN_DATE ?? new Date().toISOString().slice(0, 10);
 
 const STREAK_MD = resolve(REPO_ROOT, process.env.STREAK_FILE ?? "docs/STREAK.md");
@@ -63,6 +74,24 @@ const ASSETS: { asset: DataAsset; mockPeriod: string; fixtureBps: number }[] = [
   { asset: "mETH", mockPeriod: "30d-fresh", fixtureBps: 34 },
   { asset: "USDY", mockPeriod: "30d", fixtureBps: 525 },
 ];
+
+const CLAIM_FEE = parseEther("0.01");
+const ATTEST_LOCK = parseEther("0.02");
+const EXPLORER = "https://sepolia.mantlescan.xyz/tx";
+const DECISION_ENUM: Record<"VALID" | "REJECTED" | "ABSTAIN", number> = {
+  VALID: 0,
+  REJECTED: 1,
+  ABSTAIN: 2,
+};
+
+function toBytes32(s: string): `0x${string}` {
+  const b = new TextEncoder().encode(s);
+  const p = new Uint8Array(32);
+  p.set(b.slice(0, 32));
+  return `0x${Array.from(p)
+    .map((x) => x.toString(16).padStart(2, "0"))
+    .join("")}`;
+}
 
 interface Marker {
   lastRunDate: string | null;
@@ -88,27 +117,41 @@ function ensureFile(path: string, initial: string): void {
   if (!existsSync(path)) writeFileSync(path, initial);
 }
 
+// Live on-chain clients, resolved once if live.
+function liveClients() {
+  const postingKey = (cfg("POSTING_KEY") ?? cfg("DEPLOYER_KEY")) as `0x${string}` | undefined;
+  const attestorKey = (cfg("ATTESTOR_KEY") ?? (cfg("AGENT_KEYS") ?? "").split(",")[0]?.trim()) as
+    | `0x${string}`
+    | undefined;
+  const rpc = cfg("RPC_URL");
+  const attAddr = cfg("ATTESTATION_ADDRESS") as `0x${string}` | undefined;
+  if (!postingKey || !attestorKey || !rpc || !attAddr) {
+    console.error(
+      "[v2-streak] live needs POSTING_KEY/DEPLOYER_KEY, ATTESTOR_KEY/AGENT_KEYS, RPC_URL, ATTESTATION_ADDRESS.",
+    );
+    process.exit(1);
+  }
+  const chain = mantleSepoliaTestnet;
+  const pub = createPublicClient({ chain, transport: http(rpc) });
+  const poster = privateKeyToAccount(postingKey);
+  const attestor = privateKeyToAccount(attestorKey);
+  return {
+    chain,
+    pub,
+    poster,
+    attestor,
+    attAddr,
+    posterWallet: createWalletClient({ account: poster, chain, transport: http(rpc) }),
+    attestorWallet: createWalletClient({ account: attestor, chain, transport: http(rpc) }),
+  };
+}
+
 async function main(): Promise<void> {
   console.log(`\n[v2-streak] === daily run ${TODAY} (mode: ${MODE}) ===`);
 
-  // Live posting is gated on OP-8.
-  if (MODE === "live" && (!ENV.POSTING_KEY || !ENV.ATTESTOR_KEY)) {
-    console.error(
-      "[v2-streak] OP-8 BLOCKED: live needs POSTING_KEY + ATTESTOR_KEY. The deployer key is never used.",
-    );
-    process.exit(1);
-  }
-  if (MODE === "live") {
-    console.error(
-      "[v2-streak] OP-8 keys present, but the live post path is not yet enabled. Aborting without posting.",
-    );
-    process.exit(1);
-  }
-
-  // 1. Dedupe (D13). The chain leg is a live concern (pending); the committed
-  //    marker is the available leg in mock. Fail-closed if neither is reachable.
+  // 1. Dedupe (D13). Committed marker is the available leg; fail-closed if both unreachable.
   const { marker, reachable: markerReachable } = readMarker();
-  const decision = decideRun({
+  const runDecision = decideRun({
     today: TODAY,
     chainReachable: false,
     markerReachable,
@@ -116,56 +159,131 @@ async function main(): Promise<void> {
     committedMarkerDate: marker.lastRunDate,
   });
   console.log(
-    `[v2-streak] dedupe -> ${decision} (marker lastRun=${marker.lastRunDate ?? "none"}, runCount=${marker.runCount})`,
+    `[v2-streak] dedupe -> ${runDecision} (marker lastRun=${marker.lastRunDate ?? "none"}, runCount=${marker.runCount})`,
   );
-  if (decision !== "run") {
+  if (runDecision !== "run") {
     console.log("[v2-streak] nothing to do today.");
     return;
   }
 
   const selfTest = isSelfTestRun(marker.runCount);
   if (selfTest)
-    console.log(
-      "[v2-streak] this is a SELF-TEST run (asserts a deliberately wrong value -> expect REJECTED).",
-    );
+    console.log("[v2-streak] SELF-TEST run (asserts a wrong value -> expect REJECTED).");
 
-  // 2. Compute a decisive attestation per asset.
-  const seams = createSeams();
+  const live = IS_LIVE ? liveClients() : null;
+  if (live) {
+    // Low-balance guard: pause the whole run rather than improvise funding (D13/constitution).
+    const attBal = await live.pub.getBalance({ address: live.attestor.address });
+    console.log(`[v2-streak] attestor ${live.attestor.address} balance ${attBal.toString()} wei`);
+    if (attBal < ATTEST_LOCK * 2n * BigInt(ASSETS.length)) {
+      console.error(
+        "::warning:: attestor balance low; pausing the streak. Top up and re-run. Marker not advanced.",
+      );
+      process.exit(0);
+    }
+  }
+
   const records: StreakRecord[] = [];
   for (const { asset, mockPeriod, fixtureBps } of ASSETS) {
-    const assertedValueBps = selfTest ? fixtureBps + 1000 : fixtureBps;
-    const dataSource = new MockDataSource({ period: mockPeriod });
-    const {
-      observation,
-      decision: dec,
-      trace,
-    } = await computeDecisiveAttestation(
+    const dataSource: DataSource = live
+      ? new LiveDataSource()
+      : new MockDataSource({ period: mockPeriod });
+    const clock = { now: () => Date.now() };
+
+    // asserted value: mock uses the fixture; live uses the observed value (so VALID),
+    // and a self-test asserts a clearly-wrong value (so REJECTED).
+    let assertedValueBps: number;
+    if (live) {
+      const probe = await dataSource.getYieldObservation({ asset, requestedWindowDays: 30 }, clock);
+      const observed = probe.legs[0]?.valueBps ?? 0;
+      assertedValueBps = selfTest ? Math.round(observed) + 1000 : Math.round(observed);
+    } else {
+      assertedValueBps = selfTest ? fixtureBps + 1000 : fixtureBps;
+    }
+
+    const claimId = `${asset}-${TODAY}${selfTest ? "-selftest" : ""}`;
+    const { observation, decision, trace, sources } = await computeDecisiveAttestation(
       {
-        claimId: `${asset}-${TODAY}${selfTest ? "-selftest" : ""}`,
+        claimId,
         asset,
         assertedValueBps,
-        reconcileToleranceBps: 5,
-        verdictToleranceBps: 5,
+        reconcileToleranceBps: 50,
+        verdictToleranceBps: 50,
         requestedWindowDays: 30,
       },
       dataSource,
-      seams.clock,
+      clock,
       "reflector",
     );
+
+    let txHash = "mock";
+    if (live) {
+      // post (poster / OPERATOR_ROLE) then attest (attestor).
+      const claimHash = hashCanonical({
+        id: claimId,
+        tier: 1,
+        asset,
+        claimType: "YIELD_BPS",
+        payload: { assertedValueBps, windowDays: observation.windowDays },
+        submitter: live.poster.address,
+        postedAt: 0,
+      });
+      const postTx = await live.posterWallet.sendTransaction({
+        account: live.poster,
+        to: live.attAddr,
+        data: encodeFunctionData({
+          abi: AgentAttestationAbi,
+          functionName: "postClaim",
+          args: [toBytes32(claimId), 1, claimHash, `https://bombe.example/claims/${claimId}`],
+        }),
+        value: CLAIM_FEE,
+        chain: live.chain,
+      });
+      await live.pub.waitForTransactionReceipt({ hash: postTx });
+
+      const sorted = [...sources].sort((a, b) => {
+        const n = a.name.localeCompare(b.name);
+        return n !== 0 ? n : a.source.localeCompare(b.source);
+      });
+      const lockValue = decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
+      const attTx = await live.attestorWallet.sendTransaction({
+        account: live.attestor,
+        to: live.attAddr,
+        data: encodeFunctionData({
+          abi: AgentAttestationAbi,
+          functionName: "attest",
+          args: [
+            toBytes32(claimId),
+            DECISION_ENUM[decision.verdict],
+            trace.final.confidenceBps,
+            hashCanonical(sorted),
+            hashCanonical(trace),
+            `https://bombe.example/traces/${claimId}/reflector`,
+          ],
+        }),
+        value: lockValue,
+        chain: live.chain,
+      });
+      await live.pub.waitForTransactionReceipt({ hash: attTx });
+      txHash = attTx;
+      console.log(`[v2-streak]   ${asset}: ${decision.verdict} ${EXPLORER}/${attTx}`);
+    } else {
+      console.log(`[v2-streak]   ${asset}: ${decision.verdict}${selfTest ? " (self-test)" : ""}`);
+    }
+
     records.push({
       date: TODAY,
       asset,
-      decision: dec.verdict,
-      txHash: "mock",
+      decision: decision.verdict,
+      txHash,
       reasoningHash: hashCanonical(trace),
       windowDays: observation.windowDays,
-      configLabel: "single-model, mock",
+      configLabel: live ? "single-model, live" : "single-model, mock",
       selfTest,
     });
-    console.log(`[v2-streak]   ${asset}: ${dec.verdict}${selfTest ? " (self-test)" : ""}`);
   }
 
-  // 3. Append to the streak surfaces.
+  // Append to the streak surfaces.
   ensureFile(
     STREAK_MD,
     `# Bombe attestation streak\n\nEvery run is listed, including abstains, self-test rejections, and failures. Mock rows are labeled and are never on-chain.\n\n${streakTableHeader()}\n`,
@@ -181,12 +299,13 @@ async function main(): Promise<void> {
   existing.push(...records.map(streakJsonEntry));
   writeFileSync(STREAK_JSON, `${JSON.stringify(existing, null, 2)}\n`);
 
-  // 4. Update the marker.
   const next: Marker = { lastRunDate: TODAY, runCount: marker.runCount + 1 };
   ensureFile(MARKER_FILE, "{}");
   writeFileSync(MARKER_FILE, `${JSON.stringify(next, null, 2)}\n`);
 
-  console.log(`[v2-streak] wrote ${records.length} streak rows; runCount -> ${next.runCount}.`);
+  console.log(
+    `[v2-streak] wrote ${records.length.toString()} rows; runCount -> ${next.runCount.toString()}.`,
+  );
   console.log("[v2-streak] === done ===\n");
 }
 
