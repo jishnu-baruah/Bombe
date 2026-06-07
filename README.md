@@ -96,7 +96,7 @@ _Generated: 2026-06-07_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 75 | 1 | 4 | 8 | 88 | 85% |
+| 76 | 1 | 4 | 7 | 88 | 86% |
 
 ### Per-Range Breakdown
 
@@ -110,7 +110,7 @@ _Generated: 2026-06-07_
 | T-5xx, Plugboard | 5 | 5 |
 | T-6xx, web app | 7 | 8 |
 | T-7xx, testing | 3 | 4 |
-| T-8xx, live seams + ship | 2 | 7 |
+| T-8xx, live seams + ship | 3 | 7 |
 | T-9xx, stretch | 0 | 3 |
 | T-Jxx, submission gates | 6 | 9 |
 
