@@ -9,10 +9,18 @@ Bombe is an autonomous AI attestor network for real-world-asset yields on Mantle
 ground-truth data, the verdict is deterministic math a verifier can rerun, every decisive call is
 staked and slashable, and the contract forbids attesting anything that cannot be falsified.
 
-## Track nomination
+## Track nomination (multi-track)
 
-- Primary: AI & RWA Track (RWA Infrastructure, AI-powered verification).
-- Also eligible: Grand Champion, Best UI/UX, 20-Project Deployment Award, Community Voting.
+Bombe is built to compete across several tracks; nominate for all of these.
+
+- **AI & RWA Track (primary).** Bombe fits both paths. As *RWA Infrastructure* it is AI-powered verification/pricing-attestation for tokenized yields (mETH, USDY). As an *RWA Application* the self-serve `/request` flow lets a new issuer connect a wallet, pay, and get a verifiable on-chain attestation, lowering the barrier to a real-asset trust primitive. Encouraged direction match: RWA yield attestation / compliance-style checks.
+- **Grand Champion (aspirational, cross-track).** Strong on all four dimensions: technical depth (AI gathers evidence, a deterministic reconciler decides, the trace is hashed on-chain), innovation (falsifiable-only attestation with contract-enforced refusal, proven by an external attestor), Mantle ecosystem contribution (live contracts + a daily on-chain attestation streak), product completeness (live site, public read API, verify-hash, self-serve paid flow).
+- **Alpha & Data Track (secondary, Path A Data & Analytics).** Bombe turns Mantle on-chain data into a verifiable signal: it reads the mETH exchange rate on-chain and cross-checks an aggregator, and every verdict is an on-chain record whose reasoning hash anyone can recompute. The leaderboard + daily streak + `/verify` are a Mantle RWA-yield data surface where the *insight is the verifiability itself*.
+- **Best UI/UX Award.** A polished, accessible frontend: left-aligned premium hero with live on-chain stats, a one-box `/verify` lookup, a `/turing` blind human-vs-AI mode, inline jargon glosses, and a connect-wallet-and-pay flow, all responsive to 380px.
+- **Community Voting.** Auto-eligible; the shareable demo + X thread (docs/X-THREAD.md) frame the "verify, don't trust" thesis for a general audience.
+- **20-Project Deployment Award (criteria-based, no judging, time-critical).** See the checklist at the bottom; Bombe meets every technical bar (contract on Mantle Sepolia, verified on Mantlescan, AI inference written on-chain, public frontend, address in submission, README) with the demo video the only operator action left.
+
+Not nominating the Agentic Economy (Byreal) Track: it requires Byreal Agent Skills / Perps CLI / RealClaw, which Bombe does not use.
 
 ## What it is
 
@@ -28,7 +36,7 @@ replaces faith with a check that anyone can rerun.
   function: reconcile the sources within a documented tolerance, then compare to the asserted
   value. The reconciled inputs and the output are written into the trace, and the trace is hashed
   on-chain, so anyone can recompute the same verdict and the same hash.
-- **Redundancy over the evidence.** Several independent gatherings must agree on the evidence
+- **Redundancy over the evidence.** Several gatherings must agree on the evidence
   before a verdict is issued; a split or a failed gathering abstains. With one model in the gateway
   today this is labeled "single-model triple-run redundancy," not multi-model consensus, until
   three genuinely different models are wired.
@@ -59,6 +67,25 @@ Four contracts are live on Mantle Sepolia (chain id 5003). An attestation is wri
 `attest()`. The leaderboard and slashing contracts settle the economics: a small claim fee in,
 stake at risk on every decisive call, trust scores out.
 
+## "Tell us" answers (Alpha & Data track, Path A Data & Analytics)
+
+**1. Which data sources does the project use?**
+Mantle on-chain data as the core source: the mETH exchange rate is read on-chain and a from-scratch
+annualized yield is computed, cross-checked against an aggregator (DefiLlama `pricePerShare`). The
+deployed AgentAttestation contract's on-chain attestation history is itself a queried data source
+(via the public read API and the leaderboard/streak surfaces).
+
+**2. What role does AI play?**
+Autonomous agents gather and cross-check the evidence and write the human-readable rationale; a
+deterministic reconciler issues the verdict, so the AI is the analyst and explainer, not an opaque
+oracle whose answer you must trust.
+
+**3. How does it generate verifiable value on Mantle?**
+Every verdict is an on-chain record carrying a reasoning hash that anyone can recompute from the
+published trace (`/verify`, `GET /api/v1/verify/{claimId}`), so the "Alpha" here is a *checkable*
+signal rather than a claim to be trusted. The leaderboard, the daily streak (with self-test
+rejections), and the public read API form a live Mantle RWA-yield data surface.
+
 ## Live artifacts
 
 - **Public frontend:** https://bombe-web.vercel.app
@@ -86,7 +113,7 @@ on-chain reasoning hash equal to the locally computed hash:
 
 | Field | Value |
 |-------|-------|
-| Claim | mETH 30-day annualized yield, observed 197.32 bps, asserted 197 bps |
+| Claim | mETH annualized yield (windowDays shown in the trace), observed 197.32 bps, asserted 197 bps |
 | Decision | VALID (deterministic reconciler), confidence 10000 bps, 0.02 MNT staked |
 | postClaim tx | `0x3cfcc3848be5d9bcdaef46503f40eccf8ed1925b2211c61c9b91a4e0ddce9885` |
 | attest tx | `0xaf3191ddf53496b9196700f01221fe0b5d5d883f21af792ba5e179594984b8da` |
@@ -102,8 +129,16 @@ An earlier attestation (v1) also proves the AI-to-on-chain path, kept here as hi
 attest tx `0xa20c3362062ffdfbd20179c3229ba08339f577e421b710bf60076ae63d7ada4d`, reasoningHash
 `0x156a5ff50cb214ea37b8feca78326b3c4f8499ee4ed82b70a64d12391d2fc4b4`, hash match confirmed.
 
-The daily public streak (both assets, with self-test rejections) begins once the daily workflow's
-GitHub secrets are set; the same pipeline that produced the headline above runs it.
+The daily public streak runs unattended (both assets, with self-test rejections); the on-chain
+attestation history is the streak.
+
+**Stranger-verifiable trace (live).** Reasoning traces are now stored durably on Neon (no blob store
+needed) via a self-authenticating endpoint that accepts a trace only if its hash matches the
+on-chain reasoningHash, and `/verify` recomputes the hash from the stored trace. A live example
+anyone can check: claim `mETH-V2-1780848175` (VALID) at
+https://bombe-web.vercel.app/verify?q=mETH-V2-1780848175 . The recomputed hash equals the on-chain
+reasoningHash `0x40f64291685fd5102c0b862b50b33c880eacabee01e44268e90307a03ec828c9`. Every new
+attestation, including the daily streak, is verifiable this way.
 
 ## How it works (architecture brief)
 
@@ -115,7 +150,10 @@ GitHub secrets are set; the same pipeline that produced the headline above runs 
   deterministic reconciler that issues the verdict, an evidence-consensus layer, and the attestation
   builder that hashes the trace and writes it on-chain. Seams keep every test deterministic.
 - **Web app (Next.js):** a live race view, a leaderboard, a per-claim trace viewer with a verify
-  button, an operator console, and the issuer and integration pages.
+  button, a public `/verify` lookup (paste a claim ID, reasoning hash, or tx), a self-serve
+  `/request` paid flow (connect your own wallet, pay non-custodially), a `/turing` blind
+  human-vs-AI mode, an operator console, the issuer/integration pages, and a keyless public read
+  API (`/api/v1/*`). Reads are Redis-cached; paid requests and traces persist on Neon.
 
 ## Differentiator in one screen
 
@@ -136,8 +174,23 @@ Done:
 - Open-source repo, integration guide, benchmarks, and an honest readiness assessment.
 
 Operator to complete before submit:
-- To start the unattended daily streak: add the posting and attestor keys as GitHub repo secrets and
-  enable the live path in the streak runner (the headline attestation above is already captured).
 - Record the demo video (see docs/DEMO-SCRIPT.md) and post the X thread (see docs/X-THREAD.md).
 - Confirm the deadline and timezone, then submit the BUIDL on DoraHacks with the pitch, answers, and
-  addresses above.
+  addresses above, nominating the tracks listed at the top.
+
+## 20-Project Deployment Award checklist
+
+First-come, criteria-based, no judge scoring. Status:
+
+- [x] Smart contract deployed on Mantle (Sepolia testnet, chain id 5003), four contracts.
+- [x] Contracts verified on Mantle Explorer (Mantlescan).
+- [x] An AI-powered function is callable on-chain: an agent's inference result is written on-chain
+  via `attest()` (e.g. `mETH-V2-1780848175`), with the reasoning hash recomputable off the stored
+  trace.
+- [x] Frontend publicly accessible (not localhost): https://bombe-web.vercel.app
+- [x] Deployment addresses included in this submission (above).
+- [x] Open-source GitHub repo with README (setup, architecture, deployed addresses).
+- [ ] Demo video (>= 2 min) walking the core use case (operator action; script in
+  docs/DEMO-SCRIPT.md).
+
+Every bar is met except the demo video; recording it secures the award.
