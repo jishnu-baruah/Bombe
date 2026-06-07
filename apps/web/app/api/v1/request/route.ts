@@ -9,12 +9,17 @@
  */
 
 import { recordRequest } from "@/lib/db";
+import { fulfillAttestation, paidFlowLive } from "@/lib/fulfill";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
 
+// Posting + attesting are two on-chain txs; give the function room to finish.
+export const maxDuration = 60;
+
 const CORS = { "Access-Control-Allow-Origin": "*" };
 const RPC_URL = process.env.RPC_URL ?? "https://rpc.sepolia.mantle.xyz";
+const SITE_URL = process.env.SITE_URL ?? "https://bombe-web.vercel.app";
 const PAYMENT_ADDRESS = (
   process.env.PAYMENT_ADDRESS ??
   process.env.NEXT_PUBLIC_PAYMENT_ADDRESS ??
@@ -127,10 +132,42 @@ export async function POST(req: Request) {
   }
   usedTxHashes.add(txKey);
 
-  // Payment verified. The deterministic post + attest (T-612 layer 2) runs only
-  // when the operator has configured + enabled the posting key path. Until then,
-  // the verified request is acknowledged for operator fulfilment.
-  const livePostingEnabled = Boolean(process.env.POSTING_KEY) && process.env.PAID_FLOW_LIVE === "1";
+  // Payment verified. If the live post path is enabled, post + attest now and
+  // return the claim; otherwise acknowledge for operator fulfilment.
+  if (paidFlowLive()) {
+    const claimId = `${asset}-REQ-${paymentTxHash.slice(2, 12)}`;
+    try {
+      const result = await fulfillAttestation({
+        claimId,
+        asset: asset as "mETH" | "USDY",
+        assertedBps: assertedBps as number,
+        windowDays: windowDays as number,
+      });
+      return NextResponse.json(
+        {
+          ok: true,
+          fulfilled: true,
+          claimId: result.claimId,
+          decision: result.decision,
+          reasoningHash: result.reasoningHash,
+          verifyUrl: `${SITE_URL}/verify?q=${encodeURIComponent(result.claimId)}`,
+          message: `Attested ${result.decision} on-chain. You can verify it yourself.`,
+        },
+        { headers: CORS },
+      );
+    } catch (e) {
+      return NextResponse.json(
+        {
+          ok: true,
+          fulfilled: false,
+          message:
+            "Payment verified and recorded. Automatic posting hit an error; the operator will fulfil it. Keep your payment transaction hash.",
+          detail: e instanceof Error ? e.message : String(e),
+        },
+        { headers: CORS },
+      );
+    }
+  }
 
   return NextResponse.json(
     {
@@ -142,9 +179,8 @@ export async function POST(req: Request) {
       windowDays,
       payer,
       paymentTxHash,
-      message: livePostingEnabled
-        ? "Payment verified. Your claim is being posted and attested on-chain; track it on the verify page shortly."
-        : "Payment verified on-chain. Your request is recorded; the operator posts supported-type claims and your attestation will appear on the verify page. Keep your payment transaction hash.",
+      message:
+        "Payment verified on-chain. Your request is recorded; the operator posts supported-type claims and your attestation will appear on the verify page. Keep your payment transaction hash.",
     },
     { headers: CORS },
   );

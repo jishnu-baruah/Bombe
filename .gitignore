@@ -41,3 +41,7 @@ pglite-data/
 
 .vercel
 _shots/
+
+# Paid-flow posting key (generated locally; never commit)
+.posting-key.json
+_devserver.log
