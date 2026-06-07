@@ -47,13 +47,6 @@ The file is the board; every status change is a visible commit.
 
 ## Active
 
-### T-611, issuer paid attestation flow, part 1: connect wallet + compose + pay (non-custodial)
-- Status: in-progress 2026-06-07 (build the no-live-key parts; live post path gated on OP-9 inputs)
-- Depends-on: T-610
-- Scope: web + payments
-- Acceptance: a request page where an issuer composes a supported-type claim (mETH/USDY yield: asserted bps + windowDays), connects their own wallet (EIP-1193 / viem, non-custodial), and pays the fee from their wallet via BOTH rails (direct MNT transfer and Mantle x402), shipping whichever lands first as primary and the other as fallback; the page validates falsifiability scope and shows the exact on-chain payload + fee + window before payment; payment target + amounts are env-configured; the live post is NOT triggered until the backend verifies the payment.
-- Notes: non-custodial payment per operator decision (OP-9). Posting is necessarily operator-side because `postClaim` is `onlyRole(OPERATOR_ROLE)` on the deployed contract and the v2 lock forbids changing it before June 15 (D18).
-
 ### T-612, issuer paid attestation flow, part 2: verify payment -> post + attest -> return proof
 - Status: blocked, see OP-9 (receiving address + dedicated posting-key authorization + hackathon-timing OK)
 - Depends-on: T-611
@@ -97,24 +90,17 @@ The file is the board; every status change is a visible commit.
 - Notes: STRETCH; draft ready at `docs/X-THREAD.md`; operator posts.
 
 ### T-901, Telegram bot (/race, /leaderboard, /subscribe)
-- Status: pending
+- Status: blocked, needs a Telegram bot token (operator credential)
 - Depends-on: none
 - Scope: stretch
 - Acceptance: bot exposes `/race`, `/leaderboard`, `/subscribe`. (PRD §11 M7)
 - Notes: STRETCH, never gates acceptance.
 
 ### T-902, Discord bot (threads, channel whitelist)
-- Status: pending
+- Status: blocked, needs a Discord bot token (operator credential)
 - Depends-on: none
 - Scope: stretch
 - Acceptance: bot with threads + channel whitelist. (PRD §11 M7)
-- Notes: STRETCH, never gates acceptance.
-
-### T-903, /turing blind mode
-- Status: pending
-- Depends-on: none
-- Scope: stretch
-- Acceptance: blind human-vs-AI `/turing` mode. (PRD §6.6, §11 M7)
 - Notes: STRETCH, never gates acceptance.
 
 ---
@@ -216,6 +202,9 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 - T-806 done 2026-06-07 — DEMO.md final pass (live path + guided mode + operator click-path + fallback notes)
 - T-807 done 2026-06-07 — ship gate verified (pnpm run ci green; test:demo 18/18, A→D deterministic, hash stable 0xc3cef617…, <60s cold start)
 
+### T-9xx, stretch (M7)
+- T-903 done 2026-06-07 — /turing blind human-vs-AI mode (guess identity from behavior, reveal + score), live
+
 ### T-Jxx, hackathon submission & judging gates
 - T-J01 done 2026-06-06 — live Mantle Sepolia deployment + canonical addresses
 - T-J02 done 2026-06-07 — verify all 4 contracts on Mantle Explorer
@@ -224,6 +213,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 - T-J08 done 2026-06-06 — issuer page + integrate page + integration guide
 - T-J09 done 2026-06-07 — public agent-read API (v1) live + deployed (see below)
 - T-610 done 2026-06-07 — public /verify lookup page (claim ID / reasoning hash / tx -> on-chain proof), live
+- T-611 done 2026-06-07 — self-serve paid flow part 1: /request connect-wallet + compose + pay (non-custodial), live
 
 ---
 

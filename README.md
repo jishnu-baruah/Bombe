@@ -96,7 +96,7 @@ _Generated: 2026-06-07_
 
 | Done | In-Progress | Blocked | Pending | Total | % Done |
 |------|-------------|---------|---------|-------|--------|
-| 81 | 2 | 5 | 3 | 91 | 89% |
+| 83 | 1 | 7 | 0 | 91 | 91% |
 
 ### Per-Range Breakdown
 
@@ -108,10 +108,10 @@ _Generated: 2026-06-07_
 | T-3xx, reference agents | 4 | 4 |
 | T-4xx, runner + indexer + gateway + DB | 6 | 6 |
 | T-5xx, Plugboard | 5 | 5 |
-| T-6xx, web app | 9 | 11 |
+| T-6xx, web app | 10 | 11 |
 | T-7xx, testing | 4 | 4 |
 | T-8xx, live seams + ship | 5 | 7 |
-| T-9xx, stretch | 0 | 3 |
+| T-9xx, stretch | 1 | 3 |
 | T-Jxx, submission gates | 6 | 9 |
 
 ### Test Counts
