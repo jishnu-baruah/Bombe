@@ -226,7 +226,8 @@ async function runLive(): Promise<void> {
   });
   const sourcesHash = hashCanonical(sorted);
   const lockValue = decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
-  const traceURI = `https://bombe.example/traces/${claimId}/reflector`;
+  const SITE = process.env.SITE_URL ?? "https://bombe-web.vercel.app";
+  const traceURI = `${SITE}/api/trace/${claimId}/${attestor.address.toLowerCase()}`;
   console.log(
     `[v2-attest] attesting ${decision.verdict} (${lockValue === 0n ? "0" : "0.02"} MNT)...`,
   );
@@ -284,6 +285,21 @@ async function runLive(): Promise<void> {
   console.log(`  source label:   ${observation.independenceLabel}`);
   console.log("[v2-attest] ========================\n");
   if (!match) throw new Error("reasoningHash MISMATCH");
+
+  // 5. Store the trace so /verify can re-derive the hash. The endpoint is
+  //    self-authenticating: it only stores a trace whose hash matches on-chain.
+  try {
+    const res = await fetch(`${SITE}/api/v1/trace`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ claimId, attestor: attestor.address, trace }),
+    });
+    console.log(`[v2-attest]   trace stored at ${SITE}: ${res.ok ? "ok" : `HTTP ${res.status}`}`);
+  } catch (e) {
+    console.log(
+      `[v2-attest]   trace store failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 }
 
 async function main(): Promise<void> {

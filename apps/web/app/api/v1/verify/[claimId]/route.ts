@@ -1,3 +1,4 @@
+import { getStoredTrace } from "@/lib/db";
 import { readClaim } from "@/lib/public-api";
 import { hashCanonical } from "@bombe/shared";
 import { NextResponse } from "next/server";
@@ -32,18 +33,31 @@ export async function GET(req: Request, { params }: { params: Promise<{ claimId:
       let status: string;
       let recomputed: string | null = null;
       let match = false;
+      let trace: unknown;
+      // 1. Try the on-chain traceURI.
       try {
         const r = await fetch(att.traceURI, { signal: AbortSignal.timeout(8000) });
-        if (!r.ok) {
-          status = `trace_unavailable (HTTP ${r.status})`;
-        } else {
-          const trace = (await r.json()) as unknown;
-          recomputed = hashCanonical(trace);
-          match = recomputed.toLowerCase() === att.reasoningHash.toLowerCase();
-          status = match ? "verified" : "mismatch";
+        if (r.ok) trace = await r.json();
+      } catch {
+        // fall through to the stored trace
+      }
+      // 2. Fall back to the trace stored in Neon (keyed by claim + attestor).
+      if (trace === undefined) {
+        const stored = await getStoredTrace(id, att.attestor);
+        if (stored) {
+          try {
+            trace = JSON.parse(stored);
+          } catch {
+            // ignore a malformed stored trace
+          }
         }
-      } catch (e) {
-        status = `trace_unavailable (${e instanceof Error ? e.message : "fetch failed"})`;
+      }
+      if (trace === undefined) {
+        status = "trace_unavailable";
+      } else {
+        recomputed = hashCanonical(trace);
+        match = recomputed.toLowerCase() === att.reasoningHash.toLowerCase();
+        status = match ? "verified" : "mismatch";
       }
       results.push({
         attestor: att.attestor,

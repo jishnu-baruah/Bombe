@@ -68,3 +68,52 @@ export async function recordRequest(r: AttestationRequest): Promise<boolean> {
     RETURNING id`) as unknown[];
   return rows.length > 0;
 }
+
+// ---------------------------------------------------------------------------
+// Reasoning-trace storage (T-802 on Neon, no blob store needed).
+// A trace is small JSON; storing it as a row is sufficient and lets /verify
+// re-derive the hash. Keyed by (claim_id, attestor).
+// ---------------------------------------------------------------------------
+
+let _tracesInitialized = false;
+
+async function ensureTracesTable(): Promise<void> {
+  if (_tracesInitialized) return;
+  await sql()`
+    CREATE TABLE IF NOT EXISTS traces (
+      claim_id TEXT NOT NULL,
+      attestor TEXT NOT NULL,
+      trace_json TEXT NOT NULL,
+      reasoning_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      PRIMARY KEY (claim_id, attestor)
+    )`;
+  _tracesInitialized = true;
+}
+
+/** Persist a reasoning trace (the JSON string) for a claim+attestor. */
+export async function storeTrace(
+  claimId: string,
+  attestor: string,
+  traceJson: string,
+  reasoningHash: string,
+): Promise<void> {
+  if (!dbEnabled()) return;
+  await ensureTracesTable();
+  await sql()`
+    INSERT INTO traces (claim_id, attestor, trace_json, reasoning_hash)
+    VALUES (${claimId}, ${attestor.toLowerCase()}, ${traceJson}, ${reasoningHash.toLowerCase()})
+    ON CONFLICT (claim_id, attestor) DO UPDATE
+      SET trace_json = EXCLUDED.trace_json, reasoning_hash = EXCLUDED.reasoning_hash`;
+}
+
+/** Fetch a stored trace JSON string for a claim+attestor, or null. */
+export async function getStoredTrace(claimId: string, attestor: string): Promise<string | null> {
+  if (!dbEnabled()) return null;
+  await ensureTracesTable();
+  const rows = (await sql()`
+    SELECT trace_json FROM traces
+    WHERE claim_id = ${claimId} AND attestor = ${attestor.toLowerCase()}
+    LIMIT 1`) as { trace_json: string }[];
+  return rows[0]?.trace_json ?? null;
+}
