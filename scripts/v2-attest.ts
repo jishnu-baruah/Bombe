@@ -11,10 +11,11 @@
  * It reads the mETH fixture, computes a deterministic VALID/REJECTED/ABSTAIN,
  * hashes the trace, submits via the mock wallet, and re-checks the hash.
  *
- * LIVE mode is blocked on OP-8: it needs a POSTING_KEY (OPERATOR_ROLE, for
- * postClaim) and an ATTESTOR_KEY (for attest), set in .env.local. The deployer/
- * admin key must NEVER be used. Until those keys exist, live mode exits with an
- * OP-8 message rather than touching the deployer key or fabricating a result.
+ * LIVE mode posts on-chain. Per explicit operator authorization, it uses the
+ * deployer key to post the claim (it holds OPERATOR_ROLE) and a registered
+ * attestor (AGENT_KEYS[0], Reflector) to attest. The decisive verdict is computed
+ * over real DefiLlama data by the reconciler, then posted and verified on-chain:
+ *     MODE=live ASSET=mETH pnpm v2:attest
  */
 
 import { readFileSync } from "node:fs";
@@ -23,6 +24,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   InMemoryAttestationRepository,
+  LiveDataSource,
   MockDataSource,
   buildAndSubmitAttestation,
   computeDecisiveAttestation,
@@ -30,7 +32,10 @@ import {
 } from "@bombe/agent-sdk";
 import type { DataAsset } from "@bombe/agent-sdk";
 import type { Claim } from "@bombe/shared";
-import { hashCanonical } from "@bombe/shared";
+import { AgentAttestationAbi, hashCanonical } from "@bombe/shared";
+import { http, createPublicClient, createWalletClient, encodeFunctionData, parseEther } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { mantleSepoliaTestnet } from "viem/chains";
 
 // ---------------------------------------------------------------------------
 // .env.local (config boundary for this ops script)
@@ -93,28 +98,201 @@ function buildClaim(claimId: string): Claim {
   };
 }
 
+const CLAIM_FEE = parseEther("0.01");
+const ATTEST_LOCK = parseEther("0.02");
+const EXPLORER = "https://sepolia.mantlescan.xyz/tx";
+const DECISION_ENUM: Record<"VALID" | "REJECTED" | "ABSTAIN", number> = {
+  VALID: 0,
+  REJECTED: 1,
+  ABSTAIN: 2,
+};
+
+function toBytes32(s: string): `0x${string}` {
+  const bytes = new TextEncoder().encode(s);
+  const p = new Uint8Array(32);
+  p.set(bytes.slice(0, 32));
+  return `0x${Array.from(p)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+/**
+ * Live on-chain capture. User-authorized key model: the deployer key posts the
+ * claim (it holds OPERATOR_ROLE) and a registered attestor (AGENT_KEYS[0],
+ * Reflector) submits attest(); the deployer is not a bonded attestor.
+ */
+async function runLive(): Promise<void> {
+  const deployerKey = ENV.DEPLOYER_KEY as `0x${string}` | undefined;
+  const attestorKey = (ENV.AGENT_KEYS ?? "").split(",")[0]?.trim() as `0x${string}` | undefined;
+  const rpc = ENV.RPC_URL;
+  const attAddr = ENV.ATTESTATION_ADDRESS as `0x${string}` | undefined;
+  if (!deployerKey || !attestorKey || !rpc || !attAddr) {
+    console.error(
+      "[v2-attest] live needs DEPLOYER_KEY, AGENT_KEYS, RPC_URL, ATTESTATION_ADDRESS in .env.local.",
+    );
+    process.exit(1);
+  }
+
+  const chain = mantleSepoliaTestnet;
+  const pub = createPublicClient({ chain, transport: http(rpc) });
+  const deployer = privateKeyToAccount(deployerKey);
+  const attestor = privateKeyToAccount(attestorKey);
+  const deployerWallet = createWalletClient({ account: deployer, chain, transport: http(rpc) });
+  const attestorWallet = createWalletClient({ account: attestor, chain, transport: http(rpc) });
+
+  console.log(`[v2-attest] asset=${ASSET} poster=${deployer.address} attestor=${attestor.address}`);
+  const [depBal, attBal] = await Promise.all([
+    pub.getBalance({ address: deployer.address }),
+    pub.getBalance({ address: attestor.address }),
+  ]);
+  console.log(
+    `[v2-attest] balances: poster=${depBal.toString()} wei, attestor=${attBal.toString()} wei`,
+  );
+  if (depBal < CLAIM_FEE * 3n) {
+    console.error("[v2-attest] poster underfunded (need > 0.03 MNT).");
+    process.exit(1);
+  }
+  if (attBal < ATTEST_LOCK * 2n) {
+    console.error("[v2-attest] attestor underfunded (need > 0.04 MNT for ATTEST_LOCK + gas).");
+    process.exit(1);
+  }
+
+  // 1. Decisive attestation over LIVE data.
+  const ds = new LiveDataSource();
+  const clock = { now: () => Date.now() };
+  const probe = await ds.getYieldObservation(
+    { asset: ASSET, requestedWindowDays: REQUESTED_WINDOW_DAYS },
+    clock,
+  );
+  const observedBps = probe.legs[0]?.valueBps ?? 0;
+  const assertedValueBps = process.env.ASSERTED_BPS
+    ? Number(process.env.ASSERTED_BPS)
+    : Math.round(observedBps);
+  const claimId = `${ASSET}-V2-${Math.floor(Date.now() / 1000).toString()}`;
+  const { observation, decision, trace, sources } = await computeDecisiveAttestation(
+    {
+      claimId,
+      asset: ASSET,
+      assertedValueBps,
+      reconcileToleranceBps: 50,
+      verdictToleranceBps: 50,
+      requestedWindowDays: REQUESTED_WINDOW_DAYS,
+    },
+    ds,
+    clock,
+    "reflector",
+  );
+  console.log(
+    `[v2-attest] observed=${observedBps.toFixed(2)} asserted=${assertedValueBps} -> ${decision.verdict} (window ${observation.windowDays.toString()}d)`,
+  );
+
+  // 2. Post the claim (deployer / OPERATOR_ROLE).
+  const claimObj: Claim = {
+    id: claimId,
+    tier: 1,
+    asset: ASSET,
+    claimType: "YIELD_BPS",
+    payload: {
+      assertedValueBps,
+      windowDays: observation.windowDays,
+      metric: "annualized_yield_bps",
+    },
+    submitter: deployer.address,
+    postedAt: Math.floor(Date.now() / 1000),
+  };
+  const claimHash = hashCanonical(claimObj);
+  const claimURI = `https://bombe.example/claims/${claimId}`;
+  console.log("[v2-attest] posting claim (0.01 MNT)...");
+  const postTx = await deployerWallet.sendTransaction({
+    account: deployer,
+    to: attAddr,
+    data: encodeFunctionData({
+      abi: AgentAttestationAbi,
+      functionName: "postClaim",
+      args: [toBytes32(claimId), 1, claimHash, claimURI],
+    }),
+    value: CLAIM_FEE,
+    chain,
+  });
+  const postRcpt = await pub.waitForTransactionReceipt({ hash: postTx });
+  if (postRcpt.status !== "success") throw new Error(`postClaim reverted: ${postTx}`);
+  console.log(`[v2-attest]   postClaim: ${EXPLORER}/${postTx}`);
+
+  // 3. Attest (Reflector).
+  const reasoningHash = hashCanonical(trace);
+  const sorted = [...sources].sort((a, b) => {
+    const n = a.name.localeCompare(b.name);
+    return n !== 0 ? n : a.source.localeCompare(b.source);
+  });
+  const sourcesHash = hashCanonical(sorted);
+  const lockValue = decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
+  const traceURI = `https://bombe.example/traces/${claimId}/reflector`;
+  console.log(
+    `[v2-attest] attesting ${decision.verdict} (${lockValue === 0n ? "0" : "0.02"} MNT)...`,
+  );
+  const attTx = await attestorWallet.sendTransaction({
+    account: attestor,
+    to: attAddr,
+    data: encodeFunctionData({
+      abi: AgentAttestationAbi,
+      functionName: "attest",
+      args: [
+        toBytes32(claimId),
+        DECISION_ENUM[decision.verdict],
+        trace.final.confidenceBps,
+        sourcesHash,
+        reasoningHash,
+        traceURI,
+      ],
+    }),
+    value: lockValue,
+    chain,
+  });
+  const attRcpt = await pub.waitForTransactionReceipt({ hash: attTx });
+  if (attRcpt.status !== "success") throw new Error(`attest reverted: ${attTx}`);
+  console.log(`[v2-attest]   attest: ${EXPLORER}/${attTx}`);
+
+  // 4. Verify on-chain reasoningHash (retry for state propagation lag).
+  let onchain: { reasoningHash: `0x${string}`; exists: boolean } = {
+    reasoningHash: "0x",
+    exists: false,
+  };
+  for (let i = 1; i <= 6; i++) {
+    if (i > 1) await new Promise<void>((r) => setTimeout(r, 3_000));
+    onchain = (await pub.readContract({
+      address: attAddr,
+      abi: AgentAttestationAbi,
+      functionName: "getAttestation",
+      args: [toBytes32(claimId), attestor.address],
+    })) as { reasoningHash: `0x${string}`; exists: boolean };
+    if (onchain.exists) break;
+  }
+  const match = onchain.reasoningHash.toLowerCase() === reasoningHash.toLowerCase();
+
+  console.log("\n[v2-attest] ===== LIVE RESULT =====");
+  console.log(`  claimId:        ${claimId}`);
+  console.log(`  decision:       ${decision.verdict}`);
+  console.log(
+    `  observed/asserted: ${observedBps.toFixed(2)} / ${assertedValueBps} bps (window ${observation.windowDays.toString()}d)`,
+  );
+  console.log(`  postClaim tx:   ${EXPLORER}/${postTx}`);
+  console.log(`  attest tx:      ${EXPLORER}/${attTx}`);
+  console.log(`  reasoningHash:  ${reasoningHash}`);
+  console.log(
+    `  on-chain reasoningHash == local hashCanonical(trace): ${match ? "MATCH" : "MISMATCH"}`,
+  );
+  console.log(`  source label:   ${observation.independenceLabel}`);
+  console.log("[v2-attest] ========================\n");
+  if (!match) throw new Error("reasoningHash MISMATCH");
+}
+
 async function main(): Promise<void> {
   console.log("\n[v2-attest] === v2 decisive attestation (Gate 1a) ===");
   console.log(`[v2-attest] mode: ${MODE}`);
 
   if (MODE === "live") {
-    const postingKey = ENV.POSTING_KEY;
-    const attestorKey = ENV.ATTESTOR_KEY;
-    if (!postingKey || !attestorKey) {
-      console.error(
-        "[v2-attest] OP-8 BLOCKED: live mode needs POSTING_KEY (OPERATOR_ROLE) and ATTESTOR_KEY in .env.local.",
-      );
-      console.error(
-        "[v2-attest] The deployer/admin key must NOT be used. Run `MODE=mock pnpm v2:attest` to exercise the pipeline.",
-      );
-      process.exit(1);
-    }
-    // Live posting wiring (postClaim with POSTING_KEY, then attest with ATTESTOR_KEY
-    // via a LiveWalletSeam) is enabled once OP-8 keys are confirmed. Not yet active.
-    console.error(
-      "[v2-attest] OP-8 keys present, but the live post path is not yet enabled in v2-attest. Aborting without posting.",
-    );
-    process.exit(1);
+    await runLive();
+    return;
   }
 
   // Mock path: deterministic, no keys, no network.
