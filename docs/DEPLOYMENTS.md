@@ -67,3 +67,28 @@ Inspect: https://vercel.com/jishnu-baruahs-projects/bombe-web/CmbkzzFTTQDScVoj7a
 - `apps/web/vercel.json` configures install/build commands; project `rootDirectory=apps/web` set via Vercel API
 - Mode: `MODE=live`, reads live Mantle Sepolia contracts + Neon Postgres + Upstash Redis
 - Verified: `curl -sI https://bombe-web.vercel.app` → HTTP 200; `/leaderboard` renders HTML
+
+---
+
+## v2 live real-data attestation, 2026-06-07
+
+The first deterministic attestation over real, live data (DefiLlama mETH yield), produced by the v2
+decisive pipeline (`MODE=live pnpm v2:attest`) and posted on Mantle Sepolia. The verdict is computed
+by the reconciler, not a model; the reasoning hash stored on-chain equals the locally computed
+`hashCanonical(trace)`.
+
+| Field | Value |
+|-------|-------|
+| Claim ID | `mETH-V2-1780794644` (mETH 30-day annualized yield) |
+| Observed / asserted | 197.32 / 197 bps |
+| Decision | VALID, confidence 10000 bps, lockedStake 0.02 MNT |
+| Poster | deployer `0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83` (OPERATOR_ROLE) |
+| Attestor | Reflector `0x3BA08C723D41A98339D43Ffa01174791EaE813Fa` |
+| postClaim tx | `0x3cfcc3848be5d9bcdaef46503f40eccf8ed1925b2211c61c9b91a4e0ddce9885` |
+| attest tx | `0xaf3191ddf53496b9196700f01221fe0b5d5d883f21af792ba5e179594984b8da` |
+| reasoningHash (on-chain == local) | `0x363137413be8dffc715c09c204381f245c8f7355369ed48dda6861b1fc72b78a` |
+| Source | DefiLlama pricePerShare-derived (single leg; on-chain mETHToETH cross-check accrues over the streak) |
+
+Key model used for this capture: the deployer key posts (operator-authorized, it holds
+OPERATOR_ROLE) and Reflector attests. Reflector was topped up 0.1 MNT from the deployer for gas. Tx
+explorer base: https://sepolia.mantlescan.xyz/tx

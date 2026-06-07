@@ -79,20 +79,27 @@ stake at risk on every decisive call, trust scores out.
 
 Explorer address pages follow `https://sepolia.mantlescan.xyz/address/<address>`.
 
-### On-chain proof
+### On-chain proof (v2 real-data headline)
 
-An earlier on-chain attestation already proves "AI inference to on-chain attestation with a matching
-reasoning hash":
+A live, deterministic mETH attestation over real DefiLlama data, on-chain on Mantle Sepolia, with the
+on-chain reasoning hash equal to the locally computed hash:
 
 | Field | Value |
 |-------|-------|
-| attest tx | `0xa20c3362062ffdfbd20179c3229ba08339f577e421b710bf60076ae63d7ada4d` |
-| on-chain reasoningHash | `0x156a5ff50cb214ea37b8feca78326b3c4f8499ee4ed82b70a64d12391d2fc4b4` |
+| Claim | mETH 30-day annualized yield, observed 197.32 bps, asserted 197 bps |
+| Decision | VALID (deterministic reconciler), confidence 10000 bps, 0.02 MNT staked |
+| postClaim tx | `0x3cfcc3848be5d9bcdaef46503f40eccf8ed1925b2211c61c9b91a4e0ddce9885` |
+| attest tx | `0xaf3191ddf53496b9196700f01221fe0b5d5d883f21af792ba5e179594984b8da` |
+| on-chain reasoningHash | `0x363137413be8dffc715c09c204381f245c8f7355369ed48dda6861b1fc72b78a` |
 | locally recomputed hash | matches the on-chain value |
+| Source | DefiLlama pricePerShare-derived; on-chain cross-check accrues as the streak runs |
 
-The v2 real-data headline transaction (a deterministic, cross-checked mETH attestation) is **pending
-the operator key setup**; the full pipeline that produces it runs end-to-end today in mock with a
-matching, recomputable hash, so capturing the live transaction is a key-and-go step.
+An earlier attestation (v1) also proves the AI-to-on-chain path, kept here as historical:
+attest tx `0xa20c3362062ffdfbd20179c3229ba08339f577e421b710bf60076ae63d7ada4d`, reasoningHash
+`0x156a5ff50cb214ea37b8feca78326b3c4f8499ee4ed82b70a64d12391d2fc4b4`, hash match confirmed.
+
+The daily public streak (both assets, with self-test rejections) begins once the daily workflow's
+GitHub secrets are set; the same pipeline that produced the headline above runs it.
 
 ## How it works (architecture brief)
 
