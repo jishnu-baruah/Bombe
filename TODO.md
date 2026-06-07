@@ -82,13 +82,6 @@ The file is the board; every status change is a visible commit.
 - Acceptance: `pnpm deploy:testnet` wraps the Mantle Sepolia (chain 5003) deploy with fail-fast named errors on any missing live var. (PRD §5, §7, §14.9)
 - Notes: the live deploy itself is DONE (see T-J01, 4 contracts live + verified). This task is only the convenience npm wrapper around the forge script, which is still a stub.
 
-### T-805, README
-- Status: pending
-- Depends-on: none
-- Scope: docs
-- Acceptance: 10-line quickstart, architecture diagram, env table, live address block + public read API, Plugboard trust model, "Why not LangGraph/CrewAI/ElizaOS?" rationale; quickstart works as written. (PRD §12, §14.10)
-- Notes: none
-
 ### T-806, DEMO.md + DECISIONS.md final pass
 - Status: pending
 - Depends-on: T-606
@@ -236,6 +229,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 
 ### T-8xx, live seams + ship (M8)
 - T-801 done 2026-06-06 — live ModelSeam (AI gateway, OpenAI-compatible)
+- T-805 done 2026-06-07 — README (architecture, env table, HTTP API, Plugboard trust model, why-not-frameworks)
 
 ### T-Jxx, hackathon submission & judging gates
 - T-J01 done 2026-06-06 — live Mantle Sepolia deployment + canonical addresses
