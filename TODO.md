@@ -75,13 +75,6 @@ The file is the board; every status change is a visible commit.
 - Acceptance: `DATABASE_URL` wiring; compiles. (PRD §6.5)
 - Notes: drizzle schema + live client skeleton ready; pglite used in mock and tests. Needs `DATABASE_URL` (OP-6).
 
-### T-804, pnpm deploy:testnet script
-- Status: pending
-- Depends-on: T-109
-- Scope: ops
-- Acceptance: `pnpm deploy:testnet` wraps the Mantle Sepolia (chain 5003) deploy with fail-fast named errors on any missing live var. (PRD §5, §7, §14.9)
-- Notes: the live deploy itself is DONE (see T-J01, 4 contracts live + verified). This task is only the convenience npm wrapper around the forge script, which is still a stub.
-
 ### T-807, ship gate
 - Status: pending
 - Depends-on: T-608, T-704
@@ -225,6 +218,7 @@ One line per landed task, grouped by area. The full acceptance notes live in the
 
 ### T-8xx, live seams + ship (M8)
 - T-801 done 2026-06-06 — live ModelSeam (AI gateway, OpenAI-compatible)
+- T-804 done 2026-06-07 — deploy:testnet wrapper (fail-fast env validation + redeploy guard honoring the v2 lock)
 - T-805 done 2026-06-07 — README (architecture, env table, HTTP API, Plugboard trust model, why-not-frameworks)
 - T-806 done 2026-06-07 — DEMO.md final pass (live path + guided mode + operator click-path + fallback notes)
 
