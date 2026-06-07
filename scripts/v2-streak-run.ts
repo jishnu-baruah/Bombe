@@ -273,6 +273,8 @@ async function main(): Promise<void> {
         return n !== 0 ? n : a.source.localeCompare(b.source);
       });
       const lockValue = decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
+      const SITE = process.env.SITE_URL ?? "https://bombe-web.vercel.app";
+      const traceURI = `${SITE}/api/trace/${claimId}/${live.attestor.address.toLowerCase()}`;
       const attTx = await live.attestorWallet.sendTransaction({
         account: live.attestor,
         to: live.attAddr,
@@ -285,7 +287,7 @@ async function main(): Promise<void> {
             trace.final.confidenceBps,
             hashCanonical(sorted),
             hashCanonical(trace),
-            `https://bombe.example/traces/${claimId}/reflector`,
+            traceURI,
           ],
         }),
         value: lockValue,
@@ -294,6 +296,19 @@ async function main(): Promise<void> {
       await live.pub.waitForTransactionReceipt({ hash: attTx });
       txHash = attTx;
       console.log(`[v2-streak]   ${asset}: ${decision.verdict} ${EXPLORER}/${attTx}`);
+      // Store the trace so the attestation is stranger-verifiable (self-auth endpoint).
+      try {
+        const tr = await fetch(`${SITE}/api/v1/trace`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ claimId, attestor: live.attestor.address, trace }),
+        });
+        console.log(`[v2-streak]   ${asset}: trace stored ${tr.ok ? "ok" : `HTTP ${tr.status}`}`);
+      } catch (e) {
+        console.log(
+          `[v2-streak]   ${asset}: trace store failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
     } else {
       console.log(`[v2-streak]   ${asset}: ${decision.verdict}${selfTest ? " (self-test)" : ""}`);
     }
