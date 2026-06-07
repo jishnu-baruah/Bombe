@@ -33,7 +33,11 @@ function loadEnv(p: string): Record<string, string> {
       const t = line.trim();
       if (!t || t.startsWith("#")) continue;
       const eq = t.indexOf("=");
-      if (eq > 0) env[t.slice(0, eq).trim()] = t.slice(eq + 1).trim().replace(/^"|"$/g, "");
+      if (eq > 0)
+        env[t.slice(0, eq).trim()] = t
+          .slice(eq + 1)
+          .trim()
+          .replace(/^"|"$/g, "");
     }
     return env;
   } catch {
@@ -54,7 +58,8 @@ const grantAbi = parseAbi([
 ]);
 
 async function main() {
-  if (!DEPLOYER_KEY || !ATTESTATION) throw new Error("DEPLOYER_KEY and ATTESTATION_ADDRESS required");
+  if (!DEPLOYER_KEY || !ATTESTATION)
+    throw new Error("DEPLOYER_KEY and ATTESTATION_ADDRESS required");
   const chain = mantleSepoliaTestnet;
   const pub = createPublicClient({ chain, transport: http(RPC_URL) });
   const deployer = privateKeyToAccount(DEPLOYER_KEY);
@@ -106,7 +111,9 @@ async function main() {
   );
   const bal = await pub.getBalance({ address: posting.address });
   console.log(`[setup] posting key balance: ${bal.toString()} wei`);
-  console.log("[setup] wrote .posting-key.json (gitignored). Add its privateKey to Vercel as POSTING_KEY.");
+  console.log(
+    "[setup] wrote .posting-key.json (gitignored). Add its privateKey to Vercel as POSTING_KEY.",
+  );
 }
 
 main().catch((e) => {
