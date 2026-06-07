@@ -85,6 +85,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, Tier-2 document verification as a pipeline step (D22)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D22, Tier-2 document verification is real, over a real document, as the pipeline `document` step.** `document.ts` fetches a referenced document, pins it by hashing its exact bytes (`docHash`), extracts the target figure with a citation, and runs a deterministic cross-check against the asserted value. Two extraction modes: **json-path** (deterministic field read for structured documents, preferred, no model) and **llm** (a model extracts the figure from prose and returns a verbatim quote; the quote is rejected unless it appears verbatim in the pinned document, so a hallucinated citation cannot pass). The first live document is the **US Treasury "average interest rate" for Treasury Bills** (fiscaldata.treasury.gov, authoritative JSON): a tokenized-treasury asset's asserted yield is cross-checked against the real government bill rate within tolerance. Exposed live at `GET /api/v1/document-check` and MCP `bombe_check_document`, with the docHash, the cited figure, and a provenance DAG (document -> extraction -> cross-check -> verdict). The verdict is the deterministic cross-check; the model only reads. An unreadable document or a missing figure ABSTAINS. | Operator answer 2026-06-08: Tier-2 lives as a pipeline document step; use WebFetch to find a real document and proceed. The US Treasury API is authoritative, machine-fetchable, and independent of both the issuer and the aggregator, so cross-checking a tokenized-treasury yield against it is a genuinely falsifiable Tier-2 claim, not a fixture. json-path extraction is deterministic and reproducible; the llm path keeps the same auditability for prose by grounding every quote in the pinned bytes. This makes the document-falsifiable tier real without a 3rd-party parser, and keeps the honesty rule (the model never decides the verdict). The 3rd-party-parser benchmark (T-49) remains a separate, credential-gated comparison. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

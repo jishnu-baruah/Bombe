@@ -78,8 +78,12 @@ marks partial or mock.
   tests.** The loop is a real LLM ReAct loop (benchmarked against a real model), but the live
   verdict path uses the deterministic `decideTier1` + the live data layer, not this loop. The
   fixture-backed tools are for deterministic tests.
-- **Document verification (Tier-2) is fixture-only.** `read_document` / `cross_check_history`
-  exist over fixtures; no live Tier-2 attestation over a real fetched document yet.
+- **Document verification (Tier-2) is real over a real document, not yet posted on-chain.**
+  `document.ts` fetches + pins (hashes) a real document and cross-checks a figure
+  deterministically, live at `GET /api/v1/document-check` against the US Treasury bill
+  rate (fiscaldata.treasury.gov). It is a real verification surface today; wiring a Tier-2
+  CASHFLOW_MATCH claim through the on-chain paid post path is the remaining step. The
+  older fixture-backed `read_document` tools remain for deterministic tests.
 - **The human attestor is simulated** (seeded latency), used only in the demo.
 - **Mainnet is intentionally not deployed.** `DeployMainnet.s.sol` is compile-only/guard-inert
   (an empty mainnet registry would be signaling theater).
@@ -90,7 +94,9 @@ marks partial or mock.
    discovery + provenance graph (`source-registry.ts`, `discover.ts`, D20).
 2. ~~**mETH on-chain second leg.**~~ DONE: mETH reconciles a DefiLlama leg against the
    Mantle protocol API leg (two computation paths, resilient).
-3. **Tier-2 document verification** over a real document source.
+3. ~~**Tier-2 document verification** over a real document source.~~ DONE: `document.ts`
+   + `/api/v1/document-check` over the live US Treasury bill rate (D22). Remaining: post a
+   Tier-2 claim through the on-chain paid path.
 4. **Settlement automation** so the leaderboard/slashing run live.
 5. **Multi-attestor / N-run** so redundancy is real, or relabel live as single-attestor.
 6. **Live /live** (real event stream) instead of the scripted replay.

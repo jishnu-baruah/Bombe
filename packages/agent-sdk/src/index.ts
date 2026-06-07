@@ -161,6 +161,21 @@ export {
   CATEGORY_GATES,
 } from "./data/pipeline.js";
 export type { Pipeline, GateResult, GateConfig, StepKind } from "./data/pipeline.js";
+export {
+  computeDocumentAttestation,
+  fetchDocumentEvidence,
+  crossCheckDocument,
+  defaultFetchText,
+} from "./data/document.js";
+export type {
+  DocumentRef,
+  DocumentEvidence,
+  DocumentExtraction,
+  DocumentVerdict,
+  DocumentClaimInput,
+  DocumentResult,
+  DocumentDeps,
+} from "./data/document.js";
 export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";
