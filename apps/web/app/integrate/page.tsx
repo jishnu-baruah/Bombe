@@ -166,6 +166,10 @@ export default function IntegratePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
+                t: "bombe_get_schema",
+                b: "What to submit + what is checked per claim type (the standard).",
+              },
+              {
                 t: "bombe_list_assets",
                 b: "The curated, verified RWA yields + the contract.",
               },
@@ -175,6 +179,14 @@ export default function IntegratePage() {
               },
               { t: "bombe_get_claim", b: "Read a claim and its on-chain verdicts." },
               { t: "bombe_verify_claim", b: "Re-derive the reasoning hash and compare to chain." },
+              {
+                t: "bombe_check_nav",
+                b: "Cross-check a vault NAV read straight off the chain (ERC-4626).",
+              },
+              {
+                t: "bombe_check_document",
+                b: "Cross-check a figure against a pinned, hashed document.",
+              },
               {
                 t: "bombe_request_attestation",
                 b: "Pay from your wallet, get an attestation back.",
