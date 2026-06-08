@@ -1,8 +1,10 @@
 "use client";
 
-import { SUPPORTED_NAV_CHAINS } from "@bombe/agent-sdk";
 import { useEffect, useState } from "react";
 import { RequestAttestationForm } from "../request/RequestAttestationForm";
+
+// Fallback if the schema fetch fails; the live set comes from /api/v1/schema.navChains.
+const FALLBACK_NAV_CHAINS = ["Ethereum", "Mantle", "Base", "Arbitrum"];
 
 // The on-platform attestation console. Nothing is hardcoded to a single asset/source:
 // the available modes + their live/planned status come from the live /api/v1/schema, the
@@ -55,8 +57,7 @@ function Verdict({ verdict, detail, extra }: { verdict: string; detail: string; 
   );
 }
 
-function NavCheckForm() {
-  const chains = SUPPORTED_NAV_CHAINS.length ? SUPPORTED_NAV_CHAINS : ["Ethereum"];
+function NavCheckForm({ chains }: { chains: string[] }) {
   const [chain, setChain] = useState(chains[0]);
   const [contract, setContract] = useState("");
   const [assertedNav, setAssertedNav] = useState("");
@@ -283,12 +284,17 @@ function DocCheckForm() {
 export function AttestationConsole() {
   const [mode, setMode] = useState<Mode>("yield");
   const [claims, setClaims] = useState<SchemaClaim[]>([]);
+  const [navChains, setNavChains] = useState<string[]>(FALLBACK_NAV_CHAINS);
 
-  // Drive the tabs' live status + the "more planned" note from the live schema.
+  // Drive the tabs' live status + the NAV chain list + the "more planned" note from the
+  // live schema, so the dashboard reflects what the system actually supports.
   useEffect(() => {
     fetch("/api/v1/schema")
       .then((r) => r.json())
-      .then((j: { claimTypes?: SchemaClaim[] }) => setClaims(j.claimTypes ?? []))
+      .then((j: { claimTypes?: SchemaClaim[]; navChains?: string[] }) => {
+        setClaims(j.claimTypes ?? []);
+        if (Array.isArray(j.navChains) && j.navChains.length) setNavChains(j.navChains);
+      })
       .catch(() => {});
   }, []);
 
@@ -324,7 +330,7 @@ export function AttestationConsole() {
         })}
       </div>
       {mode === "yield" && <RequestAttestationForm />}
-      {mode === "nav" && <NavCheckForm />}
+      {mode === "nav" && <NavCheckForm chains={navChains} />}
       {mode === "document" && <DocCheckForm />}
       {morePlanned.length > 0 && (
         <p className="text-[12px] text-[rgba(255,255,255,0.4)] mt-6">

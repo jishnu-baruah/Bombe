@@ -15,6 +15,7 @@
  */
 
 import { hashCanonical } from "@bombe/shared";
+import { SUPPORTED_NAV_CHAINS } from "./nav.js";
 
 export type CapabilityStatus = "live" | "planned";
 
@@ -232,6 +233,7 @@ export function schemaDocument() {
     claimTypes: CAPABILITY_REGISTRY,
     tolerances: CLASS_TOLERANCES,
     tolerancesHash: hashCanonical(CLASS_TOLERANCES),
+    navChains: SUPPORTED_NAV_CHAINS,
     grades: GRADES,
     abstainReasons: ABSTAIN_REASONS,
     notes: [
