@@ -188,6 +188,7 @@ export {
   computeNavAttestation,
   crossCheckNav,
   defaultReadErc4626,
+  SUPPORTED_NAV_CHAINS,
 } from "./data/nav.js";
 export type { NavRef, NavRead, NavDeps, NavClaimInput, NavVerdict, NavResult } from "./data/nav.js";
 export { createDataSource } from "./data/factory.js";
