@@ -61,6 +61,12 @@ export interface AssetSpec {
   chain?: string;
   /** RWA category (a RwaCategory string), used to auto-select the verification pipeline. */
   category?: string;
+  /**
+   * Maturity / liquidity grade by TVL: "blue-chip" (>=$1B), "established" (>=$100M),
+   * "emerging" (>=$10M), "long-tail" (<$10M). Honest signal of liquidity/data-noise risk,
+   * not a quality endorsement. Lower grades abstain more often via the bounds/freshness gates.
+   */
+  grade?: string;
 }
 
 /** A single source leg: one computation path to the asset's yield. */

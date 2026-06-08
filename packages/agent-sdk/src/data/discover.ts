@@ -30,6 +30,7 @@ export type RwaCategory =
   | "real-estate"
   | "lending"
   | "btc-yield"
+  | "vault"
   | "other";
 
 export const RWA_CATEGORIES: RwaCategory[] = [
@@ -43,6 +44,7 @@ export const RWA_CATEGORIES: RwaCategory[] = [
   "real-estate",
   "lending",
   "btc-yield",
+  "vault",
 ];
 
 /**
@@ -62,7 +64,6 @@ const PROJECT_CATEGORY: Record<string, RwaCategory> = {
   hashnote: "tokenized-treasury",
   "mountain-protocol": "tokenized-treasury",
   sdai: "tokenized-treasury",
-  "sky-lending": "tokenized-treasury",
   usual: "tokenized-treasury",
   spiko: "tokenized-treasury",
   // Private credit / institutional lending
@@ -105,6 +106,14 @@ const PROJECT_CATEGORY: Record<string, RwaCategory> = {
   // BTC yield
   "solv-basis-trading": "btc-yield",
   "solv-protocol": "btc-yield",
+  // Yield vaults / active strategies (ERC-4626 and similar)
+  "morpho-blue": "vault",
+  "yearn-finance": "vault",
+  "yearn-v3": "vault",
+  spark: "vault",
+  "fluid-lending": "vault",
+  gearbox: "vault",
+  "sky-lending": "vault",
 };
 
 const RWA_PROJECTS = new Set(Object.keys(PROJECT_CATEGORY));
@@ -139,6 +148,8 @@ export interface DiscoveredAsset {
   chain: string;
   /** The RWA category this asset belongs to. */
   category: RwaCategory;
+  /** Maturity/liquidity grade by TVL (blue-chip/established/emerging/long-tail). */
+  grade: string;
   apy: number | null;
   tvlUsd: number;
   poolId: string;
@@ -202,13 +213,22 @@ export async function discoverAssets(
       const hay = `${p.symbol} ${p.project}`.toLowerCase();
       if (!hay.includes(query)) continue;
     }
+    const tvl = p.tvlUsd ?? 0;
     out.push({
       symbol: p.symbol,
       project: p.project,
       chain: p.chain ?? "unknown",
       category,
+      grade:
+        tvl >= 1e9
+          ? "blue-chip"
+          : tvl >= 1e8
+            ? "established"
+            : tvl >= 1e7
+              ? "emerging"
+              : "long-tail",
       apy: typeof p.apy === "number" ? p.apy : null,
-      tvlUsd: Math.round(p.tvlUsd ?? 0),
+      tvlUsd: Math.round(tvl),
       poolId: p.pool,
       verified: FEATURED_POOL_IDS.has(p.pool) || p.symbol in FEATURED_BY_SYMBOL,
       descriptor: {

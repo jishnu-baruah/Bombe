@@ -62,6 +62,7 @@ export const CATEGORY_GATES: Record<string, GateConfig> = {
   "real-estate": { maxStalenessDays: 120, minBps: 0, maxBps: 3000 },
   lending: { maxStalenessDays: 5, minBps: 0, maxBps: 5000 },
   "btc-yield": { maxStalenessDays: 10, minBps: 0, maxBps: 5000 },
+  vault: { maxStalenessDays: 7, minBps: 0, maxBps: 5000 },
   other: DEFAULT_GATES,
 };
 

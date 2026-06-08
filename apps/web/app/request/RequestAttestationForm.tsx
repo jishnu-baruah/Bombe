@@ -217,15 +217,19 @@ export function RequestAttestationForm() {
           </label>
           <label className="block">
             <span className="block text-[13px] text-[rgba(255,255,255,0.72)] mb-1.5">
-              Window (days)
+              Data range (window)
             </span>
-            <input
-              inputMode="numeric"
+            <select
               value={windowDays}
               onChange={(e) => setWindowDays(e.target.value)}
-              placeholder="e.g. 30"
-              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] font-mono placeholder:text-[#505a63] focus:outline-none focus:border-[#494fdf]"
-            />
+              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] focus:outline-none focus:border-[#494fdf]"
+            >
+              <option value="7">7 days</option>
+              <option value="30">30 days</option>
+              <option value="90">90 days</option>
+              <option value="180">180 days</option>
+              <option value="365">365 days</option>
+            </select>
           </label>
         </div>
         <p className="text-[12px] text-[#505a63] mt-2">
