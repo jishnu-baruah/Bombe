@@ -44,8 +44,8 @@ export interface FulfillResult {
 
 /**
  * Post + attest a supported-type yield claim on behalf of a paying issuer.
- * Deterministic verdict over YIELD_BPS for any registered DataAsset (mETH, USDY,
- * sUSDe, BUIDL, OUSG today; the asset registry is the single extension point).
+ * Deterministic verdict over YIELD_BPS for any featured asset, or any open AssetSpec
+ * passed in (the asset registry + discovery are the extension points).
  */
 export async function fulfillAttestation(params: {
   claimId: string;

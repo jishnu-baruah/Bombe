@@ -19,6 +19,7 @@ import {
   DefiLlamaError,
   windowedAnnualizedYieldBps,
 } from "./defillama.js";
+import { GENERATED_FEATURED } from "./featured-assets.js";
 import type { AssetSpec, SourceDescriptor, SourceLeg, SourceScheme } from "./types.js";
 
 export type { AssetSpec, SourceDescriptor, SourceKind, SourceScheme } from "./types.js";
@@ -135,104 +136,42 @@ export const SCHEME_FETCHERS: Record<SourceScheme, SchemeFetcher> = {
 };
 
 /**
- * FEATURED — the curated, verified showcase. Mantle-native RWA first. Each is data;
- * the open path accepts any AssetSpec, featured or issuer-specified.
+ * FEATURED — the curated, verified showcase. mETH leads with two computation paths;
+ * the rest are GENERATED_FEATURED, each a real DefiLlama pool vetted for clean data
+ * within its category's plausible band. The open path accepts any AssetSpec beyond
+ * these. Mantle-native RWA sorts first for display.
  */
+const METH_SPEC: AssetSpec = {
+  symbol: "mETH",
+  name: "Mantle Staked ETH",
+  verified: true,
+  chain: "Mantle",
+  category: "liquid-staking",
+  sources: [
+    {
+      scheme: "defillama",
+      ref: "b9f2f00a-ba96-4589-a171-dde979a23d87",
+      kind: "pricePerShare",
+      legName: "defillama-meth",
+      label: "DefiLlama aggregator, pricePerShare-derived",
+    },
+    {
+      scheme: "mantle-meth-api",
+      ref: "https://meth.mantle.xyz/api/stats/apy",
+      kind: "reportedApy",
+      legName: "mantle-meth-api",
+      label: "Mantle protocol API, reported APY (METHtoETH rate)",
+    },
+  ],
+  independenceLabel:
+    "mETH staking yield: one ground truth, two computation paths (DefiLlama aggregator pricePerShare vs Mantle protocol-reported APY). Both derive from the same underlying staking, so they cross-check the computation, not the source.",
+};
+
 export const FEATURED: AssetSpec[] = [
-  {
-    symbol: "mETH",
-    name: "Mantle Staked ETH",
-    verified: true,
-    chain: "Mantle",
-    category: "liquid-staking",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "b9f2f00a-ba96-4589-a171-dde979a23d87",
-        kind: "pricePerShare",
-        legName: "defillama-meth",
-        label: "DefiLlama aggregator, pricePerShare-derived",
-      },
-      {
-        scheme: "mantle-meth-api",
-        ref: "https://meth.mantle.xyz/api/stats/apy",
-        kind: "reportedApy",
-        legName: "mantle-meth-api",
-        label: "Mantle protocol API, reported APY (METHtoETH rate)",
-      },
-    ],
-    independenceLabel:
-      "mETH staking yield: one ground truth, two computation paths (DefiLlama aggregator pricePerShare vs Mantle protocol-reported APY). Both derive from the same underlying staking, so they cross-check the computation, not the source.",
-  },
-  {
-    symbol: "USDY",
-    name: "Ondo US Dollar Yield (tokenized US T-bills, on Mantle)",
-    verified: true,
-    chain: "Mantle",
-    category: "tokenized-treasury",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "b5d7a190-38d2-4fdd-8c14-1fd00c11bce1",
-        kind: "reportedApy",
-        legName: "defillama-usdy",
-      },
-    ],
-    independenceLabel:
-      "Ondo USD Yield (tokenized US T-bills), DefiLlama Mantle pool, issuer-derived reported APY. Single source, full transparency; an on-chain accrual leg is pending (D4a). Does not catch issuer fraud.",
-  },
-  {
-    symbol: "sUSDe",
-    name: "Ethena Staked USDe (synthetic-dollar yield, on Mantle)",
-    verified: true,
-    chain: "Mantle",
-    category: "synthetic-dollar",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "a4e37545-203b-4412-9acd-3e8b1aa4d744",
-        kind: "reportedApy",
-        legName: "defillama-susde-mantle",
-      },
-    ],
-    independenceLabel:
-      "Ethena staked USDe (synthetic-dollar yield) on Mantle, DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
-  },
-  {
-    symbol: "BUIDL",
-    name: "BlackRock USD Institutional Digital Liquidity Fund (tokenized US Treasuries)",
-    verified: true,
-    chain: "Ethereum",
-    category: "tokenized-treasury",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "b663ca59-c7e6-4435-ae4a-28d339ce6a15",
-        kind: "reportedApy",
-        legName: "defillama-buidl",
-      },
-    ],
-    independenceLabel:
-      "BlackRock BUIDL (tokenized US Treasuries). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
-  },
-  {
-    symbol: "OUSG",
-    name: "Ondo Short-Term US Government Bond Fund (tokenized US Treasuries)",
-    verified: true,
-    chain: "Ethereum",
-    category: "tokenized-treasury",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "7436db9b-2872-46c8-81a2-da6baff902b7",
-        kind: "reportedApy",
-        legName: "defillama-ousg",
-      },
-    ],
-    independenceLabel:
-      "Ondo OUSG (tokenized US Treasuries). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
-  },
-];
+  METH_SPEC,
+  // Generated assets minus any that duplicate a hand-authored symbol (mETH).
+  ...GENERATED_FEATURED.filter((s) => s.symbol !== "mETH" && s.symbol !== "METH"),
+].sort((a, b) => Number(b.chain === "Mantle") - Number(a.chain === "Mantle"));
 
 /** Featured specs keyed by symbol. */
 export const FEATURED_BY_SYMBOL: Record<string, AssetSpec> = Object.fromEntries(

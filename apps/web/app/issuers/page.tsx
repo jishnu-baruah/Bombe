@@ -1,9 +1,13 @@
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { FEATURED_SYMBOLS } from "@bombe/agent-sdk";
 import Link from "next/link";
 import { RequestAttestationForm } from "../request/RequestAttestationForm";
 import { RequestAssetForm } from "./RequestAssetForm";
+
+// Round down to a clean floor for honest "N+" copy (never overstate the catalog).
+const SUPPORTED_FLOOR = Math.floor(FEATURED_SYMBOLS.length / 10) * 10;
 
 // RWA categories the network can attest. `live` = a real source exists today (often on
 // Mantle); the rest are requestable the moment a public data source exists. Honest: we
@@ -315,11 +319,13 @@ export default function IssuersPage() {
             What we cover
           </p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
-            Any RWA yield with a real source. Anything else, one request away.
+            {SUPPORTED_FLOOR}+ verified RWA yields. Anything else, one request away.
           </h2>
           <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
-            Coverage is open, not a fixed list. Any yield with a public data source is attestable
-            now (browse the live universe at{" "}
+            The verified catalog spans {SUPPORTED_FLOOR}+ assets across these categories,
+            Mantle-native first, each a real source vetted for clean data. Coverage is open, not a
+            fixed list: any yield with a public data source is attestable now (browse the live
+            universe at{" "}
             <Link href="/integrate" className="text-[#494fdf] hover:text-[#6b70e8]">
               the discovery API
             </Link>

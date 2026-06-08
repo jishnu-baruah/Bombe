@@ -87,7 +87,7 @@ server.tool(
   "bombe_request_attestation",
   "Request a paid attestation of a supported yield claim. Pay the fee from your own wallet first (non-custodial), then pass the payment tx hash. Returns the on-chain claim id and verdict.",
   {
-    asset: z.enum(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG"]),
+    asset: z.string().describe("a featured symbol (see bombe_list_assets) or any discovered asset"),
     assertedBps: z.number().int().positive().describe("the yield you assert, in basis points"),
     windowDays: z.number().int().positive(),
     payer: z.string().describe("the address you paid from"),

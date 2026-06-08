@@ -304,11 +304,9 @@ export async function getClaim(id: string): Promise<Claim | undefined> {
       payload = { uri: onChain.claimURI };
     }
 
-    // Build the Claim, mapping on-chain/URI data to the strict taxonomy types.
-    // Unknown assets/claimTypes are cast — on-chain data may come from future claim types.
-    type AssetEnum = Claim["asset"];
+    // Build the Claim. The asset space is open (any symbol), so the asset is carried
+    // verbatim; only the claimType is constrained to the known set (it drives the tier).
     type ClaimTypeEnum = Claim["claimType"];
-    const KNOWN_ASSETS: AssetEnum[] = ["mETH", "USDY", "sUSDe", "BUIDL", "OUSG", "PC-POOL-1"];
     const KNOWN_CLAIM_TYPES: ClaimTypeEnum[] = [
       "YIELD_BPS",
       "DISTRIBUTION_PAID",
@@ -317,11 +315,8 @@ export async function getClaim(id: string): Promise<Claim | undefined> {
       "FAIR_VALUE",
     ];
 
-    const rawAsset = (payload.asset as string | undefined) ?? "mETH";
+    const asset: Claim["asset"] = (payload.asset as string | undefined)?.trim() || "mETH";
     const rawClaimType = (payload.claimType as string | undefined) ?? "YIELD_BPS";
-    const asset: AssetEnum = KNOWN_ASSETS.includes(rawAsset as AssetEnum)
-      ? (rawAsset as AssetEnum)
-      : "mETH";
     const claimType: ClaimTypeEnum = KNOWN_CLAIM_TYPES.includes(rawClaimType as ClaimTypeEnum)
       ? (rawClaimType as ClaimTypeEnum)
       : "YIELD_BPS";

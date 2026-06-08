@@ -4,7 +4,8 @@ import { z } from "zod";
 // a circular dependency — this file defines SSE wire types independently).
 const TierLiteral = z.union([z.literal(1), z.literal(2), z.literal(3)]);
 
-const AssetEnum = z.enum(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG", "PC-POOL-1"]);
+// Open asset space (any non-empty symbol); see taxonomy.ts.
+const AssetEnum = z.string().min(1);
 
 const ClaimTypeEnum = z.enum([
   "YIELD_BPS",

@@ -10,6 +10,7 @@
 
 import { recordRequest } from "@/lib/db";
 import { fulfillAttestation, paidFlowLive } from "@/lib/fulfill";
+import { FEATURED_SYMBOLS } from "@bombe/agent-sdk";
 import type { AssetSpec, DataAsset } from "@bombe/agent-sdk";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
@@ -28,7 +29,8 @@ const PAYMENT_ADDRESS = (
 ).toLowerCase();
 const PRICE_MNT =
   process.env.ATTEST_PRICE_MNT ?? process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
-const SUPPORTED_ASSETS = new Set(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG"]);
+// The curated/verified featured set is auto-attested; any other asset needs an open spec.
+const SUPPORTED_ASSETS = new Set(FEATURED_SYMBOLS);
 
 // Best-effort in-process dedupe of payment tx hashes (a DB-backed store is the
 // durable version, gated on OP-6).
@@ -90,7 +92,7 @@ export async function POST(req: Request) {
   const openSpec = !isFeatured && validSpec(spec, asset) ? (spec as AssetSpec) : undefined;
   if (!isFeatured && !openSpec) {
     return bad(
-      "Unsupported asset. Featured: mETH, USDY, sUSDe, BUIDL, OUSG. For any other asset, include a valid `spec` (see GET /api/v1/discover).",
+      "Unsupported asset. Use a featured symbol (GET /api/v1/assets) or include a valid `spec` for any other asset (GET /api/v1/discover).",
     );
   }
   if (claimType !== "YIELD_BPS") {
