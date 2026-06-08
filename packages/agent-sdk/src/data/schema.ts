@@ -72,11 +72,11 @@ export const CAPABILITY_REGISTRY: ClaimTypeCapability[] = [
   {
     claimType: "NAV_PER_SHARE",
     tier: 1,
-    status: "planned",
+    status: "live", // current-NAV (single on-chain read) is live; historical/realized-yield is archive-gated
     requires: ["asset.contract(ERC-4626)", "assertion.value", "assertion.windowDays?"],
     checks:
-      "read convertToAssets(1e18) on-chain at the latest block (current NAV); for realized yield, read at two blocks ~windowDays apart and annualize the delta (archive-gated)",
-    returns: "VALID/REJECTED + NAV (+ realized yield)",
+      "read convertToAssets(1e18) on-chain at the latest block (current NAV, live); for realized yield, read at two blocks ~windowDays apart and annualize the delta (archive-gated, planned)",
+    returns: "VALID/REJECTED + on-chain NAV (+ realized yield when archive-enabled)",
     abstainWhen: "contract not readable / not ERC-4626 / no archive RPC for the historical window",
     schemes: ["onchain-rate"],
   },

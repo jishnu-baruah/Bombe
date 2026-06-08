@@ -62,6 +62,22 @@ server.tool(
 );
 
 server.tool(
+  "bombe_check_nav",
+  "NAV_PER_SHARE check: read an ERC-4626 vault's share price directly on-chain (convertToAssets/pricePerShare) and deterministically cross-check an asserted NAV. Independent of any aggregator. Returns the verdict, the on-chain read, and the provenance.",
+  {
+    chain: z.string().describe("e.g. Ethereum, Mantle, Base, Arbitrum"),
+    contract: z.string().describe("the ERC-4626 vault address (0x..)"),
+    assertedNav: z.number().positive().describe("asserted assets per 1.0 share"),
+    tolerancePct: z.number().positive().optional(),
+  },
+  async ({ chain, contract, assertedNav, tolerancePct }) => {
+    const qs = new URLSearchParams({ chain, contract, assertedNav: String(assertedNav) });
+    if (typeof tolerancePct === "number") qs.set("tolerancePct", String(tolerancePct));
+    return text(await getText(`/api/v1/nav-check?${qs.toString()}`));
+  },
+);
+
+server.tool(
   "bombe_check_document",
   "Tier-2 document verification: cross-check an asserted tokenized-treasury yield (bps) against the live, hashed US Treasury bill rate. Returns the verdict, the pinned document hash, the cited figure, and the provenance. Deterministic; re-fetch the document to verify.",
   {
