@@ -90,7 +90,7 @@ Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evide
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-07_
+_Generated: 2026-06-08_
 
 ### Overall
 
@@ -117,11 +117,11 @@ _Generated: 2026-06-07_
 ### Test Counts
 
 - 77 forge tests
-- 724 vitest tests
+- 755 vitest tests
 
 ### Operator Items
 
-6 open, 4 resolved (tracked in OPERATOR_TODO.md).
+8 open, 4 resolved (tracked in OPERATOR_TODO.md).
 <!-- PROGRESS:END -->
 
 Refresh the dashboard with `pnpm progress`.
