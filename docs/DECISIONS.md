@@ -109,6 +109,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, Attestation schema locked + /schema endpoint (D25)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D25, the universal attestation schema is LOCKED (docs/ATTESTATION-SCHEMA.md); only the `/api/v1/schema` endpoint is built now, the handlers are demand-gated and post-2026-07-10.** Seven council locks bind the spec: **D25.1** PRICE requires two sources with different manipulation profiles or ABSTAIN (a single oracle read is an oracle-of-an-oracle, zero value-add); **D25.2** BACKING_RATIO is VALID only against a recognized third-party reserve attestor (issuer/custom-http reserves grade down or abstain); **D25.3** the `claimType -> tier` mapping must move on-chain (`mapping(bytes32=>uint8) claimTypeTier` read by `attest()`), a v4 contract change in the 2026-07-11 batch, and until it ships contract-enforced abstain is claimed ONLY for the hardcoded FAIR_VALUE guard; **D25.4** RULE_ADHERENCE is Tier-2, default ABSTAIN, capped to a tiny DSL; **D25.5** build order: /schema, current-NAV, PRICE dual-source, historical-NAV (archive-gated), BACKING_RATIO, RULE_ADHERENCE; **D25.6** single-oracle stocks/commodities are OUT OF SCOPE by default (no "unlock the universe" metric; only admitted later at a visibly inferior "single-oracle echo" grade for a paying integration); **D25.7** /schema is P0 and publishes the intake shape + capability matrix + per-class tolerances + grade/abstain definitions, with a `tolerancesHash` so bands are tamper-evident. Blocking before any handler ships: D25.1, D25.2, D25.3. Honesty fixes applied: Tier-2 verdicts are "deterministic given evidence; extraction is model-assisted and graded" (not flatly "never a model"); DOCUMENTED_NAV confirmed live (the /api/v1/document-check path, not fixture). | Council final ruling on the proposed schema. The locks all enforce the project's own top invariant (recompute + cross-check, never relay) and the honesty constitution (D10/S7): a single relayed source is not an independent verification, reserve fraud is the failure mode that matters, and "the chain enforces abstain" must be real on-chain, not a convention. Gating the build to post-July-10 + demand keeps effort on proving the layer (one real integration) over breadth. The /schema endpoint is the cheapest high-leverage artifact: it is the ecosystem-standard contract itself, and publishing tamper-evident tolerances closes the operator-widens-a-band attack. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

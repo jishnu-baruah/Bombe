@@ -176,6 +176,14 @@ export type {
   DocumentResult,
   DocumentDeps,
 } from "./data/document.js";
+export {
+  schemaDocument,
+  CAPABILITY_REGISTRY,
+  CLASS_TOLERANCES,
+  GRADES,
+  ABSTAIN_REASONS,
+} from "./data/schema.js";
+export type { ClaimTypeCapability, CapabilityStatus } from "./data/schema.js";
 export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";

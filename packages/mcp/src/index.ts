@@ -55,6 +55,13 @@ server.tool(
 );
 
 server.tool(
+  "bombe_get_schema",
+  "Get the attestation schema: what to submit to get any RWA claim attested, the claim-type capability matrix (what is checked, returned, and when it abstains), the per-class tolerances (with a tamper-evident hash), and the grade / abstain-reason definitions. The ecosystem-standard intake contract.",
+  {},
+  async () => text(await getText("/api/v1/schema")),
+);
+
+server.tool(
   "bombe_check_document",
   "Tier-2 document verification: cross-check an asserted tokenized-treasury yield (bps) against the live, hashed US Treasury bill rate. Returns the verdict, the pinned document hash, the cited figure, and the provenance. Deterministic; re-fetch the document to verify.",
   {
