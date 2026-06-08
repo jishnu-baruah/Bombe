@@ -13,7 +13,7 @@
 
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createWalletClient, custom, parseEther } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
 
@@ -30,15 +30,22 @@ const PAYMENT_ADDRESS =
 const PRICE_MNT = process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
 const MANTLE_SEPOLIA_HEX = "0x138b"; // 5003
 
-// The verified/featured assets (mirrors the source registry). Any other asset is
-// attestable via the open spec path / discovery API.
-const ASSETS = [
+interface AssetOption {
+  id: string;
+  label: string;
+}
+// Fallback if the live list cannot be fetched; the full set comes from /api/v1/assets.
+const FALLBACK_ASSETS: AssetOption[] = [
   { id: "mETH", label: "mETH — Mantle staked ETH (two computation paths)" },
   { id: "USDY", label: "USDY — Ondo tokenized US T-bills (Mantle)" },
-  { id: "sUSDe", label: "sUSDe — Ethena synthetic-dollar yield (Mantle)" },
-  { id: "BUIDL", label: "BUIDL — BlackRock tokenized US Treasuries" },
-  { id: "OUSG", label: "OUSG — Ondo tokenized US Treasuries" },
-] as const;
+];
+
+interface AssetApiEntry {
+  symbol: string;
+  name?: string;
+  chain?: string;
+  category?: string;
+}
 
 type Status =
   | { kind: "idle" }
@@ -51,9 +58,30 @@ type Status =
 
 export function RequestAttestationForm() {
   const [asset, setAsset] = useState<string>("mETH");
+  const [assets, setAssets] = useState<AssetOption[]>(FALLBACK_ASSETS);
   const [assertedBps, setAssertedBps] = useState<string>("");
   const [windowDays, setWindowDays] = useState<string>("30");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+
+  // Populate the asset list from the live featured set so it always matches the registry.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/v1/assets")
+      .then((r) => r.json())
+      .then((j: { assets?: AssetApiEntry[] }) => {
+        if (!alive || !Array.isArray(j.assets) || j.assets.length === 0) return;
+        setAssets(
+          j.assets.map((a) => ({
+            id: a.symbol,
+            label: `${a.symbol} — ${a.name ?? a.symbol}${a.chain ? ` (${a.chain})` : ""}`,
+          })),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const account =
     status.kind === "connected" ||
@@ -166,7 +194,7 @@ export function RequestAttestationForm() {
             onChange={(e) => setAsset(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] focus:outline-none focus:border-[#494fdf]"
           >
-            {ASSETS.map((a) => (
+            {assets.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.label}
               </option>

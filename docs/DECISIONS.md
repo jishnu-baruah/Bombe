@@ -93,6 +93,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, Large vetted featured catalog + fully open asset space (D23)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D23, the featured catalog expands to ~30 vetted real assets and the on-chain asset space becomes fully open.** The featured set is generated (`featured-assets.ts`) from DefiLlama pools across the yield-meaningful RWA categories (tokenized treasuries, private credit, synthetic-dollar, liquid staking, liquid restaking, lending, BTC yield), each vetted live (clean apy in the category's plausible band, fresh chart, TVL >= 2M). ~29 assets, Mantle-native sorted first, mETH leading with two computation paths. Categorization is by ISSUER project (the pool IS the asset's native yield), not by venue, to avoid mislabeling (e.g. a sUSDe-on-Aave pool is synthetic-dollar, not lending); pendle and tokenized-equity LP pools are excluded (their apy is not the asset's yield). The claim taxonomy `asset` is loosened from a fixed enum to `z.string().min(1)`: any non-empty symbol validates, so discovered/issuer assets post and display correctly. The request form and SUPPORTED_ASSETS derive from `FEATURED_SYMBOLS`; the MCP request tool accepts any string. Site copy states "30+ verified yields" (floored, never overstated) and keeps the live on-chain stats honest (they still reflect actual claims, not the catalog). | Operator directive 2026-06-08: keep adding assets, focus trending, cover all platforms incl. Mantle, batch-test, loop the target up from 20. A small curated list is not a product; the value is a large, real, vetted catalog plus the open discovery universe. Generating from vetted DefiLlama pools keeps every entry real (no fabricated pools) and the pipeline gates protect attest-time quality. Opening the taxonomy is the honest end-state of "attest any RWA yield"; safety was never the symbol list, it is the deterministic reconciler + the gates + the on-chain Tier-3 guard. A research subagent compiled the platform/slug coverage; the verified per-product slugs (superstate-ustb, openeden-tbill, hashnote-usyc, maple-rwa, clearpool-tpool, lombard-lbtc, ...) pushed the count from 5 to ~29. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

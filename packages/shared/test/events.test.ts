@@ -39,8 +39,11 @@ describe("ClaimPostedEventSchema", () => {
     }
   });
 
-  it("rejects an invalid asset", () => {
-    expect(ClaimPostedEventSchema.safeParse({ ...valid, asset: "UNKNOWN" }).success).toBe(false);
+  it("rejects an empty asset but accepts any non-empty symbol (open asset space)", () => {
+    expect(ClaimPostedEventSchema.safeParse({ ...valid, asset: "" }).success).toBe(false);
+    expect(ClaimPostedEventSchema.safeParse({ ...valid, asset: "SOME-NEW-RWA" }).success).toBe(
+      true,
+    );
   });
 
   it("rejects missing claimId", () => {

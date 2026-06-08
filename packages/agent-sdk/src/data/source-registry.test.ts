@@ -15,11 +15,19 @@ const deps = {
 };
 
 describe("source registry", () => {
-  it("features Mantle-native RWA first and never says 'independent'", () => {
-    expect(FEATURED_SYMBOLS.slice(0, 2)).toEqual(["mETH", "USDY"]);
+  it("features a large vetted set, Mantle-native first, never says 'independent'", () => {
+    expect(FEATURED_SYMBOLS[0]).toBe("mETH");
+    expect(FEATURED_SYMBOLS).toContain("USDY");
+    expect(FEATURED.length).toBeGreaterThanOrEqual(20);
+    // Mantle-native assets sort to the front: no Mantle asset appears after a non-Mantle one.
+    const firstNonMantle = FEATURED.findIndex((s) => s.chain !== "Mantle");
+    if (firstNonMantle >= 0) {
+      expect(FEATURED.slice(firstNonMantle).some((s) => s.chain === "Mantle")).toBe(false);
+    }
     for (const s of FEATURED) {
       expect(s.independenceLabel).not.toMatch(/\bindependent\b/i);
       expect(s.verified).toBe(true);
+      expect(s.category).toBeTypeOf("string");
     }
   });
 

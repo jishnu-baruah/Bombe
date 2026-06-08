@@ -54,9 +54,10 @@ describe("ClaimSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects an invalid asset", () => {
-    const result = ClaimSchema.safeParse({ ...validClaim, asset: "INVALID_ASSET" });
-    expect(result.success).toBe(false);
+  it("rejects an empty asset but accepts any non-empty symbol (open asset space)", () => {
+    expect(ClaimSchema.safeParse({ ...validClaim, asset: "" }).success).toBe(false);
+    // The asset space is open: a newly discovered RWA symbol validates.
+    expect(ClaimSchema.safeParse({ ...validClaim, asset: "SOME-NEW-RWA" }).success).toBe(true);
   });
 
   it("rejects an invalid claimType", () => {

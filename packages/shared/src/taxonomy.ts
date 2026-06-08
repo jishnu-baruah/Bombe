@@ -12,7 +12,10 @@ export type ClaimTier = 1 | 2 | 3;
 export const ClaimSchema = z.object({
   id: z.string(),
   tier: z.union([z.literal(1), z.literal(2), z.literal(3)]),
-  asset: z.enum(["mETH", "USDY", "sUSDe", "BUIDL", "OUSG", "PC-POOL-1"]),
+  // Open asset space: any non-empty symbol. The network attests any RWA yield with a
+  // real source (the curated/verified set + the discovery universe); safety lives in the
+  // deterministic reconciler + the verification gates, not in a fixed symbol list.
+  asset: z.string().min(1),
   claimType: z.enum([
     "YIELD_BPS", // Tier 1
     "DISTRIBUTION_PAID", // Tier 1

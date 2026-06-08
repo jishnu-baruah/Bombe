@@ -10,11 +10,15 @@ marks partial or mock.
 - **Contracts.** Four contracts deployed + verified on Mantle Sepolia (5003). `postClaim`,
   `attest`, the Tier-3 abstain revert, slashing, and the leaderboard are real Solidity,
   deep-tested + fuzzed.
-- **Open source resolver.** `LiveDataSource` resolves an `AssetSpec` over a pluggable
-  scheme registry (`source-registry.ts`): a new asset within a known scheme (defillama,
-  mantle-meth-api) is pure data; a new kind of source is one new fetcher. The featured
-  set is real and live: mETH, USDY, sUSDe (Ethena on Mantle), BUIDL, OUSG (tokenized US
-  Treasuries). Each leg records its auditable source URL in the trace.
+- **Open source resolver + large vetted catalog.** `LiveDataSource` resolves an
+  `AssetSpec` over a pluggable scheme registry (`source-registry.ts`): a new asset within
+  a known scheme (defillama, mantle-meth-api) is pure data; a new kind of source is one
+  new fetcher. The featured set is ~29 real assets (`featured-assets.ts`), generated from
+  DefiLlama pools across the RWA categories (treasuries, private credit, synthetic-dollar,
+  staking, restaking, lending, BTC yield), each vetted live for clean + fresh data,
+  Mantle-native first, mETH leading with two computation paths. Each leg records its
+  auditable source URL. The on-chain asset space is open (any symbol, D23); the rest of
+  the universe is discoverable.
 - **mETH: two real computation paths.** mETH reconciles a DefiLlama aggregator
   (pricePerShare-derived) leg against the Mantle protocol API (METHtoETH rate +
   reported APY) leg, resilient if one source is down. One ground truth, two
