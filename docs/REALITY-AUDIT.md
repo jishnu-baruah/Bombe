@@ -13,11 +13,12 @@ marks partial or mock.
 - **Open source resolver + large vetted catalog.** `LiveDataSource` resolves an
   `AssetSpec` over a pluggable scheme registry (`source-registry.ts`): a new asset within
   a known scheme (defillama, mantle-meth-api) is pure data; a new kind of source is one
-  new fetcher. The featured set is ~29 real assets (`featured-assets.ts`), generated from
+  new fetcher. The featured set is ~36 real assets (`featured-assets.ts`), generated from
   DefiLlama pools across the RWA categories (treasuries, private credit, synthetic-dollar,
-  staking, restaking, lending, BTC yield), each vetted live for clean + fresh data,
-  Mantle-native first, mETH leading with two computation paths. Each leg records its
-  auditable source URL. The on-chain asset space is open (any symbol, D23); the rest of
+  staking, restaking, lending, BTC yield, and yield vaults), each vetted live for clean +
+  fresh data, Mantle-native first, mETH leading with two computation paths, each carrying a
+  maturity/liquidity grade (blue-chip/established/emerging/long-tail, D24). Each leg records
+  its auditable source URL. The on-chain asset space is open (any symbol, D23); the rest of
   the universe is discoverable.
 - **mETH: two real computation paths.** mETH reconciles a DefiLlama aggregator
   (pricePerShare-derived) leg against the Mantle protocol API (METHtoETH rate +
@@ -35,6 +36,14 @@ marks partial or mock.
   deterministic gates: a freshness gate (stale data abstains) and a bounds/sanity gate
   (an absurd or misparsed yield abstains). Gates can only abstain, never invent a
   verdict; they make every asset safer by default as coverage opens up (D21).
+- **Published schema (`GET /api/v1/schema`).** The ecosystem-standard intake contract: the
+  capability matrix (each claim type's tier, honest live/planned status, checks, returns,
+  abstain conditions), per-class tolerances, grade + abstain-reason definitions, and a
+  `tolerancesHash` that makes the bands tamper-evident (D25.7). MCP `bombe_get_schema`.
+- **On-chain NAV check (`GET /api/v1/nav-check`).** NAV_PER_SHARE (current): reads an
+  ERC-4626 vault's share price straight off the chain (`convertToAssets`/`pricePerShare`)
+  and deterministically cross-checks an asserted NAV. Genuinely independent of any
+  aggregator, the evidence is the chain itself (D25.5 step 2). MCP `bombe_check_nav`.
 - **Deterministic verdict.** `decideTier1` is real arithmetic (reconcile, compare to the
   asserted value). The verdict is never a model's opinion.
 - **Real LLM reasoning.** `narrate.ts` has a real model (gpt-oss:20b via the AI gateway)

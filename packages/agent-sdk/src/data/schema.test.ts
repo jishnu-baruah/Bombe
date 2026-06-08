@@ -13,12 +13,13 @@ describe("attestation schema (D25)", () => {
     );
   });
 
-  it("marks only YIELD_BPS + the document checks as live, the rest planned", () => {
+  it("marks the deterministic on-chain/doc checks live, the blocked ones planned", () => {
     const live = CAPABILITY_REGISTRY.filter((c) => c.status === "live").map((c) => c.claimType);
     expect(live).toContain("YIELD_BPS");
     expect(live).toContain("DOCUMENTED_NAV");
-    // The new check kinds are planned, not claimed live (council ruling).
-    for (const ct of ["PRICE", "BACKING_RATIO", "NAV_PER_SHARE", "RULE_ADHERENCE"]) {
+    expect(live).toContain("NAV_PER_SHARE"); // current-NAV: cleared (no dependency on D25.1/2/3)
+    // The blocked check kinds stay planned until D25.1/D25.2/D25.3 are resolved.
+    for (const ct of ["PRICE", "BACKING_RATIO", "RULE_ADHERENCE"]) {
       expect(CAPABILITY_REGISTRY.find((c) => c.claimType === ct)?.status).toBe("planned");
     }
   });

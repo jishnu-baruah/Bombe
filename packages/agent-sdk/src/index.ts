@@ -184,6 +184,12 @@ export {
   ABSTAIN_REASONS,
 } from "./data/schema.js";
 export type { ClaimTypeCapability, CapabilityStatus } from "./data/schema.js";
+export {
+  computeNavAttestation,
+  crossCheckNav,
+  defaultReadErc4626,
+} from "./data/nav.js";
+export type { NavRef, NavRead, NavDeps, NavClaimInput, NavVerdict, NavResult } from "./data/nav.js";
 export { createDataSource } from "./data/factory.js";
 export { computeDecisiveAttestation } from "./data/decisive-path.js";
 export type { DecisiveClaimInput, DecisiveResult } from "./data/decisive-path.js";
