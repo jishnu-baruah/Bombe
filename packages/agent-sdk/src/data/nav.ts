@@ -43,19 +43,25 @@ const ERC4626_ABI = parseAbi([
   "function decimals() view returns (uint8)",
 ]);
 
-/** Public RPCs for current-block reads (no archive). Extend as needed. */
-const RPCS: Record<string, string> = {
-  ethereum: "https://eth.llamarpc.com",
-  mantle: "https://rpc.mantle.xyz",
-  "mantle sepolia": "https://rpc.sepolia.mantle.xyz",
-  base: "https://mainnet.base.org",
-  arbitrum: "https://arb1.arbitrum.io/rpc",
+/**
+ * Public RPCs per chain (no archive), tried in order. Several public endpoints (e.g.
+ * llamarpc) Cloudflare-challenge serverless IPs; these are chosen to answer plain
+ * eth_call from a serverless function.
+ */
+const RPCS: Record<string, string[]> = {
+  ethereum: [
+    "https://ethereum-rpc.publicnode.com",
+    "https://cloudflare-eth.com",
+    "https://rpc.ankr.com/eth",
+  ],
+  mantle: ["https://rpc.mantle.xyz", "https://mantle-rpc.publicnode.com"],
+  "mantle sepolia": ["https://rpc.sepolia.mantle.xyz"],
+  base: ["https://mainnet.base.org", "https://base-rpc.publicnode.com"],
+  arbitrum: ["https://arb1.arbitrum.io/rpc", "https://arbitrum-one-rpc.publicnode.com"],
 };
 
-/** Default reader over viem: tries convertToAssets(1e18), falls back to pricePerShare(). */
-export async function defaultReadErc4626(chain: string, contract: string): Promise<NavRead> {
-  const rpc = RPCS[chain.toLowerCase()];
-  if (!rpc) throw new Error(`no RPC configured for chain "${chain}"`);
+/** Read the share price from one RPC: convertToAssets(1e18), falling back to pricePerShare(). */
+async function readFromRpc(rpc: string, contract: string): Promise<NavRead> {
   const client = createPublicClient({ transport: http(rpc) });
   const address = contract as `0x${string}`;
   let decimals = 18;
@@ -94,6 +100,21 @@ export async function defaultReadErc4626(chain: string, contract: string): Promi
       raw: out.toString(),
     };
   }
+}
+
+/** Default reader over viem: tries each configured RPC for the chain until one answers. */
+export async function defaultReadErc4626(chain: string, contract: string): Promise<NavRead> {
+  const rpcs = RPCS[chain.toLowerCase()];
+  if (!rpcs || rpcs.length === 0) throw new Error(`no RPC configured for chain "${chain}"`);
+  let lastErr: Error | undefined;
+  for (const rpc of rpcs) {
+    try {
+      return await readFromRpc(rpc, contract);
+    } catch (err) {
+      lastErr = err as Error;
+    }
+  }
+  throw new Error(`all RPCs failed for ${chain}: ${lastErr?.message ?? "unknown"}`);
 }
 
 /** A NAV_PER_SHARE claim to decide. assertedNav is assets per 1.0 share. */
