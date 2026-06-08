@@ -82,11 +82,79 @@ The file is the board; every status change is a visible commit.
 - Acceptance: bot with threads + channel whitelist. (PRD §11 M7)
 - Notes: STRETCH, never gates acceptance.
 
+### T-V20, De-hardcode the verification surfaces
+- Status: in-progress 2026-06-08
+- Depends-on: T-V06
+- Scope: web | agent-sdk
+- Acceptance: no check is locked to a single source. `document-check` accepts any `docUrl`+`jsonPath`/`target` (done); `nav-check` accepts a custom RPC; tolerances stay published + hashed. Prefer config/registry/discovery over literals everywhere. (D25.7)
+- Notes: started with document-check (any document). Next: nav custom RPC, surface dynamic tolerances.
+
+### T-V21, Agentic evidence layer (strong agents within guardrails)
+- Status: pending (design)
+- Depends-on: T-V06
+- Scope: agent-sdk
+- Acceptance: the agent does real work in the EVIDENCE layer with strong tools+guidelines, auto-discovers sources (via discovery), classifies the claim type from a freeform ask, reads ambiguous documents (model extraction with grounded citations), and flags anomalies; it may ABSTAIN on its own judgment. The VERDICT stays the deterministic reconciler so it is falsifiable + slashable (the invariant, D25). Document the agent/deterministic boundary in CONTEXT.md.
+- Notes: "deterministic verdict, agentic evidence." Determinism is for the slashable call only; everything upstream is the agent's to reason about.
+
+### T-V22, PRICE dual-source handler
+- Status: blocked, D25.1 + demand-gated + post-2026-07-10
+- Depends-on: T-V21
+- Scope: agent-sdk | web
+- Acceptance: two sources, different manipulation profiles, reconciled; explicit ABSTAIN reasons. (D25.1)
+- Notes: needs a real DEX-TWAP + oracle leg.
+
+### T-V23, BACKING_RATIO handler (third-party attestor)
+- Status: blocked, D25.2 + demand-gated + post-2026-07-10
+- Depends-on: T-V21
+- Scope: agent-sdk | web
+- Acceptance: VALID only against a recognized third-party reserve attestor; issuer/custom-http reserves grade down or abstain. (D25.2)
+- Notes: needs an attestor allowlist.
+
+### T-V24, RULE_ADHERENCE handler (capped DSL)
+- Status: blocked, D25.4 + demand-gated + post-2026-07-10
+- Depends-on: T-V21
+- Scope: agent-sdk
+- Acceptance: tiny DSL (comparison + action + window); replay on-chain history; default ABSTAIN. (D25.4)
+- Notes: archive-dependent; reorg/MEV-sensitive.
+
+### T-V25, On-chain claimTypeTier mapping (v4 contract)
+- Status: blocked, D25.3, 2026-07-11 contract batch
+- Depends-on: none
+- Scope: contracts
+- Acceptance: governance-set `mapping(bytes32=>uint8) claimTypeTier` read by `attest()` to enforce the judgment-tier abstain guard for ALL claim types, not just the hardcoded FAIR_VALUE. (D25.3)
+- Notes: until this ships, do not claim contract-enforced abstain beyond FAIR_VALUE.
+
+### T-V26, Historical-NAV / realized-yield
+- Status: blocked, needs an L1 archive RPC
+- Depends-on: T-V07
+- Scope: agent-sdk | web
+- Acceptance: read ERC-4626 share price at two blocks ~windowDays apart, annualize the delta. (D25.5)
+- Notes: current-NAV is live; this is the archive-gated follow-up.
+
+### T-V27, rwa-xyz source scheme (broader asset classes)
+- Status: blocked, see OP-12 (rwa.xyz Data API key)
+- Depends-on: T-V01
+- Scope: agent-sdk
+- Acceptance: a `rwa-xyz` scheme unlocks PE/VC, real estate, stocks, commodities, long-tail credit/strategy issuers; only the falsifiable yield/price slice is attested, appraisals ABSTAIN. (OP-12)
+- Notes: rwa.xyz public endpoints 404; needs the paid key.
+
 ---
 
 ## Done (archive)
 
 One line per landed task, grouped by area. The full acceptance notes live in the merge commit for each task ID.
+
+### T-Vxx, v3/v4 attestation platform (D20–D25, all live on bombe-web)
+- T-V01 done 2026-06-08 — open source resolver + pluggable scheme registry + discovery (D20, #98)
+- T-V02 done 2026-06-08 — per-asset verification pipeline + freshness/bounds gates (D21, #99)
+- T-V03 done 2026-06-08 — Tier-2 document verification over a real document (D22, #101)
+- T-V04 done 2026-06-08 — large vetted catalog (~36 assets) + fully open asset space (D23, #102)
+- T-V05 done 2026-06-08 — maturity/liquidity grades + vault category + window selector (D24, #103)
+- T-V06 done 2026-06-08 — attestation schema LOCKED + /api/v1/schema, tamper-evident tolerances (D25, #104)
+- T-V07 done 2026-06-08 — NAV_PER_SHARE current on-chain ERC-4626 check (D25.5 step 2, #105)
+- T-V08 done 2026-06-08 — capabilities on the landing page + multi-mode issuer console (#107)
+- T-V09 done 2026-06-07 — issuer pay UI embedded + non-custodial paid flow + provenance graph (#97, #100, #106)
+- T-V10 done 2026-06-08 — mETH second computation path via the Mantle protocol API (#98)
 
 ### T-0xx, Ops / workflow / CI
 - T-001 done 2026-06-05 — .gitattributes line-ending normalization
