@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FEATURED_SYMBOLS } from "@bombe/agent-sdk";
 import Link from "next/link";
-import { RequestAttestationForm } from "../request/RequestAttestationForm";
+import { AttestationConsole } from "./AttestationConsole";
 import { RequestAssetForm } from "./RequestAssetForm";
 
 // Round down to a clean floor for honest "N+" copy (never overstate the catalog).
@@ -142,17 +142,21 @@ export default function IssuersPage() {
       >
         <div className="max-w-6xl mx-auto">
           <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            Pay and get your attestation
+            Get your attestation
           </p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
-            Do it right here, from your own wallet.
+            Do it right here, on the platform.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[40rem] pretty">
-            Pick an asset, connect your wallet, pay the fee. The network checks it against live
-            data, posts the claim, and signs the on-chain verdict you can verify yourself. We never
-            hold your funds.
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
+            Pick what you want checked. <span className="text-[rgba(255,255,255,0.8)]">Yield</span>{" "}
+            is a paid attestation posted on-chain from your own wallet.{" "}
+            <span className="text-[rgba(255,255,255,0.8)]">Vault NAV</span> reads an ERC-4626 share
+            price straight off the chain, and{" "}
+            <span className="text-[rgba(255,255,255,0.8)]">Document</span> cross-checks a yield
+            against the live, hashed US Treasury rate, both free and live. Each returns a verdict
+            you can verify; judgment claims abstain. We never hold your funds.
           </p>
-          <RequestAttestationForm />
+          <AttestationConsole />
         </div>
       </section>
 

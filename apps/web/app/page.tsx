@@ -2,7 +2,15 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getNetworkStats } from "@/lib/public-api";
+import { CAPABILITY_REGISTRY } from "@bombe/agent-sdk";
 import Link from "next/link";
+
+// Capabilities, sorted live-first; rendered straight from the SDK registry (single
+// source of truth with /api/v1/schema) so the landing page cannot over-claim.
+const CAPS = [...CAPABILITY_REGISTRY].sort(
+  (a, b) => Number(b.status === "live") - Number(a.status === "live"),
+);
+const LIVE_CAPS = CAPABILITY_REGISTRY.filter((c) => c.status === "live").length;
 
 // ── Delta table: Bombe vs alternatives (PRD §6.6) ──────────────────────────
 const DELTA_ROWS = [
@@ -378,6 +386,61 @@ export default async function LandingPage() {
                 <p className="text-[12px] text-[#3a3d40] italic leading-[1.5]">{tier.example}</p>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Capabilities matrix (live from the SDK registry) ───────────────── */}
+      <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
+            What we can attest
+          </p>
+          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+            {LIVE_CAPS} claim types live. The rest, honestly, planned.
+          </h2>
+          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
+            Bring a falsifiable claim and a source we can recompute ourselves; no checkable source,
+            or a judgment claim, means ABSTAIN. The same matrix is published at{" "}
+            <a
+              href="/api/v1/schema"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[#494fdf] hover:text-[#6b70e8] font-mono text-[14px]"
+            >
+              /api/v1/schema
+            </a>{" "}
+            with a tamper-evident tolerances hash.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {CAPS.map((c) => (
+              <div
+                key={c.claimType}
+                className="rounded-[14px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-4"
+              >
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <code className="font-mono text-[13px] text-[#ffffff]">{c.claimType}</code>
+                  <span
+                    className={`text-[10.5px] font-semibold uppercase tracking-[0.5px] px-2 py-0.5 rounded-full border ${
+                      c.status === "live"
+                        ? "text-[#86c95f] border-[rgba(66,134,25,0.4)] bg-[rgba(66,134,25,0.08)]"
+                        : "text-[#c9a227] border-[rgba(176,144,0,0.4)] bg-[rgba(176,144,0,0.07)]"
+                    }`}
+                  >
+                    {c.status}
+                  </span>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.5)] leading-[1.5]">{c.checks}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link
+              href="/issuers"
+              className="text-[14px] text-[#494fdf] hover:text-[#6b70e8] font-semibold"
+            >
+              Get an attestation on the platform →
+            </Link>
           </div>
         </div>
       </section>

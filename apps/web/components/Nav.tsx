@@ -13,7 +13,6 @@ const NAV_LINKS = [
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/turing", label: "Turing" },
   { href: "/verify", label: "Verify" },
-  { href: "/capabilities", label: "Capabilities" },
   { href: "/issuers", label: "Issuers" },
   { href: "/operator", label: "Operator" },
 ] as const;
