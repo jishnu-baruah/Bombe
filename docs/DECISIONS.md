@@ -101,6 +101,14 @@ Per the PRD prime directive (§0) and §15.3, every resolved ambiguity is record
 
 ---
 
+## 2026-06-08, Asset grades, vaults, window selection, rwa.xyz gate (D24)
+
+| Decision | Rationale |
+|----------|-----------|
+| **D24, the catalog gains a maturity/liquidity grade and a vault category, the request flow exposes data-range selection, and rwa.xyz is recorded as a gated data source.** Every `AssetSpec` carries `grade` (blue-chip >=$1B / established >=$100M / emerging >=$10M / long-tail <$10M by TVL), an honest liquidity-risk signal, not a quality endorsement; lower grades abstain more often via the existing gates. The featured catalog grows to ~36 incl. a `vault` category (ERC-4626 / active-strategy vaults: Morpho, Sky, Yearn via DefiLlama), labeled to attest the vault's reported share yield, never a strategy-quality judgment. The request form exposes a 7/30/90/180/365-day window selector (the actual window is still clamped to available history and always displayed). rwa.xyz (PE/VC, real estate, stocks, commodities, the long-tail credit/strategy issuers) is key-gated (OP-12); only the falsifiable yield/price slice would be attested, with appraisals (PE/VC, real estate NAV) abstaining unless a documented NAV exists. | Operator directive 2026-06-08: add more assets even if lesser-known, with proper terminology; support vaults incl. auto-strategy vaults; offer data-range selection; ingest as much as possible incl. rwa.xyz. Grades let the catalog grow honestly instead of pretending uniform quality. Vaults are the cleanest deterministic yield (share price), so they belong; the on-chain ERC-4626 scheme + strategy-vault claim types (NAV/holdings/rule-adherence) are the next batch. The falsifiable line holds: facts attested, judgment abstained, which is what lets Bombe be the ecosystem attestation standard rather than an attest-anything toy. |
+
+---
+
 ## ESCALATIONS
 
 Format for each escalation entry:

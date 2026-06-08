@@ -99,6 +99,13 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Need: periodically read the `asset_requests` Neon table; for each, if a public data source exists (DefiLlama pool, a protocol API), add a featured AssetSpec or confirm it is already discoverable, and tell the requester. Categories without a real source (e.g. real estate, gold on Mantle) stay on request until one exists. Never fabricate a source.
 - To resolve: ongoing operator triage; no credential needed.
 
+## OP-12, rwa.xyz Data API key (broader RWA asset classes)   [open]
+- Date: 2026-06-08
+- Blocks: ingesting the full RWA universe beyond DefiLlama yields, specifically the asset classes DefiLlama does not cover: PE/VC, real estate, stocks, commodities, non-US govt debt, and the long tail of credit / active-strategy issuers (Republic, Spiko, Midas, OpenTrade, Sivo, Saturn, st0x, Reental, STOKR, ...). DefiLlama already covers treasuries, credit, staking, restaking, synthetic-dollar, lending, BTC yield, and vaults, which the catalog now uses.
+- Need: an **rwa.xyz Data API key** (their paid "Data API"; public endpoints 404, access is "Book demo"). With it, a `rwa-xyz` source scheme can fetch yields/NAVs across all asset classes. Honesty note: PE/VC and real-estate "values" are often appraisals (Tier-3 judgment) and must ABSTAIN unless a documented NAV exists (Tier-2 document check); only the falsifiable yield/price slice is attested.
+- Half-done state: the scheme registry + discovery + grade system are built and DefiLlama-sourced; rwa.xyz is the one external data source that needs a credential to unlock the non-yield classes.
+- To resolve: provide the rwa.xyz Data API key (or confirm a free tier + base URL); the agent wires the `rwa-xyz` scheme and expands discovery to its asset classes.
+
 ## Resolved
 
 ## OP-4, Mantle Sepolia RPC + funded wallets   [done]

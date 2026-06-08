@@ -13,16 +13,17 @@ const SUPPORTED_FLOOR = Math.floor(FEATURED_SYMBOLS.length / 10) * 10;
 // Mantle); the rest are requestable the moment a public data source exists. Honest: we
 // do not render a category as live without a real source behind it.
 const COVERAGE = [
-  { name: "Tokenized treasuries", live: true, eg: "Ondo USDY, OUSG, BUIDL" },
+  { name: "Tokenized treasuries", live: true, eg: "Ondo USDY/OUSG, BUIDL, USYC, TBILL, sDAI" },
+  { name: "Liquid staking", live: true, eg: "mETH (two paths), stETH, rETH, cbETH, ETHx" },
+  { name: "Liquid restaking", live: true, eg: "weETH, rsETH, ezETH" },
+  { name: "Private credit / loans", live: true, eg: "Maple, Clearpool" },
   { name: "Synthetic-dollar yield", live: true, eg: "Ethena sUSDe" },
-  { name: "Tokenized equities", live: true, eg: "Fluxion AAPLx, NVDAx, TSLAx" },
-  { name: "Private credit / loans", live: true, eg: "Maple/Syrup, Clearpool" },
+  { name: "Yield vaults / strategies", live: true, eg: "Morpho, Sky, Yearn vaults (share yield)" },
   { name: "Lending yield", live: true, eg: "Aave, Lendle on Mantle" },
-  { name: "Liquid staking", live: true, eg: "mETH (two computation paths)" },
-  { name: "BTC yield", live: true, eg: "Solv basis" },
-  { name: "Liquid restaking", live: false, eg: "cmETH (awaiting a clean APR source)" },
+  { name: "BTC yield", live: true, eg: "Lombard LBTC, Solv" },
+  { name: "Tokenized equities", live: false, eg: "price claim + oracle (on request)" },
   { name: "Tokenized commodities", live: false, eg: "gold (XAUT, PAXG) on request" },
-  { name: "Real estate", live: false, eg: "property tokens on request" },
+  { name: "Real estate / PE-VC", live: false, eg: "documented NAV only; appraisals abstain" },
 ] as const;
 
 // Issuer-facing value page: who pays for attestations, why, and the economics.

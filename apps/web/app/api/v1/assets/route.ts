@@ -14,10 +14,13 @@ export function GET() {
       explorer: "https://sepolia.mantlescan.xyz",
       // The curated, verified showcase. The full attestable universe is open:
       // GET /api/v1/discover enumerates it, and any descriptor can be attested.
+      count: FEATURED.length,
       assets: FEATURED.map((s) => ({
         symbol: s.symbol,
         name: s.name ?? s.symbol,
         chain: s.chain,
+        category: s.category,
+        grade: s.grade,
         metric: "annualized_yield_bps",
         sources: s.sources.map((src) => ({ scheme: src.scheme, kind: src.kind, label: src.label })),
         note: s.independenceLabel,

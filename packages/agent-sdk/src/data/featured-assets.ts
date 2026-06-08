@@ -1,11 +1,11 @@
 /**
- * data/featured-assets.ts — Generated curated RWA asset specs. (D23)
+ * data/featured-assets.ts — Generated curated RWA asset specs. (D23/D24)
  *
  * Each entry is a REAL DefiLlama pool, vetted for clean current data within its
- * category's plausible band (the pipeline bounds gate). Generated from the vetted
- * pool set; mETH (two computation paths) is defined separately in source-registry.ts.
- * Honesty: every label states the source is single + issuer-derived where that is true,
- * and never uses the word "independent". The pipeline gates protect attest-time quality.
+ * category's plausible band (the pipeline bounds gate). `grade` is a maturity/liquidity
+ * signal by TVL (blue-chip/established/emerging/long-tail), not a quality endorsement;
+ * lower grades abstain more often via the gates. Generated; mETH (two computation paths)
+ * is defined separately in source-registry.ts. Labels never use the word "independent".
  */
 
 import type { AssetSpec } from "./types.js";
@@ -17,6 +17,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Mantle",
     category: "lending",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -34,6 +35,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Mantle",
     category: "lending",
+    grade: "long-tail",
     sources: [
       {
         scheme: "defillama",
@@ -51,6 +53,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Mantle",
     category: "tokenized-treasury",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -64,10 +67,11 @@ export const GENERATED_FEATURED: AssetSpec[] = [
   },
   {
     symbol: "LBTC",
-    name: "lombard-lbtc LBTC",
+    name: "Lombard LBTC",
     verified: true,
     chain: "Ethereum",
     category: "btc-yield",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -76,7 +80,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
         legName: "defillama-lbtc",
       },
     ],
-    independenceLabel: "lombard-lbtc LBTC (BTC yield). DefiLlama reported APY. Single source.",
+    independenceLabel: "Lombard LBTC (BTC yield). DefiLlama reported APY. Single source.",
   },
   {
     symbol: "WEETH",
@@ -84,6 +88,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-restaking",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -101,6 +106,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-restaking",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -118,6 +124,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-restaking",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -135,6 +142,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-restaking",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -152,6 +160,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -169,6 +178,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -186,6 +196,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -203,6 +214,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -220,6 +232,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -237,6 +250,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "liquid-staking",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -254,6 +268,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Polygon",
     category: "liquid-staking",
+    grade: "long-tail",
     sources: [
       {
         scheme: "defillama",
@@ -271,6 +286,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "private-credit",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -288,6 +304,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "private-credit",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -305,6 +322,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Flare",
     category: "private-credit",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -322,6 +340,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "synthetic-dollar",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -339,6 +358,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "BSC",
     category: "tokenized-treasury",
+    grade: "blue-chip",
     sources: [
       {
         scheme: "defillama",
@@ -356,6 +376,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "Ethereum",
     category: "tokenized-treasury",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -373,6 +394,7 @@ export const GENERATED_FEATURED: AssetSpec[] = [
     verified: true,
     chain: "XRPL",
     category: "tokenized-treasury",
+    grade: "established",
     sources: [
       {
         scheme: "defillama",
@@ -385,28 +407,12 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       "Ondo OUSG (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
   },
   {
-    symbol: "SDAI",
-    name: "Maker sDAI SDAI",
-    verified: true,
-    chain: "Gnosis",
-    category: "tokenized-treasury",
-    sources: [
-      {
-        scheme: "defillama",
-        ref: "13392973-be6e-4b2f-bce9-4f7dd53d1c3a",
-        kind: "reportedApy",
-        legName: "defillama-sdai",
-      },
-    ],
-    independenceLabel:
-      "Maker sDAI SDAI (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
-  },
-  {
     symbol: "TBL",
-    name: "openeden-tbill TBL",
+    name: "OpenEden TBL",
     verified: true,
     chain: "XRPL",
     category: "tokenized-treasury",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -416,14 +422,15 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       },
     ],
     independenceLabel:
-      "openeden-tbill TBL (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+      "OpenEden TBL (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
   },
   {
     symbol: "USDO",
-    name: "openeden-usdo USDO",
+    name: "OpenEden USDO",
     verified: true,
     chain: "Ethereum",
     category: "tokenized-treasury",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -433,14 +440,15 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       },
     ],
     independenceLabel:
-      "openeden-usdo USDO (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+      "OpenEden USDO (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
   },
   {
     symbol: "TBILL",
-    name: "openeden-tbill TBILL",
+    name: "OpenEden TBILL",
     verified: true,
     chain: "Ethereum",
     category: "tokenized-treasury",
+    grade: "emerging",
     sources: [
       {
         scheme: "defillama",
@@ -450,14 +458,15 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       },
     ],
     independenceLabel:
-      "openeden-tbill TBILL (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+      "OpenEden TBILL (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
   },
   {
     symbol: "STBT",
-    name: "matrixdock-stbt STBT",
+    name: "Matrixdock STBT",
     verified: true,
     chain: "Ethereum",
     category: "tokenized-treasury",
+    grade: "long-tail",
     sources: [
       {
         scheme: "defillama",
@@ -467,14 +476,15 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       },
     ],
     independenceLabel:
-      "matrixdock-stbt STBT (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+      "Matrixdock STBT (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
   },
   {
     symbol: "CUSDO",
-    name: "openeden-usdo CUSDO",
+    name: "OpenEden CUSDO",
     verified: true,
     chain: "Solana",
     category: "tokenized-treasury",
+    grade: "long-tail",
     sources: [
       {
         scheme: "defillama",
@@ -484,6 +494,150 @@ export const GENERATED_FEATURED: AssetSpec[] = [
       },
     ],
     independenceLabel:
-      "openeden-usdo CUSDO (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+      "OpenEden CUSDO (tokenized US Treasuries / money-market). DefiLlama reported APY, issuer-derived. Single source, full transparency; does not catch issuer fraud.",
+  },
+  {
+    symbol: "SUSDS",
+    name: "Sky SUSDS",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "blue-chip",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "d8c4eff5-c8a9-46fc-a888-057c4c668e72",
+        kind: "reportedApy",
+        legName: "defillama-susds",
+      },
+    ],
+    independenceLabel:
+      "Sky SUSDS (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "GTUSDCP",
+    name: "Morpho GTUSDCP",
+    verified: true,
+    chain: "Base",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "e0672197-9f3e-4414-bca5-e6b4c90aa469",
+        kind: "reportedApy",
+        legName: "defillama-gtusdcp",
+      },
+    ],
+    independenceLabel:
+      "Morpho GTUSDCP (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "STEAKUSDC",
+    name: "Morpho STEAKUSDC",
+    verified: true,
+    chain: "Base",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "7820bd3c-461a-4811-9f0b-1d39c1503c3f",
+        kind: "reportedApy",
+        legName: "defillama-steakusdc",
+      },
+    ],
+    independenceLabel:
+      "Morpho STEAKUSDC (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "SENPYUSD",
+    name: "Morpho SENPYUSD",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "c032b20d-49bb-4f95-8c8c-ae6333728a6e",
+        kind: "reportedApy",
+        legName: "defillama-senpyusd",
+      },
+    ],
+    independenceLabel:
+      "Morpho SENPYUSD (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "SENPYUSDMAIN",
+    name: "Morpho SENPYUSDMAIN",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "699f25fe-09f4-4f82-8f58-baa5b0af8fa4",
+        kind: "reportedApy",
+        legName: "defillama-senpyusdmain",
+      },
+    ],
+    independenceLabel:
+      "Morpho SENPYUSDMAIN (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "SDAI",
+    name: "Sky SDAI",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "c8a24fee-ec00-4f38-86c0-9f6daebc4225",
+        kind: "reportedApy",
+        legName: "defillama-sdai",
+      },
+    ],
+    independenceLabel:
+      "Sky SDAI (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "SENRLUSDV2",
+    name: "Morpho SENRLUSDV2",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "2e53bb82-f13f-4157-a3bf-b1a91b94b6a4",
+        kind: "reportedApy",
+        legName: "defillama-senrlusdv2",
+      },
+    ],
+    independenceLabel:
+      "Morpho SENRLUSDV2 (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
+  },
+  {
+    symbol: "SENRLUSD",
+    name: "Morpho SENRLUSD",
+    verified: true,
+    chain: "Ethereum",
+    category: "vault",
+    grade: "established",
+    sources: [
+      {
+        scheme: "defillama",
+        ref: "b9e65633-654a-4e6b-9271-970a7246cb61",
+        kind: "reportedApy",
+        legName: "defillama-senrlusd",
+      },
+    ],
+    independenceLabel:
+      "Morpho SENRLUSD (yield vault / active strategy). DefiLlama reported vault APY. Single source; reflects the vault's reported share yield, not a strategy-quality judgment.",
   },
 ];
