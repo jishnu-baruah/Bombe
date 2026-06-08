@@ -102,6 +102,11 @@ async function readFromRpc(rpc: string, contract: string): Promise<NavRead> {
   }
 }
 
+/** The chains the NAV reader supports (display names), derived from the RPC config. */
+export const SUPPORTED_NAV_CHAINS: string[] = Object.keys(RPCS)
+  .filter((c) => !c.includes("sepolia"))
+  .map((c) => c.replace(/\b\w/g, (m) => m.toUpperCase()));
+
 /** Default reader over viem: tries each configured RPC for the chain until one answers. */
 export async function defaultReadErc4626(chain: string, contract: string): Promise<NavRead> {
   const rpcs = RPCS[chain.toLowerCase()];
