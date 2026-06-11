@@ -10,7 +10,7 @@
 
 import { recordRequest } from "@/lib/db";
 import { fulfillAttestation, paidFlowLive } from "@/lib/fulfill";
-import { FEATURED_SYMBOLS } from "@bombe/agent-sdk";
+import { FEATURED_SYMBOLS, SCHEME_FETCHERS } from "@bombe/agent-sdk";
 import type { AssetSpec, DataAsset } from "@bombe/agent-sdk";
 import { NextResponse } from "next/server";
 import { http, createPublicClient, parseEther } from "viem";
@@ -31,6 +31,13 @@ const PRICE_MNT =
   process.env.ATTEST_PRICE_MNT ?? process.env.NEXT_PUBLIC_ATTEST_PRICE_MNT ?? "0.02";
 // The curated/verified featured set is auto-attested; any other asset needs an open spec.
 const SUPPORTED_ASSETS = new Set(FEATURED_SYMBOLS);
+
+// Source schemes that are actually live. custom-http (and any other stubbed fetcher)
+// is excluded so an issuer can never pay for a spec that is guaranteed to fail at
+// fulfilment. Derived from the SDK registry minus the known-disabled set.
+const DISABLED_SCHEMES = new Set(["custom-http"]);
+const ENABLED_SCHEMES = Object.keys(SCHEME_FETCHERS).filter((s) => !DISABLED_SCHEMES.has(s));
+const schemeEnabled = (s: string) => ENABLED_SCHEMES.includes(s);
 
 // Best-effort in-process dedupe of payment tx hashes (a DB-backed store is the
 // durable version, gated on OP-6).
@@ -89,11 +96,22 @@ export async function POST(req: Request) {
   // Featured assets resolve automatically; a non-featured asset is allowed only with
   // a valid open `spec` describing its sources (attested but labeled unverified).
   const isFeatured = SUPPORTED_ASSETS.has(asset);
-  const openSpec = !isFeatured && validSpec(spec, asset) ? (spec as AssetSpec) : undefined;
-  if (!isFeatured && !openSpec) {
-    return bad(
-      "Unsupported asset. Use a featured symbol (GET /api/v1/assets) or include a valid `spec` for any other asset (GET /api/v1/discover).",
-    );
+  let openSpec: AssetSpec | undefined;
+  if (!isFeatured) {
+    if (!validSpec(spec, asset)) {
+      return bad(
+        "Unsupported asset. Use a featured symbol (GET /api/v1/assets) or include a valid `spec` for any other asset (GET /api/v1/discover).",
+      );
+    }
+    // Reject specs whose sources use a scheme that is not live yet, before the
+    // payment is consumed, so an issuer never pays for a guaranteed-to-fail spec.
+    const offending = spec.sources.find((src) => !schemeEnabled(src.scheme));
+    if (offending) {
+      return bad(
+        `Source scheme "${offending.scheme}" is not enabled yet. Supported schemes: ${ENABLED_SCHEMES.join(", ")}.`,
+      );
+    }
+    openSpec = spec;
   }
   if (claimType !== "YIELD_BPS") {
     return bad("Unsupported claim type. Self-serve supports YIELD_BPS today.");
@@ -189,6 +207,9 @@ export async function POST(req: Request) {
         { headers: CORS },
       );
     } catch (e) {
+      // 202 Accepted: the payment is verified + recorded, but automatic posting
+      // failed and the claim needs operator fulfilment. 200 would wrongly read as
+      // fully done; 202 signals "accepted, processing pending".
       return NextResponse.json(
         {
           ok: true,
@@ -197,7 +218,7 @@ export async function POST(req: Request) {
             "Payment verified and recorded. Automatic posting hit an error; the operator will fulfil it. Keep your payment transaction hash.",
           detail: e instanceof Error ? e.message : String(e),
         },
-        { headers: CORS },
+        { status: 202, headers: CORS },
       );
     }
   }
