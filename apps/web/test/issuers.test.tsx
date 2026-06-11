@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import IssuersPage from "../app/issuers/page";
+import IssuersPage from "../app/(app)/issuers/page";
 
 // Mock next/link, not available in jsdom
 vi.mock("next/link", () => ({

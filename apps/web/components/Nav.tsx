@@ -4,11 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-// DESIGN.md nav-bar: canvas-dark bg, height 64px, button-md labels
-// Taste: backdrop-blur glassmorphism nav; smooth mobile dropdown with proper focus states
+// Floating glass pill nav, unified with the landing chrome: centered,
+// backdrop-blur, hairline stroke, white pill CTA. Active route highlighted.
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
   { href: "/live", label: "Live" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/turing", label: "Turing" },
@@ -17,95 +16,119 @@ const NAV_LINKS = [
   { href: "/operator", label: "Operator" },
 ] as const;
 
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className="w-5 h-5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {open ? (
+        <>
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </>
+      ) : (
+        <>
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 export function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6 border-b border-[rgba(255,255,255,0.06)]"
-      style={{
-        background: "rgba(0,0,0,0.82)",
-        backdropFilter: "blur(20px) saturate(1.4)",
-        WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-      }}
-      aria-label="Primary navigation"
-    >
-      {/* Wordmark */}
-      <Link
-        href="/"
-        className="flex items-center gap-2 mr-auto group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] rounded-sm"
-        aria-label="Bombe home"
+    <header className="fixed top-[24px] left-0 right-0 z-50 flex justify-center px-4">
+      <nav
+        className="w-fit max-w-full backdrop-blur-[20px] bg-white/[0.06] rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+        aria-label="Primary navigation"
       >
-        <span className="text-[20px] font-semibold text-[#ffffff] tracking-[-0.5px] group-hover:text-[rgba(255,255,255,0.9)] transition-colors">
-          Bombe
-        </span>
-        <span
-          className="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-full tracking-[0.3px]"
-          style={{ backgroundColor: "rgba(73,79,223,0.18)", color: "#4f55f1" }}
-        >
-          TESTNET
-        </span>
-      </Link>
+        <div className="flex items-center gap-4 lg:gap-6 h-14 pl-6 pr-2.5">
+          {/* Wordmark */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] rounded-sm"
+            aria-label="Bombe home"
+          >
+            <span className="text-lg font-semibold tracking-[-0.03em] text-white">Bombe</span>
+            <span className="font-mono text-[10px] tracking-[0.18em] text-[rgba(255,255,255,0.55)] mt-0.5">
+              TESTNET
+            </span>
+          </Link>
 
-      {/* Desktop nav links, hidden below md */}
-      <ul className="hidden md:flex items-center gap-0.5">
-        {NAV_LINKS.map(({ href, label }) => {
-          const isActive = pathname === href;
-          return (
-            <li key={href}>
-              <Link
-                href={href}
-                className={`px-3 py-2 text-[14px] font-semibold rounded-full transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] ${
-                  isActive
-                    ? "bg-[#16181a] text-[#ffffff]"
-                    : "text-[rgba(255,255,255,0.60)] hover:text-[#ffffff] hover:bg-[rgba(255,255,255,0.06)]"
-                }`}
-              >
-                {label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+          {/* Desktop nav links */}
+          <ul className="hidden lg:flex items-center gap-0.5">
+            {NAV_LINKS.map(({ href, label }) => {
+              const isActive = pathname === href;
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className={`px-3 py-2 text-sm rounded-full cursor-pointer transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] ${
+                      isActive
+                        ? "bg-white/[0.10] text-white"
+                        : "text-white/65 hover:text-white hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
 
-      {/* Desktop CTA, button-primary (white pill on dark) */}
-      <Link
-        href="/live"
-        className="hidden md:inline-flex items-center ml-4 px-5 py-2 text-[14px] font-semibold bg-[#ffffff] text-[#000000] rounded-full hover:bg-[#e8e8e8] active:scale-[0.97] transition-all duration-150 hover:shadow-[0_2px_12px_rgba(255,255,255,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"
-      >
-        Watch Live
-      </Link>
+          {/* Desktop CTA */}
+          <Link
+            href="/live"
+            className="hidden lg:inline-flex items-center h-9 px-5 rounded-full bg-white text-black text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-white/90 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"
+          >
+            Watch live
+          </Link>
 
-      {/* Mobile hamburger */}
-      <button
-        type="button"
-        className="md:hidden text-[rgba(255,255,255,0.72)] hover:text-[#ffffff] ml-4 p-2 rounded-md hover:bg-[rgba(255,255,255,0.06)] transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"
-        onClick={() => setMenuOpen((v) => !v)}
-        aria-label={menuOpen ? "Close menu" : "Open menu"}
-        aria-expanded={menuOpen}
-        aria-controls="mobile-menu"
-      >
-        <span className="text-[18px]">{menuOpen ? "✕" : "☰"}</span>
-      </button>
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            className="lg:hidden flex items-center justify-center w-11 h-11 -ml-1 rounded-full text-white cursor-pointer transition-colors duration-150 hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+          >
+            <MenuIcon open={menuOpen} />
+          </button>
+        </div>
+      </nav>
 
-      {/* Mobile dropdown */}
+      {/* Mobile dropdown: glass panel below the pill */}
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="absolute top-16 left-0 right-0 border-b border-[rgba(255,255,255,0.06)] py-3 px-4 flex flex-col gap-0.5 md:hidden"
-          style={{
-            background: "rgba(0,0,0,0.92)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-          }}
+          className="absolute top-[72px] left-4 right-4 lg:hidden rounded-[20px] border border-white/10 backdrop-blur-[20px] bg-black/85 shadow-[0_16px_60px_rgba(0,0,0,0.6)] py-3 px-3 flex flex-col gap-0.5"
         >
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            className="px-4 py-3 text-base text-white/70 hover:text-white rounded-[12px] hover:bg-white/[0.06] cursor-pointer transition-colors duration-150"
+          >
+            Home
+          </Link>
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="px-3 py-3 text-[16px] font-semibold text-[rgba(255,255,255,0.72)] hover:text-[#ffffff] rounded-xl hover:bg-[rgba(255,255,255,0.06)] transition-all duration-150"
+              className="px-4 py-3 text-base text-white/70 hover:text-white rounded-[12px] hover:bg-white/[0.06] cursor-pointer transition-colors duration-150"
             >
               {label}
             </Link>
@@ -113,12 +136,12 @@ export function Nav() {
           <Link
             href="/live"
             onClick={() => setMenuOpen(false)}
-            className="mt-2 px-5 py-3 text-[16px] font-semibold bg-[#ffffff] text-[#000000] rounded-full text-center hover:bg-[#e8e8e8] transition-all duration-150"
+            className="mt-2 h-12 inline-flex items-center justify-center text-base font-medium bg-white text-black rounded-full cursor-pointer transition-all duration-150 hover:bg-white/90 active:scale-[0.98]"
           >
-            Watch Live
+            Watch live
           </Link>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

@@ -36,8 +36,8 @@ interface AssetOption {
 }
 // Fallback if the live list cannot be fetched; the full set comes from /api/v1/assets.
 const FALLBACK_ASSETS: AssetOption[] = [
-  { id: "mETH", label: "mETH — Mantle staked ETH (two computation paths)" },
-  { id: "USDY", label: "USDY — Ondo tokenized US T-bills (Mantle)" },
+  { id: "mETH", label: "mETH: Mantle staked ETH (two computation paths)" },
+  { id: "USDY", label: "USDY: Ondo tokenized US T-bills (Mantle)" },
 ];
 
 interface AssetApiEntry {

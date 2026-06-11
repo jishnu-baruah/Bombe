@@ -25,6 +25,34 @@ vi.mock("@/lib/public-api", () => ({
   getNetworkStats: vi.fn().mockResolvedValue(null),
 }));
 
+// Mock the Spline 3D runtime, WebGL is unavailable in jsdom.
+vi.mock("@splinetool/react-spline", () => ({
+  default: () => null,
+}));
+
+// Mock GSAP, no real layout/scroll engine in jsdom. Timelines are chainable
+// no-ops; context runs its setup callback and exposes revert.
+vi.mock("gsap", () => {
+  const timeline: Record<string, () => unknown> = {};
+  for (const method of ["to", "fromTo", "set", "add"]) {
+    timeline[method] = () => timeline;
+  }
+  return {
+    gsap: {
+      registerPlugin: () => {},
+      set: () => {},
+      to: () => {},
+      fromTo: () => {},
+      timeline: () => timeline,
+      context: (fn?: () => void) => {
+        fn?.();
+        return { revert: () => {} };
+      },
+    },
+  };
+});
+vi.mock("gsap/ScrollTrigger", () => ({ ScrollTrigger: {} }));
+
 // LandingPage is an async server component; resolve it before rendering.
 async function renderPage() {
   render(await LandingPage());

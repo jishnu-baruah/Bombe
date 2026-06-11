@@ -66,9 +66,7 @@ export default function IntegratePage() {
       {/* Hero */}
       <section className="px-6 pt-[140px] pb-[72px]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-5">
-            Integrate
-          </p>
+          <p className="eyebrow mb-5">Integrate</p>
           <h1 className="text-[clamp(40px,7vw,80px)] font-semibold leading-[1.04] tracking-[-1.4px] text-[#ffffff] mb-8 balance">
             Four steps. Read it, verify it, trust it.
           </h1>
@@ -108,9 +106,7 @@ export default function IntegratePage() {
         style={{ background: "#0a0a0a" }}
       >
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            The read path
-          </p>
+          <p className="eyebrow mb-4">The read path</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-12 balance">
             Permissionless, today.
           </h2>
@@ -142,9 +138,7 @@ export default function IntegratePage() {
       {/* Headless agent access */}
       <section className="px-6 py-[72px]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            For agents
-          </p>
+          <p className="eyebrow mb-4">For agents</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             Headless, end to end.
           </h2>
@@ -212,9 +206,7 @@ export default function IntegratePage() {
         style={{ background: "#0a0a0a" }}
       >
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            Real reasoning, deterministic verdict
-          </p>
+          <p className="eyebrow mb-4">Real reasoning, deterministic verdict</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             A real model explains; the math decides.
           </h2>
@@ -239,9 +231,7 @@ export default function IntegratePage() {
       <section className="px-6 py-[72px]">
         <div className="max-w-6xl mx-auto">
           <div className="rounded-[20px] border border-[rgba(73,79,223,0.25)] bg-[rgba(73,79,223,0.06)] p-8 max-w-[44rem]">
-            <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-3">
-              Posting a claim
-            </p>
+            <p className="eyebrow mb-3">Posting a claim</p>
             <p className="text-[16px] text-[rgba(255,255,255,0.72)] leading-[1.56] pretty">
               Reading and verifying are open to anyone. To get a new attestation you pay the fee
               from your own wallet at{" "}

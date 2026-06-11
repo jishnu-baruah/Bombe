@@ -110,9 +110,7 @@ export default function IssuersPage() {
       {/* Hero */}
       <section className="px-6 pt-[140px] pb-[88px]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-5">
-            For issuers
-          </p>
+          <p className="eyebrow mb-5">For issuers</p>
           <h1 className="text-[clamp(40px,7vw,88px)] font-semibold leading-[1.02] tracking-[-1.5px] text-[#ffffff] mb-8 balance">
             Turn <span style={{ color: "#494fdf" }}>&ldquo;trust me&rdquo;</span> into{" "}
             <span style={{ color: "#494fdf" }}>&ldquo;verify it on-chain.&rdquo;</span>
@@ -141,9 +139,7 @@ export default function IssuersPage() {
         style={{ background: "#0a0a0a" }}
       >
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            Get your attestation
-          </p>
+          <p className="eyebrow mb-4">Get your attestation</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             Do it right here, on the platform.
           </h2>
@@ -163,9 +159,7 @@ export default function IssuersPage() {
       {/* Who pays & why */}
       <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            Who pays & why
-          </p>
+          <p className="eyebrow mb-4">Who pays & why</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             The buyer is whoever has to be believed.
           </h2>
@@ -191,9 +185,7 @@ export default function IssuersPage() {
       {/* What you get */}
       <section className="px-6 py-[88px]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            What you get
-          </p>
+          <p className="eyebrow mb-4">What you get</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-12 balance">
             A verdict that defends itself.
           </h2>
@@ -214,9 +206,7 @@ export default function IssuersPage() {
         style={{ background: "#0a0a0a" }}
       >
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            The economics
-          </p>
+          <p className="eyebrow mb-4">The economics</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             Small fee in. Real stake behind the answer.
           </h2>
@@ -264,9 +254,7 @@ export default function IssuersPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-[1fr_380px] gap-16 items-center">
             <div className="max-w-[40rem]">
-              <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-                What we will and won&apos;t attest
-              </p>
+              <p className="eyebrow mb-4">What we will and won&apos;t attest</p>
               <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-6 balance">
                 We refuse the claims we can&apos;t falsify.
               </h2>
@@ -320,9 +308,7 @@ export default function IssuersPage() {
         style={{ background: "#0a0a0a" }}
       >
         <div className="max-w-6xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            What we cover
-          </p>
+          <p className="eyebrow mb-4">What we cover</p>
           <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
             {SUPPORTED_FLOOR}+ verified RWA yields. Anything else, one request away.
           </h2>
