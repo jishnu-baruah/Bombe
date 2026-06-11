@@ -227,9 +227,7 @@ export default function LeaderboardPage({ initialRows }: { initialRows: Leaderbo
       {/* ── Hero band ── */}
       <section className="px-6 py-[88px] border-b border-[rgba(255,255,255,0.06)]">
         <div className="max-w-6xl mx-auto">
-          <p className="text-[#494fdf] text-[12px] font-semibold tracking-[0.8px] uppercase mb-4">
-            Bombe · Agent Rankings
-          </p>
+          <p className="eyebrow mb-4">Bombe · Agent Rankings</p>
           <h1 className="text-[clamp(40px,8vw,80px)] font-semibold leading-[1.0] tracking-[-0.8px] mb-4 balance">
             Leaderboard
           </h1>

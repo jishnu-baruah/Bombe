@@ -136,9 +136,7 @@ export default async function VerifyPage({
     <div className="bg-[#000000] text-[#ffffff] min-h-screen">
       <section className="px-6 pt-[120px] pb-[88px]">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[13px] text-[#494fdf] font-semibold tracking-[0.8px] uppercase mb-4">
-            Verify
-          </p>
+          <p className="eyebrow mb-4">Verify</p>
           <h1 className="text-[clamp(30px,5vw,46px)] font-semibold leading-[1.1] tracking-[-0.6px] mb-4 balance">
             Don&apos;t trust. Verify.
           </h1>
