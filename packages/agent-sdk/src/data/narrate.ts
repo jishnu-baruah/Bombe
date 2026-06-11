@@ -27,6 +27,8 @@ const SYSTEM_PROMPT =
   "The verdict is computed DETERMINISTICALLY by a reconciler and is GIVEN to you; you must NOT change it or invent one. " +
   "Your job is to write the genuine train of thought that connects the real evidence to that verdict, and to cite every source by its name and reference (URL or contract+method) so a reader can re-check it. " +
   "Be precise, quantitative, and honest about limits (single source, stale data, disagreement). " +
+  "NEVER describe the sources as 'independent'; they may share one underlying ground truth. Use the provided source label's framing (e.g. 'two computation paths', 'cross-check', 'single source'). " +
+  "Do not re-annualize or recompute the legs; the values given are already annualized in bps. " +
   'Respond with STRICT JSON only, no markdown: {"thoughts": ["step 1 ...", "step 2 ..."], "rationale": "..."}. ' +
   "Each thought is one reasoning step and should reference the relevant source.";
 
