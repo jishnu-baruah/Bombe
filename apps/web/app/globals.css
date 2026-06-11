@@ -133,6 +133,34 @@ body {
   min-height: 100dvh;
 }
 
+/* ── Sleek scrollbar (matches the dark canvas; subtle thumb, transparent track).
+   Styled rather than fully hidden so the scroll affordance survives. ── */
+* {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  /* padding-box border keeps the thumb visually thin with breathing room */
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.24);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* ── Focus-visible ring (accessible, not intrusive) ── */
 :focus-visible {
   outline: 2px solid #494fdf;
