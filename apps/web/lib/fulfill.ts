@@ -95,8 +95,7 @@ export async function fulfillAttestation(params: {
         aiGatewayModels: process.env.AI_GATEWAY_MODELS,
       })
     : undefined;
-  const fallbackModel =
-    (process.env.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() || "gemma3:12b";
+  const fallbackModel = (process.env.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() || "gemma3:12b";
 
   // Primary + fallback both present → ModelRouter (no mock fallback: if both live
   // providers fail, the narrate path falls back to a plain factual description,
