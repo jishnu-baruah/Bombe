@@ -54,7 +54,11 @@ const LIVE_MODEL_TIMEOUT_MS = 30_000;
 interface ChatCompletionResponse {
   choices: Array<{
     message: {
-      content: string;
+      content?: string | null;
+      // Reasoning models (e.g. gpt-oss via Ollama) put their output in a reasoning
+      // channel; if `content` is empty we must read this or we silently drop the reply.
+      reasoning?: string | null;
+      reasoning_content?: string | null;
     };
   }>;
   usage: {
@@ -175,8 +179,12 @@ export class LiveModelSeam implements ModelSeam {
       throw new ModelError("Live model returned no choices", undefined, "other");
     }
 
+    // Prefer the final answer (content); fall back to the reasoning channel so a
+    // reasoning model's output is never silently dropped (gpt-oss returns empty content).
+    const msg = choice.message;
+    const text = msg.content || msg.reasoning || msg.reasoning_content || "";
     return {
-      text: choice.message.content,
+      text,
       tokensIn: data.usage.prompt_tokens,
       tokensOut: data.usage.completion_tokens,
       modelUsed: data.model ?? this.modelName,
