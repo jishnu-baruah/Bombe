@@ -1,10 +1,10 @@
+import { Nav } from "@/components/Nav";
 import { CapabilitiesSection } from "@/components/landing/capabilities-section";
 import { CtaSection } from "@/components/landing/cta-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { FooterSection } from "@/components/landing/footer-section";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
-import { Navigation } from "@/components/landing/navigation";
 import { PlugboardSection } from "@/components/landing/plugboard-section";
 import { TiersSection } from "@/components/landing/tiers-section";
 import { CAPABILITY_REGISTRY } from "@bombe/agent-sdk";
@@ -18,7 +18,7 @@ const CAPS = [...CAPABILITY_REGISTRY]
 export default function LandingPage() {
   return (
     <main className="landing relative min-h-screen overflow-x-hidden noise-overlay">
-      <Navigation />
+      <Nav />
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />

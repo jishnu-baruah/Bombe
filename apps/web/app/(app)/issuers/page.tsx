@@ -1,6 +1,3 @@
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { FEATURED_SYMBOLS } from "@bombe/agent-sdk";
 import Link from "next/link";
 import { AttestationConsole } from "./AttestationConsole";
@@ -8,6 +5,16 @@ import { RequestAssetForm } from "./RequestAssetForm";
 
 // Round down to a clean floor for honest "N+" copy (never overstate the catalog).
 const SUPPORTED_FLOOR = Math.floor(FEATURED_SYMBOLS.length / 10) * 10;
+
+// Shared Mouli-system primitives (match components/landing/*): white-pill primary,
+// hairline outline secondary, dark card. Kept inline so this page carries no
+// bespoke component variants.
+const BTN_PRIMARY =
+  "inline-flex items-center justify-center h-12 px-7 rounded-full bg-white text-black text-base font-medium transition-all duration-150 hover:bg-white/90 active:scale-[0.98]";
+const BTN_OUTLINE =
+  "inline-flex items-center justify-center h-12 px-7 rounded-full border border-white/40 text-base text-foreground transition-all duration-150 hover:border-white/70 hover:bg-foreground/[0.04] active:scale-[0.98]";
+const CARD =
+  "rounded-[20px] bg-[#16181a] border border-white/[0.08] p-8 transition-all duration-200 hover:border-white/[0.16]";
 
 // RWA categories the network can attest. `live` = a real source exists today (often on
 // Mantle); the rest are requestable the moment a public data source exists. Honest: we
@@ -104,146 +111,153 @@ const ECONOMICS = [
   },
 ] as const;
 
+const TIERS = [
+  {
+    label: "Tier 1",
+    verdict: "Attested",
+    accent: "text-[#86c95f]",
+    body: "Deterministic truth from on-chain state or oracle math.",
+  },
+  {
+    label: "Tier 2",
+    verdict: "Attested",
+    accent: "text-[#86c95f]",
+    body: "Truth checkable against referenced documents and statements.",
+  },
+  {
+    label: "Tier 3",
+    verdict: "Abstain only",
+    accent: "text-[#d4a017]",
+    body: "Valuations and opinions. Contract-enforced abstention, never an attestation.",
+  },
+] as const;
+
 export default function IssuersPage() {
   return (
-    <div className="bg-[#000000] text-[#ffffff]">
+    <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="px-6 pt-[140px] pb-[88px]">
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-5">For issuers</p>
-          <h1 className="text-[clamp(40px,7vw,88px)] font-semibold leading-[1.02] tracking-[-1.5px] text-[#ffffff] mb-8 balance">
-            Turn <span style={{ color: "#494fdf" }}>&ldquo;trust me&rdquo;</span> into{" "}
-            <span style={{ color: "#494fdf" }}>&ldquo;verify it on-chain.&rdquo;</span>
+      <section className="relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-5">For issuers</span>
+          <h1 className="font-display balance text-[clamp(40px,7vw,88px)] leading-[1.02] text-foreground mb-8">
+            Turn <span className="text-[#9296f5]">&ldquo;trust me&rdquo;</span> into{" "}
+            <span className="text-[#9296f5]">&ldquo;verify it on-chain.&rdquo;</span>
           </h1>
-          <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] max-w-[40rem] mb-10 pretty">
+          <p className="pretty text-lg text-muted-foreground leading-relaxed max-w-[42rem] mb-10">
             If your product reports a number that someone has to take on faith, Bombe lets an
             outside, stake-backed network attest to it. Connect your wallet, pay the fee, and get a
             verifiable on-chain attestation back: a model-written, source-cited reasoning narrative
             anyone can recheck, and a verdict computed deterministically from the evidence, not from
-            the model's opinion. Your counterparties get a result they can verify on Mantle Sepolia,
-            not a logo on a slide.
+            the model&apos;s opinion. Your counterparties get a result they can verify on Mantle
+            Sepolia, not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/request">
-              <Button variant="primary">Request an attestation →</Button>
+            <Link href="/request" className={BTN_PRIMARY}>
+              Request an attestation →
             </Link>
-            <Link href="/integrate">
-              <Button variant="outline-dark">See how to integrate →</Button>
+            <Link href="/integrate" className={BTN_OUTLINE}>
+              See how to integrate →
             </Link>
           </div>
         </div>
       </section>
 
       {/* Pay and get your attestation (embedded, non-custodial) */}
-      <section
-        className="px-6 py-[72px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">Get your attestation</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">Get your attestation</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             Do it right here, on the platform.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
-            Pick what you want checked. <span className="text-[rgba(255,255,255,0.8)]">Yield</span>{" "}
-            is a paid attestation posted on-chain from your own wallet.{" "}
-            <span className="text-[rgba(255,255,255,0.8)]">Vault NAV</span> reads an ERC-4626 share
-            price straight off the chain, and{" "}
-            <span className="text-[rgba(255,255,255,0.8)]">Document</span> cross-checks a yield
-            against the live, hashed US Treasury rate, both free and live. Each returns a verdict
-            you can verify; judgment claims abstain. We never hold your funds.
+          <p className="pretty text-base text-muted-foreground leading-relaxed mb-10 max-w-[46rem]">
+            Pick what you want checked. <span className="text-foreground">Yield</span> is a paid
+            attestation posted on-chain from your own wallet.{" "}
+            <span className="text-foreground">Vault NAV</span> reads an ERC-4626 share price
+            straight off the chain, and <span className="text-foreground">Document</span>{" "}
+            cross-checks a yield against the live, hashed US Treasury rate, both free and live. Each
+            returns a verdict you can verify; judgment claims abstain. We never hold your funds.
           </p>
           <AttestationConsole />
         </div>
       </section>
 
       {/* Who pays & why */}
-      <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">Who pays & why</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">Who pays & why</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             The buyer is whoever has to be believed.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-12 max-w-[40rem] pretty">
+          <p className="pretty text-base text-muted-foreground leading-relaxed mb-12 max-w-[42rem]">
             These are illustrative profiles, not customers or partners. Each shares one problem: a
-            claim that matters to other people, and no outside way to back it.
+            claim that matters to other people, for which an on-chain, falsifiable check is
+            possible.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-3">
             {ARCHETYPES.map((a) => (
-              <Card key={a.title} variant="feature-dark">
-                <div className="text-[24px] mb-4" style={{ color: "#494fdf" }}>
-                  {a.icon}
-                </div>
-                <h3 className="text-[18px] font-semibold mb-2 tracking-[-0.1px]">{a.title}</h3>
-                <p className="text-[14px] text-[rgba(255,255,255,0.60)] leading-[1.56]">{a.pain}</p>
-              </Card>
+              <div key={a.title} className={CARD}>
+                <div className="text-2xl mb-4 text-[#9296f5]">{a.icon}</div>
+                <h3 className="font-display text-xl text-foreground mb-2">{a.title}</h3>
+                <p className="pretty text-sm text-muted-foreground leading-relaxed">{a.pain}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* What you get */}
-      <section className="px-6 py-[88px]">
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">What you get</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-12 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">What you get</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-12">
             A verdict that defends itself.
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-3">
             {GUARANTEES.map((g) => (
-              <Card key={g.title} variant="feature-dark">
-                <h3 className="text-[18px] font-semibold mb-2 tracking-[-0.1px]">{g.title}</h3>
-                <p className="text-[14px] text-[rgba(255,255,255,0.60)] leading-[1.56]">{g.body}</p>
-              </Card>
+              <div key={g.title} className={CARD}>
+                <h3 className="font-display text-xl text-foreground mb-2">{g.title}</h3>
+                <p className="pretty text-sm text-muted-foreground leading-relaxed">{g.body}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Economics */}
-      <section
-        className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">The economics</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">The economics</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             Small fee in. Real stake behind the answer.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[40rem] pretty">
+          <p className="pretty text-base text-muted-foreground leading-relaxed mb-10 max-w-[42rem]">
             You pay once to post a claim. Attestors put up more than they can earn on a single call,
             so being right is the only profitable strategy.
           </p>
 
-          <div className="rounded-[20px] bg-[#16181a] overflow-hidden border border-[rgba(255,255,255,0.06)] shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
-            <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_1.2fr_1.6fr] gap-4 px-6 py-4 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-              <span className="text-[12px] font-semibold text-[#505a63] uppercase tracking-[0.8px]">
-                Action
-              </span>
-              <span className="text-[12px] font-semibold text-[#505a63] uppercase tracking-[0.8px]">
-                Who
-              </span>
-              <span className="text-[12px] font-semibold text-[#505a63] uppercase tracking-[0.8px]">
-                Amount
-              </span>
-              <span className="text-[12px] font-semibold text-[#505a63] uppercase tracking-[0.8px]">
-                Purpose
-              </span>
+          <div className="rounded-[20px] bg-[#16181a] border border-white/[0.08] overflow-hidden">
+            <div className="hidden md:grid grid-cols-[1.4fr_0.8fr_1.2fr_1.6fr] gap-4 px-6 py-4 border-b border-white/[0.08] bg-white/[0.02]">
+              {["Action", "Who", "Amount", "Purpose"].map((h) => (
+                <span
+                  key={h}
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+                >
+                  {h}
+                </span>
+              ))}
             </div>
             {ECONOMICS.map((row, i) => (
               <div
                 key={row.action}
-                className={`grid grid-cols-1 md:grid-cols-[1.4fr_0.8fr_1.2fr_1.6fr] gap-1 md:gap-4 px-6 py-5 text-[14px] leading-[1.5] ${
-                  i < ECONOMICS.length - 1 ? "border-b border-[rgba(255,255,255,0.05)]" : ""
+                className={`grid grid-cols-1 md:grid-cols-[1.4fr_0.8fr_1.2fr_1.6fr] gap-1 md:gap-4 px-6 py-5 text-sm leading-relaxed ${
+                  i < ECONOMICS.length - 1 ? "border-b border-white/[0.06]" : ""
                 }`}
               >
-                <span className="text-[#ffffff] font-medium">{row.action}</span>
-                <span className="text-[rgba(255,255,255,0.60)]">{row.who}</span>
-                <span className="text-[#494fdf] font-medium tabular font-mono text-[13px]">
-                  {row.amount}
-                </span>
-                <span className="text-[rgba(255,255,255,0.45)]">{row.purpose}</span>
+                <span className="text-foreground font-medium">{row.action}</span>
+                <span className="text-muted-foreground">{row.who}</span>
+                <span className="text-[#9296f5] font-mono text-[13px] tabular">{row.amount}</span>
+                <span className="text-muted-foreground/70">{row.purpose}</span>
               </div>
             ))}
           </div>
@@ -251,77 +265,61 @@ export default function IssuersPage() {
       </section>
 
       {/* Will / won't attest */}
-      <section className="px-6 py-[88px]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-[1fr_380px] gap-16 items-center">
-            <div className="max-w-[40rem]">
-              <p className="eyebrow mb-4">What we will and won&apos;t attest</p>
-              <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-6 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid lg:grid-cols-[1fr_400px] gap-12 lg:gap-16 items-center">
+            <div className="max-w-[42rem]">
+              <span className="eyebrow block mb-6">What we will and won&apos;t attest</span>
+              <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-6">
                 We refuse the claims we can&apos;t falsify.
               </h2>
-              <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-6 pretty">
+              <p className="pretty text-lg text-muted-foreground leading-relaxed mb-6">
                 Bombe attests to deterministic on-chain facts and document-checkable claims. It will
                 not attest to a valuation or an opinion, because no honest agent can. On a judgment
                 claim every agent abstains, and the contract rejects any other answer.
               </p>
-              <p className="text-[16px] text-[rgba(255,255,255,0.45)] leading-[1.5] pretty">
-                That refusal is the product. A network that will attest to anything is worth
-                nothing.
+              <p className="pretty text-base text-muted-foreground/70 leading-relaxed">
+                That refusal is enforced at the contract layer: a Tier-3 non-abstain attestation
+                reverts, making the network&apos;s selectivity tamper-proof, not just aspirational.
               </p>
             </div>
 
             <div className="flex flex-col gap-3">
-              <div className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="tier-1" label="TIER 1" />
-                  <span className="text-[#428619] text-[13px] font-semibold">Attested</span>
+              {TIERS.map((t) => (
+                <div
+                  key={t.label}
+                  className="rounded-[16px] bg-[#16181a] border border-white/[0.08] p-5"
+                >
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border border-white/[0.12] text-muted-foreground">
+                      {t.label}
+                    </span>
+                    <span className={`text-[13px] font-semibold ${t.accent}`}>{t.verdict}</span>
+                  </div>
+                  <p className="text-[13px] text-muted-foreground leading-relaxed">{t.body}</p>
                 </div>
-                <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5]">
-                  Deterministic truth from on-chain state or oracle math.
-                </p>
-              </div>
-              <div className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="tier-2" label="TIER 2" />
-                  <span className="text-[#428619] text-[13px] font-semibold">Attested</span>
-                </div>
-                <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5]">
-                  Truth checkable against referenced documents and statements.
-                </p>
-              </div>
-              <div className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="tier-3" label="TIER 3" />
-                  <span className="text-[#b09000] text-[13px] font-semibold">Abstain only</span>
-                </div>
-                <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5]">
-                  Valuations and opinions. Contract-enforced abstention, never an attestation.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Coverage + request */}
-      <section
-        className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">What we cover</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">What we cover</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             {SUPPORTED_FLOOR}+ verified RWA yields. Anything else, one request away.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.55)] mb-10 max-w-[44rem] pretty">
+          <p className="pretty text-base text-muted-foreground leading-relaxed mb-10 max-w-[46rem]">
             The verified catalog spans {SUPPORTED_FLOOR}+ assets across these categories,
             Mantle-native first, each a real source vetted for clean data. Coverage is open, not a
             fixed list: any yield with a public data source is attestable now (browse the live
             universe at{" "}
-            <Link href="/integrate" className="text-[#494fdf] hover:text-[#6b70e8]">
+            <Link href="/integrate" className="text-[#9296f5] hover:text-white transition-colors">
               the discovery API
             </Link>
-            ). Categories without a live source yet are not faked, they are requestable, and become
+            ). Categories without a live source yet are not faked; they are requestable, and become
             attestable the moment a real source exists.
           </p>
 
@@ -329,28 +327,28 @@ export default function IssuersPage() {
             {COVERAGE.map((c) => (
               <div
                 key={c.name}
-                className="rounded-[14px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-4"
+                className="rounded-[16px] bg-[#16181a] border border-white/[0.08] p-4"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <h3 className="text-[14px] font-semibold tracking-[-0.1px]">{c.name}</h3>
+                  <h3 className="font-display text-sm text-foreground">{c.name}</h3>
                   <span
-                    className={`text-[11px] font-semibold uppercase tracking-[0.6px] ${
-                      c.live ? "text-[#86c95f]" : "text-[#b09000]"
+                    className={`font-mono text-[10px] uppercase tracking-[0.14em] ${
+                      c.live ? "text-[#86c95f]" : "text-[#d4a017]"
                     }`}
                   >
                     {c.live ? "Live" : "On request"}
                   </span>
                 </div>
-                <p className="text-[12.5px] text-[rgba(255,255,255,0.45)] leading-[1.5]">{c.eg}</p>
+                <p className="text-[12.5px] text-muted-foreground/70 leading-relaxed">{c.eg}</p>
               </div>
             ))}
           </div>
 
-          <div className="max-w-[44rem]">
-            <h3 className="text-[20px] font-semibold mb-2 tracking-[-0.2px]">
+          <div className="max-w-[46rem]">
+            <h3 className="font-display text-xl text-foreground mb-2">
               Can&apos;t find your asset? Request it.
             </h3>
-            <p className="text-[15px] text-[rgba(255,255,255,0.55)] leading-[1.56] mb-6 pretty">
+            <p className="pretty text-[15px] text-muted-foreground leading-relaxed mb-6">
               Tell us the token and where its yield is published. If a public source exists, it
               becomes attestable as a source descriptor, often the same day.
             </p>
@@ -360,22 +358,22 @@ export default function IssuersPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="max-w-[36rem]">
-            <h2 className="font-semibold leading-[1.05] tracking-[-0.48px] mb-6 text-[#ffffff] text-[clamp(32px,5vw,56px)] balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="max-w-[40rem]">
+            <h2 className="font-display balance text-[clamp(32px,5vw,56px)] leading-[1.05] text-foreground mb-6">
               Ready to be verifiable?
             </h2>
-            <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-10 max-w-[34rem] pretty">
+            <p className="pretty text-lg text-muted-foreground leading-relaxed mb-10 max-w-[36rem]">
               Reading a verdict is permissionless and takes a few lines. Start there, then talk to
               us about posting your own claims.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/integrate">
-                <Button variant="primary">Read the integration guide →</Button>
+              <Link href="/integrate" className={BTN_PRIMARY}>
+                Read the integration guide →
               </Link>
-              <Link href="/verify">
-                <Button variant="outline-dark">Verify a claim</Button>
+              <Link href="/verify" className={BTN_OUTLINE}>
+                Verify a claim
               </Link>
             </div>
           </div>

@@ -34,10 +34,10 @@ function ClaimProof({ result }: { result: LookupResult }) {
   const claim = result.claim;
   if (!claim) return null;
   return (
-    <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] overflow-hidden">
-      <div className="px-6 py-5 border-b border-[rgba(255,255,255,0.06)] flex flex-wrap items-center gap-3 justify-between">
+    <div className="rounded-[20px] bg-[#16181a] border border-white/[0.08] overflow-hidden">
+      <div className="px-6 py-5 border-b border-white/[0.08] flex flex-wrap items-center gap-3 justify-between">
         <div>
-          <p className="text-[12px] text-[#505a63] font-semibold tracking-[0.8px] uppercase mb-1">
+          <p className="text-[12px] text-muted-foreground font-semibold tracking-[0.8px] uppercase mb-1">
             {result.kind === "reasoningHash" ? "Reasoning hash matched" : "Claim"}
           </p>
           <p className="text-[18px] font-semibold tracking-[-0.3px] font-mono break-all">
@@ -85,15 +85,15 @@ function ClaimProof({ result }: { result: LookupResult }) {
                   </a>
                 </div>
                 <dl className="grid sm:grid-cols-[140px_1fr] gap-y-1.5 gap-x-4 text-[13px]">
-                  <dt className="text-[#505a63]">
+                  <dt className="text-muted-foreground">
                     <Gloss def={GLOSSARY.reasoningHash}>reasoning hash</Gloss>
                   </dt>
                   <dd className="font-mono text-[#8d969e] break-all">{a.reasoningHash}</dd>
-                  <dt className="text-[#505a63]">
+                  <dt className="text-muted-foreground">
                     <Gloss def={GLOSSARY.sourcesHash}>sources hash</Gloss>
                   </dt>
                   <dd className="font-mono text-[#8d969e] break-all">{a.sourcesHash}</dd>
-                  <dt className="text-[#505a63]">trace</dt>
+                  <dt className="text-muted-foreground">trace</dt>
                   <dd className="font-mono text-[#8d969e] break-all">
                     {a.traceURI || "(not stored yet)"}
                   </dd>
@@ -104,7 +104,7 @@ function ClaimProof({ result }: { result: LookupResult }) {
         </ul>
       )}
 
-      <div className="px-6 py-4 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] flex flex-wrap gap-4 text-[13px]">
+      <div className="px-6 py-4 border-t border-white/[0.08] bg-[rgba(255,255,255,0.02)] flex flex-wrap gap-4 text-[13px]">
         <Link
           href={`/claim/${encodeURIComponent(claim.claimId)}`}
           className="text-[#494fdf] hover:text-[#6b70e8]"
@@ -133,14 +133,14 @@ export default async function VerifyPage({
   const result = q ? await lookup(q) : null;
 
   return (
-    <div className="bg-[#000000] text-[#ffffff] min-h-screen">
-      <section className="px-6 pt-[120px] pb-[88px]">
+    <div className="bg-background text-foreground min-h-screen">
+      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
         <div className="max-w-3xl mx-auto">
-          <p className="eyebrow mb-4">Verify</p>
-          <h1 className="text-[clamp(30px,5vw,46px)] font-semibold leading-[1.1] tracking-[-0.6px] mb-4 balance">
+          <span className="eyebrow block mb-6">Verify</span>
+          <h1 className="font-display balance text-4xl lg:text-[56px] leading-[1.05] text-foreground mb-4">
             Don&apos;t trust. Verify.
           </h1>
-          <p className="text-[17px] text-[rgba(255,255,255,0.6)] leading-[1.55] mb-8 max-w-[34rem] pretty">
+          <p className="pretty text-lg text-muted-foreground leading-relaxed mb-8 max-w-[36rem]">
             Paste a claim ID, a reasoning hash, or a transaction hash. Get the verdict and its
             on-chain proof, straight from the contract on Mantle Sepolia. No account, no keys.
           </p>
@@ -152,7 +152,7 @@ export default async function VerifyPage({
               defaultValue={q ?? ""}
               placeholder="mETH-2026-06-07  or  0x… hash  or  tx hash"
               aria-label="Claim ID, reasoning hash, or transaction hash"
-              className="flex-1 px-4 py-3 rounded-full bg-[#16181a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] placeholder:text-[#505a63] font-mono focus:outline-none focus:border-[#494fdf] transition-colors"
+              className="flex-1 px-4 py-3 rounded-full bg-[#16181a] border border-white/[0.08] text-[15px] text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:border-[#494fdf] transition-colors"
             />
             <button
               type="submit"
@@ -162,19 +162,19 @@ export default async function VerifyPage({
             </button>
           </form>
 
-          <p className="text-[13px] text-[#505a63] mb-10">
+          <p className="text-[13px] text-muted-foreground mb-10">
             Reasoning-hash lookup scans the recent claim set; if a hash is not found there it is
             shown as a transaction on the explorer.
           </p>
 
           {result && !result.found && (
-            <div className="rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[#0f1012] px-6 py-5 text-[14px] text-[rgba(255,255,255,0.7)]">
+            <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5 text-[14px] text-[rgba(255,255,255,0.7)]">
               {result.message ?? "Nothing found for that input."}
             </div>
           )}
 
           {result?.found && result.kind === "txHash" && (
-            <div className="rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[#0f1012] px-6 py-5">
+            <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5">
               <p className="text-[14px] text-[rgba(255,255,255,0.7)] mb-3">{result.message}</p>
               <a
                 href={result.explorerUrl}

@@ -8,11 +8,14 @@ import { useState } from "react";
 // Floating glass pill nav, unified with the landing chrome: centered,
 // backdrop-blur, hairline stroke, white pill CTA. Active route highlighted.
 
+// One nav for the whole site (landing + app). Links point at the functional /
+// capability surfaces that get demoed and checked. Operator is internal ops and
+// lives in the footer, not the primary nav.
 const NAV_LINKS = [
   { href: "/live", label: "Live" },
   { href: "/verify", label: "Verify" },
   { href: "/issuers", label: "Issuers" },
-  { href: "/operator", label: "Operator" },
+  { href: "/integrate", label: "Integrate" },
 ] as const;
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -67,8 +70,8 @@ export function Nav() {
             className="flex items-center gap-2 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] rounded-sm"
             aria-label="Bombe home"
           >
-            <span className="text-lg font-semibold tracking-[-0.03em] text-white">Bombe</span>
-            <span className="font-mono text-[10px] tracking-[0.18em] text-[rgba(255,255,255,0.55)] mt-0.5">
+            <span className="font-display text-lg text-foreground">Bombe</span>
+            <span className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground mt-0.5">
               TESTNET
             </span>
           </Link>
