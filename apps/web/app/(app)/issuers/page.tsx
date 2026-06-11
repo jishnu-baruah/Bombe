@@ -118,8 +118,9 @@ export default function IssuersPage() {
           <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] max-w-[40rem] mb-10 pretty">
             If your product reports a number that someone has to take on faith, Bombe lets an
             outside, stake-backed network attest to it. Connect your wallet, pay the fee, and get a
-            verifiable on-chain attestation back, with a model-written, source-cited reasoning trace
-            anyone can recheck. Your counterparties get a verdict they can verify on Mantle Sepolia,
+            verifiable on-chain attestation back: a model-written, source-cited reasoning narrative
+            anyone can recheck, and a verdict computed deterministically from the evidence, not from
+            the model's opinion. Your counterparties get a result they can verify on Mantle Sepolia,
             not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">

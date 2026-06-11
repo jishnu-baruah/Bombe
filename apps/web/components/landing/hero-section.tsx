@@ -1,8 +1,11 @@
 import { CinematicHero } from "@/components/ui/cinematic-landing-hero";
 import { Marquee } from "./marquee";
 
-// Real infrastructure Bombe runs on (no fabricated customer logos).
-const builtOn = ["Mantle", "Nous Hermes", "Foundry", "viem", "Next.js"];
+// Real infrastructure Bombe runs on (no fabricated customer logos). The reasoning
+// narrative is written by an open model (Gemma) via an OpenAI-compatible AI gateway;
+// the verdict itself is deterministic. Nous Hermes is the EXTERNAL Plugboard attestor,
+// deliberately not part of Bombe's own stack, so it is not listed here.
+const builtOn = ["Mantle", "Gemma", "Foundry", "viem", "Next.js"];
 
 export function HeroSection() {
   return (
