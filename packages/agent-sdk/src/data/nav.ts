@@ -41,6 +41,7 @@ const ERC4626_ABI = parseAbi([
   "function convertToAssets(uint256 shares) view returns (uint256)",
   "function pricePerShare() view returns (uint256)",
   "function decimals() view returns (uint8)",
+  "function asset() view returns (address)",
 ]);
 
 /**
@@ -60,31 +61,50 @@ const RPCS: Record<string, string[]> = {
   arbitrum: ["https://arb1.arbitrum.io/rpc", "https://arbitrum-one-rpc.publicnode.com"],
 };
 
-/** Read the share price from one RPC: convertToAssets(1e18), falling back to pricePerShare(). */
+/**
+ * Read the share price from one RPC: convertToAssets(1 share), falling back to
+ * pricePerShare(). Scales the INPUT by the share decimals and the OUTPUT by the
+ * underlying ASSET decimals, which differ for stablecoin vaults (18-decimal shares over
+ * a 6-decimal USDC asset) where assuming they are equal reads 0.
+ */
 async function readFromRpc(rpc: string, contract: string): Promise<NavRead> {
   const client = createPublicClient({ transport: http(rpc) });
   const address = contract as `0x${string}`;
-  let decimals = 18;
+  let shareDecimals = 18;
   try {
-    decimals = Number(
+    shareDecimals = Number(
       await client.readContract({ address, abi: ERC4626_ABI, functionName: "decimals" }),
     );
   } catch {
     // default 18
   }
-  const scale = 10 ** decimals;
+  // The underlying asset's decimals govern the output of convertToAssets/pricePerShare.
+  let assetDecimals = shareDecimals;
   try {
-    const one = BigInt(Math.round(scale));
+    const asset = (await client.readContract({
+      address,
+      abi: ERC4626_ABI,
+      functionName: "asset",
+    })) as `0x${string}`;
+    assetDecimals = Number(
+      await client.readContract({ address: asset, abi: ERC4626_ABI, functionName: "decimals" }),
+    );
+  } catch {
+    // not ERC-4626 (no asset()) or unreadable: fall back to share decimals
+  }
+  const inScale = BigInt(Math.round(10 ** shareDecimals));
+  const outScale = 10 ** assetDecimals;
+  try {
     const out = (await client.readContract({
       address,
       abi: ERC4626_ABI,
       functionName: "convertToAssets",
-      args: [one],
+      args: [inScale],
     })) as bigint;
     return {
-      assetsPerShare: Number(out) / scale,
+      assetsPerShare: Number(out) / outScale,
       method: "convertToAssets",
-      decimals,
+      decimals: assetDecimals,
       raw: out.toString(),
     };
   } catch {
@@ -94,9 +114,9 @@ async function readFromRpc(rpc: string, contract: string): Promise<NavRead> {
       functionName: "pricePerShare",
     })) as bigint;
     return {
-      assetsPerShare: Number(out) / scale,
+      assetsPerShare: Number(out) / outScale,
       method: "pricePerShare",
-      decimals,
+      decimals: assetDecimals,
       raw: out.toString(),
     };
   }
