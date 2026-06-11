@@ -10,7 +10,12 @@
  * Tier-1 yield is deterministic, so no AI gateway is needed at this layer.
  */
 
-import { LiveDataSource, computeDecisiveAttestation, createLiveModelSeam } from "@bombe/agent-sdk";
+import {
+  LiveDataSource,
+  ModelRouter,
+  computeDecisiveAttestation,
+  createLiveModelSeam,
+} from "@bombe/agent-sdk";
 import type { AssetSpec, DataAsset } from "@bombe/agent-sdk";
 import { AgentAttestationAbi, type Claim, hashCanonical } from "@bombe/shared";
 import { http, createPublicClient, createWalletClient, encodeFunctionData, parseEther } from "viem";
@@ -65,17 +70,47 @@ export async function fulfillAttestation(params: {
   const attWallet = createWalletClient({ account: attestor, chain, transport: http(RPC_URL) });
 
   // 1. Deterministic verdict over live data, with a real guided-LLM train of
-  //    thought when the AI gateway is configured (the verdict stays deterministic).
+  //    thought when a gateway is configured (the verdict stays deterministic).
+  //
+  //    Narrator resilience: when NARRATOR_PRIMARY_* is set we run a fast primary
+  //    provider (Mistral) with the AI_GATEWAY_* provider (Gemma via Ollama) as an
+  //    automatic failover, wired through ModelRouter so any switch is recorded in
+  //    the trace. With only AI_GATEWAY_* set, behaviour is unchanged (single seam).
+  //    Two genuinely different confirmed providers; the verdict is still the
+  //    deterministic reconciler, so this is resilience + latency, not "consensus".
   const ds = new LiveDataSource();
   const clock = { now: () => Date.now() };
-  const narrator = process.env.AI_GATEWAY_KEY
+
+  const primarySeam = process.env.NARRATOR_PRIMARY_KEY
+    ? createLiveModelSeam({
+        aiGatewayKey: process.env.NARRATOR_PRIMARY_KEY,
+        aiGatewayBaseUrl: process.env.NARRATOR_PRIMARY_BASE_URL,
+        aiGatewayModels: process.env.NARRATOR_PRIMARY_MODEL,
+      })
+    : undefined;
+  const fallbackSeam = process.env.AI_GATEWAY_KEY
     ? createLiveModelSeam({
         aiGatewayKey: process.env.AI_GATEWAY_KEY,
         aiGatewayBaseUrl: process.env.AI_GATEWAY_BASE_URL,
         aiGatewayModels: process.env.AI_GATEWAY_MODELS,
       })
     : undefined;
-  const modelId = (process.env.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() || "default";
+  const fallbackModel =
+    (process.env.AI_GATEWAY_MODELS ?? "").split(",")[0]?.trim() || "gemma3:12b";
+
+  // Primary + fallback both present → ModelRouter (no mock fallback: if both live
+  // providers fail, the narrate path falls back to a plain factual description,
+  // never a fabricated template). Otherwise use whichever single seam exists.
+  let narrator: ReturnType<typeof createLiveModelSeam> | ModelRouter | undefined;
+  if (primarySeam && fallbackSeam) {
+    narrator = new ModelRouter({ primary: primarySeam, fallback: fallbackSeam, fallbackModel });
+  } else {
+    narrator = primarySeam ?? fallbackSeam;
+  }
+  const modelId = primarySeam
+    ? (process.env.NARRATOR_PRIMARY_MODEL ?? "mistral-small-latest").split(",")[0]?.trim() ||
+      "mistral-small-latest"
+    : fallbackModel;
   const { observation, decision, trace, sources } = await computeDecisiveAttestation(
     {
       claimId,
