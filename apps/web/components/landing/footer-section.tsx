@@ -7,9 +7,8 @@ const footerLinks: Record<
 > = {
   Product: [
     { name: "Live Race", href: "/live" },
-    { name: "Leaderboard", href: "/leaderboard" },
-    { name: "Turing", href: "/turing" },
     { name: "Verify", href: "/verify" },
+    { name: "For issuers", href: "/issuers" },
   ],
   Developers: [
     { name: "Integration guide", href: "/integrate" },

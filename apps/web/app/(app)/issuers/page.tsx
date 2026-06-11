@@ -87,8 +87,8 @@ const ECONOMICS = [
   {
     action: "Attestation proven correct",
     who: "Attestor",
-    amount: "Earns fee share + trust score",
-    purpose: "Reward for accuracy, tracked on the leaderboard.",
+    amount: "Earns fee share + reputation",
+    purpose: "Reward for accuracy, recorded on-chain at settlement.",
   },
   {
     action: "Attestation proven wrong",
@@ -373,8 +373,8 @@ export default function IssuersPage() {
               <Link href="/integrate">
                 <Button variant="primary">Read the integration guide →</Button>
               </Link>
-              <Link href="/leaderboard">
-                <Button variant="outline-dark">View the leaderboard</Button>
+              <Link href="/verify">
+                <Button variant="outline-dark">Verify a claim</Button>
               </Link>
             </div>
           </div>
