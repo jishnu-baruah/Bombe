@@ -1,14 +1,18 @@
 "use client";
 
+import { useHideOnScroll } from "@/lib/use-hide-on-scroll";
 import Link from "next/link";
 import { useState } from "react";
 
 // Glassmorphism nav (anti-slop rule 3): floating pill, backdrop-blur,
 // hairline stroke. CTA follows the white-pill primary button system.
+// `route: true` links are real app pages (Next <Link>); the rest scroll to a
+// section on the landing page (<a href="#...">).
 const navLinks = [
   { name: "Why Bombe", href: "#features" },
   { name: "How it works", href: "#how-it-works" },
   { name: "Claim types", href: "#capabilities" },
+  { name: "Verify", href: "/verify", route: true },
 ];
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -41,9 +45,15 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Hide on scroll-down, reveal on scroll-up; force-visible while the menu is open.
+  const hidden = useHideOnScroll() && !isMobileMenuOpen;
 
   return (
-    <header className="fixed top-[24px] left-0 right-0 z-50 flex justify-center px-4">
+    <header
+      className={`fixed top-[24px] left-0 right-0 z-50 flex justify-center px-4 transition-transform duration-300 ease-out will-change-transform ${
+        hidden ? "-translate-y-[160%]" : "translate-y-0"
+      }`}
+    >
       <nav
         className="w-fit max-w-full backdrop-blur-[20px] bg-white/[0.06] rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
         aria-label="Primary navigation"
@@ -59,15 +69,19 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-3 py-2 rounded-full text-sm text-foreground/70 cursor-pointer transition-colors duration-150 hover:text-foreground hover:bg-white/[0.06]"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const cls =
+                "px-3 py-2 rounded-full text-sm text-foreground/70 cursor-pointer transition-colors duration-150 hover:text-foreground hover:bg-white/[0.06]";
+              return link.route ? (
+                <Link key={link.name} href={link.href} className={cls}>
+                  {link.name}
+                </Link>
+              ) : (
+                <a key={link.name} href={link.href} className={cls}>
+                  {link.name}
+                </a>
+              );
+            })}
           </div>
 
           {/* Desktop CTA */}
@@ -108,19 +122,33 @@ export function Navigation() {
         <div className="flex flex-col h-full px-8 pt-32 pb-8">
           {/* Navigation Links */}
           <div className="flex-1 flex flex-col justify-center gap-8">
-            {navLinks.map((link, i) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`font-display text-4xl text-foreground cursor-pointer transition-all duration-300 hover:text-muted-foreground ${
-                  isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                }`}
-                style={{ transitionDelay: isMobileMenuOpen ? `${i * 60}ms` : "0ms" }}
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link, i) => {
+              const cls = `font-display text-4xl text-foreground cursor-pointer transition-all duration-300 hover:text-muted-foreground ${
+                isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`;
+              const style = { transitionDelay: isMobileMenuOpen ? `${i * 60}ms` : "0ms" };
+              return link.route ? (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cls}
+                  style={style}
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cls}
+                  style={style}
+                >
+                  {link.name}
+                </a>
+              );
+            })}
           </div>
 
           {/* Bottom CTAs */}

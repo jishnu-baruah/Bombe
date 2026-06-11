@@ -1,5 +1,6 @@
 "use client";
 
+import { useHideOnScroll } from "@/lib/use-hide-on-scroll";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -45,9 +46,16 @@ function MenuIcon({ open }: { open: boolean }) {
 export function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Hide the pill on scroll-down, reveal on scroll-up. Force-visible whenever the
+  // mobile menu is open so it can never scroll away mid-interaction.
+  const hidden = useHideOnScroll() && !menuOpen;
 
   return (
-    <header className="fixed top-[24px] left-0 right-0 z-50 flex justify-center px-4">
+    <header
+      className={`fixed top-[24px] left-0 right-0 z-50 flex justify-center px-4 transition-transform duration-300 ease-out will-change-transform ${
+        hidden ? "-translate-y-[160%]" : "translate-y-0"
+      }`}
+    >
       <nav
         className="w-fit max-w-full backdrop-blur-[20px] bg-white/[0.06] rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
         aria-label="Primary navigation"
