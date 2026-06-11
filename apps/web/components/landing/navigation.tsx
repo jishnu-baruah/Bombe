@@ -73,10 +73,10 @@ export function Navigation() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-2">
             <Link
-              href="/leaderboard"
+              href="/issuers"
               className="px-3 py-2 rounded-full text-sm text-foreground/70 cursor-pointer transition-colors duration-150 hover:text-foreground hover:bg-white/[0.06]"
             >
-              Leaderboard
+              For issuers
             </Link>
             <Link
               href="/live"
@@ -131,11 +131,11 @@ export function Navigation() {
             style={{ transitionDelay: isMobileMenuOpen ? "240ms" : "0ms" }}
           >
             <Link
-              href="/leaderboard"
+              href="/issuers"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex-1 inline-flex items-center justify-center h-12 rounded-full border border-white/40 text-base text-foreground cursor-pointer transition-colors duration-150 hover:border-white/70"
             >
-              Leaderboard
+              For issuers
             </Link>
             <Link
               href="/live"

@@ -54,10 +54,10 @@ export function CtaSection() {
                   </span>
                 </Link>
                 <Link
-                  href="/leaderboard"
+                  href="/issuers"
                   className="inline-flex items-center justify-center h-12 px-7 rounded-full border border-white/40 text-base text-foreground cursor-pointer transition-all duration-150 hover:border-white/70 hover:bg-foreground/[0.04] active:scale-[0.98]"
                 >
-                  View leaderboard
+                  Get an attestation
                 </Link>
               </div>
 

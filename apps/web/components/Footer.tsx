@@ -51,10 +51,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/leaderboard"
+                  href="/issuers"
                   className="text-[rgba(255,255,255,0.50)] hover:text-[#ffffff] transition-colors duration-150"
                 >
-                  Leaderboard
+                  For issuers
                 </Link>
               </li>
             </ul>

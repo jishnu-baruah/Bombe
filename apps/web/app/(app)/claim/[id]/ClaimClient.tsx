@@ -457,8 +457,8 @@ function ClaimHeader({ id, claim }: { id: string; claim: Claim | undefined }) {
       <div className="px-6 py-[88px]">
         <div className="max-w-4xl mx-auto">
           <p className="text-[#e23b4a] text-[16px]">Claim &ldquo;{id}&rdquo; not found.</p>
-          <Link href="/leaderboard" className="text-[#376cd5] hover:underline mt-4 block">
-            ← Back to Leaderboard
+          <Link href="/verify" className="text-[#376cd5] hover:underline mt-4 block">
+            ← Back to Verify
           </Link>
         </div>
       </div>
@@ -469,10 +469,10 @@ function ClaimHeader({ id, claim }: { id: string; claim: Claim | undefined }) {
     <section className="px-6 py-[88px] border-b border-[rgba(255,255,255,0.06)]">
       <div className="max-w-4xl mx-auto">
         <Link
-          href="/leaderboard"
+          href="/verify"
           className="text-[#505a63] hover:text-[#ffffff] text-[14px] mb-6 block transition-colors"
         >
-          ← Leaderboard
+          ← Verify
         </Link>
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <span className="font-mono text-[#494fdf] text-[14px]">Claim</span>
