@@ -17,14 +17,14 @@
  * PRD §6.6, §6.7, DESIGN.md.
  */
 
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Mono } from "@/components/ui/Mono";
+import { parseEvent } from "@/lib/parseEvent";
 // Import via alias, browser-safe (avoids Node-only @bombe/shared barrel). See next.config.ts.
 import type { AgentDoneEvent, AgentStepEvent, ClaimPostedEvent, SseEvent } from "@bombe-events";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { Badge } from "../../components/ui/Badge";
-import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
-import { Mono } from "../../components/ui/Mono";
-import { parseEvent } from "../../lib/parseEvent";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -688,9 +688,7 @@ export default function LivePage() {
       {/* ── Hero band ── */}
       <section className="px-6 pt-[88px] pb-8 border-b border-[rgba(255,255,255,0.06)]">
         <div className="max-w-[1200px] mx-auto">
-          <p className="text-[#494fdf] text-[12px] font-semibold tracking-[0.8px] uppercase mb-4">
-            Bombe · Live Race View
-          </p>
+          <p className="eyebrow mb-4">Bombe · Live Race View</p>
           <h1 className="text-[clamp(36px,6vw,56px)] font-semibold leading-[1.0] tracking-[-0.5px] mb-4 balance">
             Agent Race
           </h1>
