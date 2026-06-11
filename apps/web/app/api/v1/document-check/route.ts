@@ -5,6 +5,32 @@ import { NextResponse } from "next/server";
 const CORS = { "Access-Control-Allow-Origin": "*" };
 export const maxDuration = 30;
 
+// SSRF guard: a user-supplied docUrl is server-fetched, so block hosts that resolve
+// to loopback / private / link-local space (incl. the cloud metadata endpoint at
+// 169.254.169.254). Literal-IP and localhost coverage; DNS-rebinding is out of scope.
+function isBlockedHost(rawUrl: string): boolean {
+  let host: string;
+  try {
+    host = new URL(rawUrl).hostname.toLowerCase();
+  } catch {
+    return true; // unparseable -> reject
+  }
+  if (host === "localhost" || host.endsWith(".localhost") || host === "0.0.0.0") return true;
+  if (host === "::1" || host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80"))
+    return true;
+  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+  if (m) {
+    const a = Number(m[1]);
+    const b = Number(m[2]);
+    if (a === 0 || a === 127 || a === 10) return true; // this-host, loopback, private
+    if (a === 192 && b === 168) return true; // private
+    if (a === 172 && b >= 16 && b <= 31) return true; // private
+    if (a === 169 && b === 254) return true; // link-local / cloud metadata
+    if (a >= 224) return true; // multicast / reserved
+  }
+  return false;
+}
+
 // Built-in default example: the live US Treasury "average interest rate" for Treasury
 // Bills (fiscaldata.treasury.gov, JSON). The endpoint is NOT limited to this; any
 // document URL + jsonPath/target can be checked (see params below).
@@ -47,6 +73,12 @@ export async function GET(req: Request) {
     if (!/^https?:\/\//.test(docUrl)) {
       return NextResponse.json(
         { error: "docUrl must be an http(s) URL" },
+        { status: 400, headers: CORS },
+      );
+    }
+    if (isBlockedHost(docUrl)) {
+      return NextResponse.json(
+        { error: "docUrl cannot target loopback, private, or link-local hosts" },
         { status: 400, headers: CORS },
       );
     }
