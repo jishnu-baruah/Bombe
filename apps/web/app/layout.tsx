@@ -1,3 +1,4 @@
+import { SupportChat } from "@/components/SupportChat";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -33,7 +34,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-[#000000] text-[#ffffff] antialiased">{children}</body>
+      <body className="bg-[#000000] text-[#ffffff] antialiased">
+        {children}
+        {/* Global support chatbot: client-only widget, mounted once so it
+            appears on the landing page and every inner app route. */}
+        <SupportChat />
+      </body>
     </html>
   );
 }
