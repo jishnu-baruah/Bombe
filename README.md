@@ -90,7 +90,7 @@ Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evide
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-08_
+_Generated: 2026-06-11_
 
 ### Overall
 
@@ -117,7 +117,7 @@ _Generated: 2026-06-08_
 ### Test Counts
 
 - 77 forge tests
-- 755 vitest tests
+- 765 vitest tests
 
 ### Operator Items
 
