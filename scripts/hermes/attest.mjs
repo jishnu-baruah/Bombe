@@ -28,9 +28,9 @@ import {
   createWalletClient,
   encodeFunctionData,
   keccak256,
+  parseEther,
   stringToHex,
   toBytes,
-  parseEther,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepoliaTestnet } from "viem/chains";
@@ -96,7 +96,8 @@ if (!claimId || !(decisionStr in DECISION)) {
   console.error(
     JSON.stringify({
       ok: false,
-      error: "usage: --claim <id> --decision VALID|REJECTED|ABSTAIN [--confidence n] [--rationale s]",
+      error:
+        "usage: --claim <id> --decision VALID|REJECTED|ABSTAIN [--confidence n] [--rationale s]",
     }),
   );
   process.exit(1);
@@ -198,8 +199,16 @@ async function main() {
         observation: { tier },
       },
     ],
-    final: { decision: decisionStr, confidenceBps: confidence, rationaleSummary: rationale || null },
-    provenance: { attestor: account.address, runtime: "nous-hermes", model: env("MODEL", "mistral-small-latest") },
+    final: {
+      decision: decisionStr,
+      confidenceBps: confidence,
+      rationaleSummary: rationale || null,
+    },
+    provenance: {
+      attestor: account.address,
+      runtime: "nous-hermes",
+      model: env("MODEL", "mistral-small-latest"),
+    },
   };
   const sources = [{ name: sourceName, source: "nous-hermes-skill" }];
   const reasoningHash = hashCanonical(trace);
@@ -258,7 +267,14 @@ async function main() {
     data: encodeFunctionData({
       abi: ABI,
       functionName: "attest",
-      args: [id32(claimId), DECISION[decisionStr], confidence, sourcesHash, reasoningHash, traceURI],
+      args: [
+        id32(claimId),
+        DECISION[decisionStr],
+        confidence,
+        sourcesHash,
+        reasoningHash,
+        traceURI,
+      ],
     }),
     value: ATTEST_LOCK,
     ...(gasOverride ? { gas: BigInt(gasOverride) } : {}),
