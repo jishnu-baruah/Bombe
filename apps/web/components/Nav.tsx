@@ -70,6 +70,14 @@ export function Nav() {
             className="flex items-center gap-2 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf] rounded-sm"
             aria-label="Bombe home"
           >
+            <img
+              src="/brand/bombe-monogram-gradient.svg"
+              alt=""
+              aria-hidden="true"
+              width={22}
+              height={22}
+              className="h-[22px] w-[22px]"
+            />
             <span className="font-display text-lg text-foreground">Bombe</span>
             <span className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground mt-0.5">
               TESTNET
