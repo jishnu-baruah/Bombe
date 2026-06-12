@@ -150,7 +150,7 @@ export default async function VerifyPage({
               type="text"
               name="q"
               defaultValue={q ?? ""}
-              placeholder="mETH-2026-06-07  or  0x… hash  or  tx hash"
+              placeholder="mETH-REQ-a9dbaf4521  or  0x… hash  or  tx hash"
               aria-label="Claim ID, reasoning hash, or transaction hash"
               className="flex-1 px-4 py-3 rounded-full bg-[#16181a] border border-white/[0.08] text-[15px] text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:border-[#494fdf] transition-colors"
             />

@@ -7,12 +7,12 @@ Read a claim and its on-chain attestations, re-derive each reasoning hash, and s
 The claim and every on-chain attestation. Returns `404` if the claim is not posted.
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/claims/mETH-REQ-a9dbaf4521
 ```
 
 ```json
 {
-  "claimId": "mETH-2026-06-07",
+  "claimId": "mETH-REQ-a9dbaf4521",
   "posted": true,
   "tier": 1,
   "closed": false,
@@ -24,7 +24,7 @@ curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
       "confidenceBps": 10000,
       "reasoningHash": "0x...",
       "sourcesHash": "0x...",
-      "traceURI": "https://.../api/trace/mETH-2026-06-07/0x3ba0...",
+      "traceURI": "https://.../api/trace/mETH-REQ-a9dbaf4521/0x3ba0...",
       "lockedStakeWei": "20000000000000000"
     }
   ]
@@ -40,12 +40,12 @@ For each attestation: fetch the trace, recompute `keccak256(canonicalJson(trace)
 | `attestor` (query) | optional; verify only this attestor |
 
 ```sh
-curl "https://bombe-web.vercel.app/api/v1/verify/mETH-2026-06-07"
+curl "https://bombe-web.vercel.app/api/v1/verify/mETH-REQ-a9dbaf4521"
 ```
 
 ```json
 {
-  "claimId": "mETH-2026-06-07",
+  "claimId": "mETH-REQ-a9dbaf4521",
   "results": [
     {
       "attestor": "0x3BA0...",

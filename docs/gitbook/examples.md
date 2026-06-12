@@ -10,7 +10,7 @@ Read a claim, then re-derive its reasoning hash yourself.
 const BASE = "https://bombe-web.vercel.app/api/v1";
 import { hashCanonical } from "@bombe/shared";
 
-const claimId = "mETH-2026-06-07";
+const claimId = "mETH-REQ-a9dbaf4521";
 const claim = await fetch(`${BASE}/claims/${claimId}`).then((r) => r.json());
 
 for (const a of claim.attestations) {
@@ -23,7 +23,7 @@ for (const a of claim.attestations) {
 No SDK? Let the endpoint do it:
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/verify/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/verify/mETH-REQ-a9dbaf4521
 ```
 
 ## 2. Discover attestable assets

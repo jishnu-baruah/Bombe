@@ -141,14 +141,20 @@ export async function POST(req: Request) {
   });
 
   try {
-    const [tx, receipt] = await Promise.all([
-      client.getTransaction({ hash: paymentTxHash as `0x${string}` }),
-      client.getTransactionReceipt({ hash: paymentTxHash as `0x${string}` }),
-    ]);
+    // Wait for the tx to be mined and the receipt to reach our RPC. A one-shot
+    // read raced users who submit right after paying (the "receipt could not be
+    // found" failure), even though their payment was valid. Bounded so we stay
+    // well within maxDuration.
+    const receipt = await client.waitForTransactionReceipt({
+      hash: paymentTxHash as `0x${string}`,
+      timeout: 30_000,
+      pollingInterval: 2_000,
+    });
 
     if (receipt.status !== "success") {
       return bad("Payment transaction did not succeed on-chain.");
     }
+    const tx = await client.getTransaction({ hash: paymentTxHash as `0x${string}` });
     if ((tx.to ?? "").toLowerCase() !== PAYMENT_ADDRESS) {
       return bad("Payment was not sent to the expected receiving address.");
     }
@@ -160,9 +166,9 @@ export async function POST(req: Request) {
     }
   } catch (e) {
     return bad(
-      `Could not verify the payment yet (it may still be propagating): ${
+      `Could not confirm the payment in time (the network may be slow): ${
         e instanceof Error ? e.message : "read failed"
-      }`,
+      }. Your payment is safe and was not used; keep the transaction hash and submit it again in a few seconds.`,
       502,
     );
   }
