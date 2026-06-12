@@ -7,7 +7,13 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["**/node_modules/**", "**/dist/**", "**/*.tsbuildinfo", "contracts/**"]
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/*.tsbuildinfo",
+      "contracts/**",
+      "subgraph/**"
+    ]
   },
   "organizeImports": {
     "enabled": true
