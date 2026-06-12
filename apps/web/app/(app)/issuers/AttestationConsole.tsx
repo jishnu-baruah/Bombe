@@ -32,10 +32,10 @@ interface SchemaClaim {
 }
 
 const field =
-  "w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] placeholder:text-[#505a63] focus:outline-none focus:border-[#494fdf]";
-const labelCls = "block text-[13px] text-[rgba(255,255,255,0.72)] mb-1.5";
+  "w-full px-4 py-2.5 rounded-xl bg-[#16181a] border border-white/[0.08] text-[15px] text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#494fdf] transition-colors";
+const labelCls = "block text-[13px] text-muted-foreground mb-1.5";
 const btn =
-  "rounded-[10px] bg-[#494fdf] hover:bg-[#5a60e8] disabled:opacity-50 px-6 py-2.5 text-[14px] font-semibold text-[#ffffff] transition-colors";
+  "rounded-full bg-[#494fdf] hover:bg-[#5a60e8] disabled:opacity-50 px-6 py-2.5 text-[14px] font-medium text-white transition-colors active:scale-[0.98]";
 
 function Verdict({ verdict, detail, extra }: { verdict: string; detail: string; extra?: string }) {
   const color =
@@ -47,11 +47,9 @@ function Verdict({ verdict, detail, extra }: { verdict: string; detail: string; 
   return (
     <div className={`mt-5 rounded-[14px] border px-5 py-4 ${color}`}>
       <p className="text-[14px] font-semibold mb-1">{verdict}</p>
-      <p className="text-[13px] text-[rgba(255,255,255,0.65)] leading-[1.5]">{detail}</p>
+      <p className="text-[13px] text-muted-foreground leading-[1.5]">{detail}</p>
       {extra && (
-        <p className="text-[12px] text-[rgba(255,255,255,0.45)] font-mono break-all mt-2">
-          {extra}
-        </p>
+        <p className="text-[12px] text-muted-foreground/70 font-mono break-all mt-2">{extra}</p>
       )}
     </div>
   );
@@ -97,9 +95,9 @@ function NavCheckForm({ chains }: { chains: string[] }) {
 
   return (
     <div>
-      <p className="text-[14px] text-[rgba(255,255,255,0.55)] leading-[1.5] mb-5">
+      <p className="text-[14px] text-muted-foreground leading-[1.5] mb-5">
         Read an ERC-4626 vault&apos;s share price straight off the chain and cross-check an asserted
-        NAV. Independent of any aggregator, the evidence is the chain itself. Free, live.
+        NAV. The evidence is the chain itself.
       </p>
       <div className="grid sm:grid-cols-2 gap-4 mb-4">
         <label>
@@ -203,14 +201,14 @@ function DocCheckForm() {
 
   return (
     <div>
-      <p className="text-[14px] text-[rgba(255,255,255,0.55)] leading-[1.5] mb-2">
+      <p className="text-[14px] text-muted-foreground leading-[1.5] mb-2">
         Point at any document. We pin it by hash, extract the cited figure at your JSON path, and
-        deterministically cross-check the asserted value. Free, live.
+        deterministically cross-check the asserted value.
       </p>
       <button
         type="button"
         onClick={treasuryPreset}
-        className="text-[12px] text-[#494fdf] hover:text-[#6b70e8] mb-5"
+        className="text-[12px] text-[#9296f5] hover:text-white transition-colors mb-5"
       >
         Use the US Treasury bill rate as a preset →
       </button>
@@ -316,15 +314,15 @@ export function AttestationConsole() {
               onClick={() => setMode(t.id)}
               className={`px-4 py-2 rounded-[12px] text-left transition-colors border ${
                 mode === t.id
-                  ? "bg-[#16181a] border-[rgba(73,79,223,0.4)] text-[#ffffff]"
-                  : "bg-transparent border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.55)] hover:text-[#ffffff]"
+                  ? "bg-[#16181a] border-[rgba(73,79,223,0.4)] text-foreground"
+                  : "bg-transparent border-white/[0.08] text-muted-foreground hover:text-foreground"
               }`}
             >
               <span className="flex items-center gap-2 text-[14px] font-semibold">
                 {t.label}
                 {st === "live" && <span className="w-1.5 h-1.5 rounded-full bg-[#86c95f]" />}
               </span>
-              <span className="block text-[11px] text-[rgba(255,255,255,0.4)]">{t.sub}</span>
+              <span className="block text-[11px] text-muted-foreground/70">{t.sub}</span>
             </button>
           );
         })}
@@ -333,7 +331,7 @@ export function AttestationConsole() {
       {mode === "nav" && <NavCheckForm chains={navChains} />}
       {mode === "document" && <DocCheckForm />}
       {morePlanned.length > 0 && (
-        <p className="text-[12px] text-[rgba(255,255,255,0.4)] mt-6">
+        <p className="text-[12px] text-muted-foreground/70 mt-6">
           {morePlanned.length} more claim type{morePlanned.length > 1 ? "s" : ""} planned (
           {morePlanned.map((c) => c.claimType).join(", ")}). They appear here automatically when
           they go live. See the full matrix on the home page.

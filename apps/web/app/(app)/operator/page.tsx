@@ -61,7 +61,7 @@ async function callOperatorApi(
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Card variant="feature-dark" className="mb-6">
-      <h2 className="text-[20px] font-semibold leading-[1.4] mb-4 text-[#ffffff]">{title}</h2>
+      <h2 className="font-display text-xl text-foreground mb-4">{title}</h2>
       {children}
     </Card>
   );
@@ -81,7 +81,7 @@ function Field({
   return (
     <div className="mb-3">
       {/* biome-ignore lint/a11y/noLabelWithoutControl: label wraps generic children which include the control */}
-      <label className="block text-[13px] text-[rgba(255,255,255,0.72)] mb-1">
+      <label className="block text-[13px] text-muted-foreground mb-1">
         {label}
         <div className="mt-1">{children}</div>
       </label>
@@ -90,10 +90,10 @@ function Field({
 }
 
 const INPUT_CLS =
-  "w-full bg-[#0a0a0a] text-[#ffffff] border border-[rgba(255,255,255,0.12)] rounded-[12px] px-4 py-[14px] text-[16px] leading-[1.5] tracking-[0.24px] focus:outline-none focus:border-[#494fdf] placeholder:text-[rgba(255,255,255,0.30)] h-14";
+  "w-full bg-[#16181a] text-foreground border border-white/[0.08] rounded-[12px] px-4 py-[14px] text-[16px] leading-[1.5] tracking-[0.24px] focus:outline-none focus:border-[#494fdf] placeholder:text-muted-foreground/70 h-14 transition-colors";
 
 const SELECT_CLS =
-  "w-full bg-[#0a0a0a] text-[#ffffff] border border-[rgba(255,255,255,0.12)] rounded-[12px] px-4 py-[14px] text-[16px] leading-[1.5] h-14 focus:outline-none focus:border-[#494fdf]";
+  "w-full bg-[#16181a] text-foreground border border-white/[0.08] rounded-[12px] px-4 py-[14px] text-[16px] leading-[1.5] h-14 focus:outline-none focus:border-[#494fdf] transition-colors";
 
 function AckBox({ result }: { result: AckResult | null }) {
   if (result === null) return null;
@@ -213,7 +213,7 @@ function AdvanceForm({ operatorKey }: { operatorKey: string }) {
 
   return (
     <div>
-      <p className="text-[14px] text-[rgba(255,255,255,0.72)] mb-3">
+      <p className="text-[14px] text-muted-foreground mb-3">
         Advances the demo state machine to the next claim in the A→D sequence.
       </p>
       <Button variant="primary" onClick={handleClick} disabled={loading}>
@@ -338,7 +338,7 @@ function RegisterAgentForm({ operatorKey }: { operatorKey: string }) {
               onChange={(e) => setIsHuman(e.target.checked)}
               className="w-4 h-4 accent-[#494fdf]"
             />
-            <label htmlFor="isHuman" className="text-[16px] text-[rgba(255,255,255,0.72)]">
+            <label htmlFor="isHuman" className="text-[16px] text-muted-foreground">
               Register as human attestor
             </label>
           </div>
@@ -378,7 +378,7 @@ function HumanAttestForm({ operatorKey }: { operatorKey: string }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <p className="text-[14px] text-[rgba(255,255,255,0.72)] mb-3">
+      <p className="text-[14px] text-muted-foreground mb-3">
         Submit a human attestation. Confidence 0–10000 bps (100% = 10000).
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -450,7 +450,7 @@ function PlugboardControl({ operatorKey }: { operatorKey: string }) {
 
   return (
     <div>
-      <p className="text-[14px] text-[rgba(255,255,255,0.72)] mb-4">
+      <p className="text-[14px] text-muted-foreground mb-4">
         Freeze snapshots the Plugboard skill file and blocks further writes until unfrozen. Used
         before epoch settlement to pin the active skill hash.
       </p>
@@ -489,13 +489,13 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-[28rem]">
-        <p className="text-[#8d969e] text-[13px] font-mono mb-4 text-center">
+        <p className="text-muted-foreground text-[13px] font-mono mb-4 text-center">
           /operator, access control
         </p>
-        <h1 className="text-[40px] font-semibold leading-[1.2] tracking-[-0.4px] text-center mb-2">
+        <h1 className="font-display text-[40px] leading-[1.2] text-center text-foreground mb-2">
           Operator Console
         </h1>
-        <p className="text-[rgba(255,255,255,0.72)] text-[16px] text-center mb-8">
+        <p className="text-muted-foreground text-[16px] text-center mb-8">
           Enter your operator key to continue.
         </p>
         <form onSubmit={handleSubmit}>
@@ -516,9 +516,9 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
             Unlock Console
           </Button>
         </form>
-        <p className="text-[#8d969e] text-[13px] mt-6 text-center">
+        <p className="text-muted-foreground text-[13px] mt-6 text-center">
           Default in mock mode:{" "}
-          <span className="font-mono text-[rgba(255,255,255,0.72)]">dev-operator</span>
+          <span className="font-mono text-muted-foreground">dev-operator</span>
         </p>
       </div>
     </div>
@@ -555,7 +555,7 @@ export default function OperatorPage() {
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <span className="text-[rgba(255,255,255,0.30)] text-[14px]">Loading…</span>
+        <span className="text-muted-foreground/70 text-[14px]">Loading…</span>
       </div>
     );
   }
@@ -570,11 +570,11 @@ export default function OperatorPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
           <div>
-            <p className="text-[#8d969e] text-[13px] font-mono mb-2">/operator</p>
-            <h1 className="text-[48px] font-semibold leading-[1.21] tracking-[-0.48px]">
+            <p className="text-muted-foreground text-[13px] font-mono mb-2">/operator</p>
+            <h1 className="font-display text-[48px] leading-[1.21] text-foreground">
               Operator Console
             </h1>
-            <p className="text-[rgba(255,255,255,0.72)] mt-2 text-[16px]">
+            <p className="text-muted-foreground mt-2 text-[16px]">
               Gated API actions for seeding claims, advancing demo, settling, and attesting.
             </p>
           </div>
@@ -582,11 +582,7 @@ export default function OperatorPage() {
             <Link href="/operator/health">
               <Button variant="outline-dark">Health Dashboard</Button>
             </Link>
-            <Button
-              variant="soft"
-              onClick={handleLogout}
-              className="!bg-[#16181a] !text-[rgba(255,255,255,0.72)] hover:!text-[#ffffff]"
-            >
+            <Button variant="outline-dark" onClick={handleLogout}>
               Sign Out
             </Button>
           </div>
@@ -595,9 +591,9 @@ export default function OperatorPage() {
         {/* Key indicator */}
         <div className="mb-8 px-4 py-3 rounded-[12px] bg-[rgba(73,79,223,0.10)] border border-[rgba(73,79,223,0.24)] flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-[#494fdf] inline-block" />
-          <span className="text-[14px] text-[rgba(255,255,255,0.72)]">
+          <span className="text-[14px] text-muted-foreground">
             Authenticated as operator{" "}
-            <span className="font-mono text-[#ffffff]">
+            <span className="font-mono text-foreground">
               {operatorKey.slice(0, 4)}
               {"*".repeat(Math.max(0, operatorKey.length - 4))}
             </span>

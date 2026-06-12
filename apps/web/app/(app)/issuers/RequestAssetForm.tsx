@@ -53,13 +53,13 @@ export function RequestAssetForm() {
     return (
       <div className="rounded-[16px] bg-[rgba(66,134,25,0.08)] border border-[rgba(66,134,25,0.3)] p-6">
         <p className="text-[15px] text-[#86c95f] font-semibold mb-1">Request recorded.</p>
-        <p className="text-[14px] text-[rgba(255,255,255,0.6)] leading-[1.5]">{msg}</p>
+        <p className="text-[14px] text-muted-foreground leading-[1.5]">{msg}</p>
       </div>
     );
   }
 
   const field =
-    "w-full rounded-[10px] bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] px-4 py-3 text-[14px] text-[#ffffff] placeholder:text-[rgba(255,255,255,0.3)] focus:border-[#494fdf] outline-none";
+    "w-full rounded-[10px] bg-[#16181a] border border-white/[0.08] px-4 py-3 text-[14px] text-foreground placeholder:text-muted-foreground/70 focus:border-[#494fdf] outline-none transition-colors";
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
@@ -96,7 +96,7 @@ export function RequestAssetForm() {
       <button
         type="submit"
         disabled={state === "sending"}
-        className="self-start rounded-[10px] bg-[#494fdf] hover:bg-[#5a60e8] disabled:opacity-50 px-6 py-3 text-[14px] font-semibold text-[#ffffff] transition-colors"
+        className="self-start rounded-full bg-[#494fdf] hover:bg-[#5a60e8] disabled:opacity-50 px-6 py-3 text-[14px] font-medium text-white transition-colors active:scale-[0.98]"
       >
         {state === "sending" ? "Sending…" : "Request this asset"}
       </button>
