@@ -21,6 +21,32 @@ interface RouteParams {
   agent: string;
 }
 
+// Live attestation traces are stored keyed by the attestor's ADDRESS (the
+// on-chain traceURI uses the address). The /claim page tabs request by agent
+// NAME, so resolve a known name to its deployed address before looking up.
+const AGENT_ADDRESS: Record<string, string> = {
+  reflector: "0x3BA08C723D41A98339D43Ffa01174791EaE813Fa",
+  rotor: "0x5e90bd4E238C2cE66D41B6c86f39B791441e69A7",
+  stator: "0x3c8612D5d13636De52492c8Dfa84b455064C8bf8",
+  human: "0x98fAb4C835475C95C797aAee9CE0C03942a524C6",
+  plugboard: "0x58826a9FCb6956332D0833b9175CE40A7587957e",
+};
+
+/** Look up a stored trace, trying the agent as-is then its mapped address (both cases). */
+async function findTrace(claimId: string, agent: string): Promise<string | null> {
+  const tried = new Set<string>();
+  const candidates = [agent];
+  const mapped = AGENT_ADDRESS[agent.toLowerCase()];
+  if (mapped) candidates.push(mapped, mapped.toLowerCase());
+  for (const key of candidates) {
+    if (tried.has(key)) continue;
+    tried.add(key);
+    const stored = await getStoredTrace(claimId, key);
+    if (stored) return stored;
+  }
+  return null;
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<RouteParams> },
@@ -29,7 +55,7 @@ export async function GET(
 
   if (getRunMode() === "live") {
     try {
-      const stored = await getStoredTrace(claimId, agent);
+      const stored = await findTrace(claimId, agent);
       if (stored) {
         return new NextResponse(stored, {
           headers: {

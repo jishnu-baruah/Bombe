@@ -14,15 +14,15 @@ Returns the curated assets (mETH, USDY), the chain, and the `AgentAttestation` a
 
 ## 2. Read a claim and its verdicts
 
-A claim id looks like `mETH-2026-06-07` (symbol plus date for the daily streak).
+A claim id is a short string, for example `mETH-REQ-a9dbaf4521` (a self-serve request claim).
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/claims/mETH-REQ-a9dbaf4521
 ```
 
 ```json
 {
-  "claimId": "mETH-2026-06-07",
+  "claimId": "mETH-REQ-a9dbaf4521",
   "posted": true,
   "tier": 1,
   "closed": false,
@@ -34,7 +34,7 @@ curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
       "confidenceBps": 10000,
       "reasoningHash": "0x363137...",
       "sourcesHash": "0x...",
-      "traceURI": "https://bombe-web.vercel.app/api/trace/mETH-2026-06-07/0x3ba0...",
+      "traceURI": "https://bombe-web.vercel.app/api/trace/mETH-REQ-a9dbaf4521/0x3ba0...",
       "lockedStakeWei": "20000000000000000"
     }
   ]
@@ -48,12 +48,12 @@ curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
 This re-derives the reasoning hash from the published trace and compares it to the on-chain value.
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/verify/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/verify/mETH-REQ-a9dbaf4521
 ```
 
 ```json
 {
-  "claimId": "mETH-2026-06-07",
+  "claimId": "mETH-REQ-a9dbaf4521",
   "results": [
     {
       "attestor": "0x3BA08C723D41A98339D43Ffa01174791EaE813Fa",
@@ -74,10 +74,10 @@ curl https://bombe-web.vercel.app/api/v1/verify/mETH-2026-06-07
 ```js
 const BASE = "https://bombe-web.vercel.app/api/v1";
 
-const claim = await fetch(`${BASE}/claims/mETH-2026-06-07`).then((r) => r.json());
+const claim = await fetch(`${BASE}/claims/mETH-REQ-a9dbaf4521`).then((r) => r.json());
 console.log(claim.attestations[0].decision); // "VALID"
 
-const verify = await fetch(`${BASE}/verify/mETH-2026-06-07`).then((r) => r.json());
+const verify = await fetch(`${BASE}/verify/mETH-REQ-a9dbaf4521`).then((r) => r.json());
 console.log(verify.results[0].status); // "verified"
 ```
 
