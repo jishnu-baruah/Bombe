@@ -12,12 +12,14 @@ export const PAGES = [
   { route: "/", what: "Overview of Bombe." },
   { route: "/live", what: "The live attestor race; the capability showcase." },
   { route: "/verify", what: "Paste a claim ID, reasoningHash, or tx to verify on-chain." },
-  { route: "/issuers", what: "The issuer console; get an attestation." },
+  {
+    route: "/issuers",
+    what: "The issuer console; get an attestation (the paid yield request lives here).",
+  },
   {
     route: "/integrate",
     what: "Developer + AI-agent integration guide (keyless JSON API + MCP).",
   },
-  { route: "/request", what: "Self-serve paid attestation." },
 ] as const;
 
 /**

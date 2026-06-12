@@ -21,7 +21,7 @@ curl https://bombe-web.vercel.app/api/v1/request
 
 ## 2. Pay the fee from your own wallet
 
-Send exactly the fee (or more) in MNT to the receiving address on Mantle Sepolia. In the browser the [request form](https://bombe-web.vercel.app/request) does this for you via your wallet; programmatically, send a plain transfer:
+Send exactly the fee (or more) in MNT to the receiving address on Mantle Sepolia. In the browser the [issuer console](https://bombe-web.vercel.app/issuers#get-attestation) does this for you via your wallet; programmatically, send a plain transfer:
 
 ```js
 import { createWalletClient, custom, parseEther } from "viem";

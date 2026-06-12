@@ -20,7 +20,7 @@ const footerLinks: Record<
     },
     { name: "Integration guide", href: "/integrate" },
     { name: "API schema", href: "/api/v1/schema", external: true },
-    { name: "Request attestation", href: "/request" },
+    { name: "Request attestation", href: "/issuers#get-attestation" },
   ],
   Protocol: [
     { name: "Operator console", href: "/operator" },

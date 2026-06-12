@@ -152,7 +152,7 @@ export default function IssuersPage() {
             Sepolia, not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/request" className={BTN_PRIMARY}>
+            <Link href="#get-attestation" className={BTN_PRIMARY}>
               Request an attestation →
             </Link>
             <Link href="/integrate" className={BTN_OUTLINE}>
@@ -163,7 +163,10 @@ export default function IssuersPage() {
       </section>
 
       {/* Pay and get your attestation (embedded, non-custodial) */}
-      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+      <section
+        id="get-attestation"
+        className="scroll-mt-28 px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]"
+      >
         <div className="max-w-[1200px] mx-auto">
           <span className="eyebrow block mb-6">Get your attestation</span>
           <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">

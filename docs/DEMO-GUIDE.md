@@ -110,15 +110,16 @@ URL blank to use the Treasury preset).
 Expect: VALID. Detail names the live Treasury figure (around 369 bps) and the
 pinned document hash.
 
-## 5. Request a paid attestation (/request)
+## 5. Request a paid attestation (/issuers, the Yield tab of the console)
 
 Say: "Anyone can pay 0.02 MNT to request a fresh attestation. It is
 non-custodial: you pay from your own wallet to the receiving address, then
 submit the payment tx hash. The network posts the claim and the attestation
 appears on the verify page."
 
-Do: pick an asset, enter the asserted yield (bps) and the window in days, show
-the price and receiving address. Submitting needs a wallet payment.
+Do: on /issuers, scroll to the console ("Get your attestation") and use the
+Yield tab; pick an asset, enter the asserted yield (bps) and the window in days,
+show the price and receiving address. Submitting needs a wallet payment.
 
 Type (non-wallet parts): asset `mETH`, asserted yield `195`, window days `30`.
 Claim type is fixed to YIELD_BPS.
@@ -183,5 +184,5 @@ the REJECTED attestor `0x3BA08C723D41A98339D43Ffa01174791EaE813Fa`.
 Expect: a success message, "Dispute recorded and under review." The claim then
 shows a "disputed, under review" chip on the attestor.
 
-Note for the recorder: everything except the paid `/request` step is fully
+Note for the recorder: everything except the paid request step is fully
 clickable with no wallet, and all of it was verified against the live API.

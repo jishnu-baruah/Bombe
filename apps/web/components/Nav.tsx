@@ -17,7 +17,6 @@ const NAV_LINKS = [
   { href: "/explorer", label: "Explorer" },
   { href: "/verify", label: "Verify" },
   { href: "/issuers", label: "Issuers" },
-  { href: "/request", label: "Request" },
   { href: "/integrate", label: "Integrate" },
 ] as const;
 
