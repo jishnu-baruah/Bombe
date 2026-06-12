@@ -359,7 +359,7 @@ export default function IssuersPage() {
                     {c.live ? "Live" : "On request"}
                   </span>
                 </div>
-                <p className="text-[12.5px] text-muted-foreground/70 leading-relaxed">{c.eg}</p>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">{c.eg}</p>
               </div>
             ))}
           </div>

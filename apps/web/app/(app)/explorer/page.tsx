@@ -92,7 +92,7 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
           </Link>
           <TierBadge tier={claim.tier} />
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60">
+        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
           {claim.source}
         </span>
       </div>
