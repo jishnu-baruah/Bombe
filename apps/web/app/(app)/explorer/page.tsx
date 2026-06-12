@@ -167,7 +167,20 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
   );
 }
 
-export default async function ExplorerPage() {
+const DECISION_FILTERS = [
+  { label: "All", value: null },
+  { label: "Valid", value: "VALID" },
+  { label: "Rejected", value: "REJECTED" },
+  { label: "Abstain", value: "ABSTAIN" },
+  { label: "Pending", value: "PENDING" },
+] as const;
+
+export default async function ExplorerPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ decision?: string }>;
+}) {
+  const { decision: decisionFilter } = await searchParams;
   let feed: Awaited<ReturnType<typeof getActivityFeed>> | null = null;
   let errored = false;
   try {
@@ -176,8 +189,14 @@ export default async function ExplorerPage() {
     errored = true;
   }
 
-  const claims = feed?.claims ?? [];
+  const allClaims = feed?.claims ?? [];
+  const claims = decisionFilter
+    ? allClaims.filter((c) =>
+        decisionFilter === "PENDING" ? c.decision === null : c.decision === decisionFilter,
+      )
+    : allClaims;
   const hasRows = claims.length > 0;
+  const filteredOut = !hasRows && allClaims.length > 0;
 
   return (
     <div className="bg-background text-foreground">
@@ -203,12 +222,31 @@ export default async function ExplorerPage() {
           {/* Source + count line */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <span className="eyebrow">Recent activity</span>
-            {hasRows ? (
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70">
-                {claims.length} claim{claims.length === 1 ? "" : "s"}
-                {feed?.source === "subgraph" ? " · indexed" : " · live read"}
-              </span>
-            ) : null}
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70">
+              {claims.length} claim{claims.length === 1 ? "" : "s"}
+              {feed?.source === "subgraph" ? " · indexed" : " · live read"}
+            </span>
+          </div>
+
+          {/* Decision filter tabs */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            {DECISION_FILTERS.map((f) => {
+              const active = (f.value ?? null) === (decisionFilter ?? null);
+              const href = f.value ? `/explorer?decision=${f.value}` : "/explorer";
+              return (
+                <Link
+                  key={f.label}
+                  href={href}
+                  className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium border transition-colors ${
+                    active
+                      ? "bg-white text-black border-white"
+                      : "border-white/[0.12] text-muted-foreground hover:text-foreground hover:border-white/30"
+                  }`}
+                >
+                  {f.label}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="rounded-[20px] bg-[#16181a] border border-white/[0.08] overflow-hidden">
@@ -243,10 +281,14 @@ export default async function ExplorerPage() {
               claims.map((claim) => <ClaimRow key={claim.claimIdHex} claim={claim} />)
             ) : (
               <div className="px-6 py-16 text-center">
-                <p className="text-base text-foreground mb-2">No recent activity in range.</p>
+                <p className="text-base text-foreground mb-2">
+                  {filteredOut ? "No claims match this filter." : "No recent activity in range."}
+                </p>
                 <p className="text-sm text-muted-foreground max-w-[34rem] mx-auto">
-                  No claims were posted in the bounded recent window read here. New activity appears
-                  within a block or two; you can also verify a known claim on{" "}
+                  {filteredOut
+                    ? "Try a different filter above, or "
+                    : "No claims were posted in the bounded recent window read here. New activity appears within a block or two; you can also "}
+                  verify a known claim on{" "}
                   <Link
                     href="/verify"
                     className="text-[#9296f5] hover:text-white transition-colors"

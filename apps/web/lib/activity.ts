@@ -27,10 +27,43 @@ const DECISION = ["VALID", "REJECTED", "ABSTAIN"] as const;
 const EXPLORER = "https://sepolia.mantlescan.xyz";
 
 // The bounded look-back for the getLogs path. The public Mantle Sepolia RPC
-// caps eth_getLogs to a finite range, so we scan a recent window rather than
-// the whole chain. This is the honest range bound of the no-indexer path; the
-// subgraph path (SUBGRAPH_URL) removes it.
-const LOG_LOOKBACK_BLOCKS = BigInt(process.env.EXPLORER_LOG_LOOKBACK ?? "45000");
+// caps eth_getLogs to ~10000 blocks per call (a larger range throws "Invalid
+// parameters"), so we scan a recent window in CHUNKS under that cap. This is the
+// honest range bound of the no-indexer path; the subgraph path removes it.
+const LOG_LOOKBACK_BLOCKS = BigInt(process.env.EXPLORER_LOG_LOOKBACK ?? "100000");
+const LOG_CHUNK_BLOCKS = BigInt(process.env.EXPLORER_LOG_CHUNK ?? "9000");
+
+// getLogs over [fromBlock, toBlock] in chunks under the RPC range cap, in
+// parallel, tolerating per-chunk RPC failures (a flaky chunk drops, not the feed).
+async function getLogsChunked(
+  c: ReturnType<typeof createPublicClient>,
+  // biome-ignore lint/suspicious/noExplicitAny: the parsed event fragment; viem's getLogs generics are not worth threading here
+  event: any,
+  fromBlock: bigint,
+  toBlock: bigint,
+  // biome-ignore lint/suspicious/noExplicitAny: viem narrows the decoded log shape per event; callers re-decode via the ABI
+): Promise<any[]> {
+  const ranges: [bigint, bigint][] = [];
+  for (let from = fromBlock; from <= toBlock; from += LOG_CHUNK_BLOCKS + 1n) {
+    const to = from + LOG_CHUNK_BLOCKS > toBlock ? toBlock : from + LOG_CHUNK_BLOCKS;
+    ranges.push([from, to]);
+  }
+  const results = await Promise.all(
+    ranges.map(async ([from, to]) => {
+      try {
+        return await c.getLogs({
+          address: ATTESTATION_ADDRESS,
+          event,
+          fromBlock: from,
+          toBlock: to,
+        });
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return results.flat();
+}
 
 let _client: ReturnType<typeof createPublicClient> | undefined;
 function client(): ReturnType<typeof createPublicClient> {
@@ -206,26 +239,10 @@ async function fromChain(
   const fromBlock = latest > LOG_LOOKBACK_BLOCKS ? latest - LOG_LOOKBACK_BLOCKS : 0n;
   const bounded = fromBlock > 0n;
 
-  let postedLogs: Awaited<ReturnType<typeof c.getLogs>>;
-  let attestedLogs: Awaited<ReturnType<typeof c.getLogs>>;
-  try {
-    [postedLogs, attestedLogs] = await Promise.all([
-      c.getLogs({
-        address: ATTESTATION_ADDRESS,
-        event: CLAIM_POSTED_EVENT,
-        fromBlock,
-        toBlock: latest,
-      }),
-      c.getLogs({
-        address: ATTESTATION_ADDRESS,
-        event: ATTESTED_EVENT,
-        fromBlock,
-        toBlock: latest,
-      }),
-    ]);
-  } catch {
-    return null;
-  }
+  const [postedLogs, attestedLogs] = await Promise.all([
+    getLogsChunked(c, CLAIM_POSTED_EVENT, fromBlock, latest),
+    getLogsChunked(c, ATTESTED_EVENT, fromBlock, latest),
+  ]);
 
   // Resolve block timestamps once per unique block.
   const blockNums = new Set<bigint>();
