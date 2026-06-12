@@ -254,10 +254,30 @@ export default function IssuersPage() {
                   i < ECONOMICS.length - 1 ? "border-b border-white/[0.06]" : ""
                 }`}
               >
-                <span className="text-foreground font-medium">{row.action}</span>
-                <span className="text-muted-foreground">{row.who}</span>
-                <span className="text-[#9296f5] font-mono text-[13px] tabular">{row.amount}</span>
-                <span className="text-muted-foreground/70">{row.purpose}</span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Action
+                  </span>
+                  <span className="text-foreground font-medium">{row.action}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Who
+                  </span>
+                  <span className="text-muted-foreground">{row.who}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Amount
+                  </span>
+                  <span className="text-[#9296f5] font-mono text-[13px] tabular">{row.amount}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Purpose
+                  </span>
+                  <span className="text-muted-foreground">{row.purpose}</span>
+                </span>
               </div>
             ))}
           </div>
@@ -278,7 +298,7 @@ export default function IssuersPage() {
                 not attest to a valuation or an opinion, because no honest agent can. On a judgment
                 claim every agent abstains, and the contract rejects any other answer.
               </p>
-              <p className="pretty text-base text-muted-foreground/70 leading-relaxed">
+              <p className="pretty text-base text-muted-foreground leading-relaxed">
                 That refusal is enforced at the contract layer: a Tier-3 non-abstain attestation
                 reverts, making the network&apos;s selectivity tamper-proof, not just aspirational.
               </p>
