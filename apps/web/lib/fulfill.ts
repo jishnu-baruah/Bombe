@@ -149,7 +149,7 @@ export async function fulfillAttestation(params: {
     data: encodeFunctionData({
       abi: AgentAttestationAbi,
       functionName: "postClaim",
-      args: [toBytes32(claimId), 1, claimHash, `${SITE}/api/claim/${claimId}`],
+      args: [toBytes32(claimId), 1, claimHash, `${SITE}/api/v1/claims/${claimId}`],
     }),
     value: CLAIM_FEE,
     chain,
