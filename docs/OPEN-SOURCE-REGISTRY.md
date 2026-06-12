@@ -43,12 +43,12 @@ AssetSpec = {
 
 ## Schemes (today)
 
-- `defillama` — reads `https://yields.llama.fi/chart/{poolId}`; pricePerShare-windowed
+- `defillama`, reads `https://yields.llama.fi/chart/{poolId}`; pricePerShare-windowed
   or reported-APY. Covers the whole DefiLlama yield/RWA universe.
-- `mantle-meth-api` — reads `https://meth.mantle.xyz/api/stats/apy` for the live
+- `mantle-meth-api`, reads `https://meth.mantle.xyz/api/stats/apy` for the live
   `METHtoETH` rate + `OneDay/Week/MonthAPY`. This is mETH's real second computation
   path (folds in the old "mETH second leg"); proves the registry is not DefiLlama-only.
-- `custom-http` (later) — the any-URL lane: an issuer-supplied endpoint + a JSON path,
+- `custom-http` (later), the any-URL lane: an issuer-supplied endpoint + a JSON path,
   always labeled UNVERIFIED, never on the verified streak.
 
 ## Featured set (verified=true)

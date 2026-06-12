@@ -24,9 +24,9 @@ The hard constraint that shapes everything: Bombe only attests claims it can fal
 
 Phased design:
 
-- **Phase 0, public /verify lookup (T-610) — build now, decision-free.** Read-only UI over the already-shipped public read API. Paste a claim ID, a reasoning hash, or a tx hash; get the verdict, the on-chain proof (explorer links), and the verify-hash result. Reasoning-hash reverse lookup scans the bounded recent claim-ID set (no global index yet); honest not-found state. Directly serves the "anyone can verify" half of the ask.
+- **Phase 0, public /verify lookup (T-610), build now, decision-free.** Read-only UI over the already-shipped public read API. Paste a claim ID, a reasoning hash, or a tx hash; get the verdict, the on-chain proof (explorer links), and the verify-hash result. Reasoning-hash reverse lookup scans the bounded recent claim-ID set (no global index yet); honest not-found state. Directly serves the "anyone can verify" half of the ask.
 
-- **Phase 1, issuer request intake (T-611) — no in-platform payment.** A "Request an attestation" form scoped to supported claim types (or a generic Tier-2 request with a document/source pointer). Records the request; the operator reviews falsifiability and posts on-chain; the issuer gets the claim ID and on-chain attestation back. Honest interim of the self-serve vision. Gated on OP-9 decision (build now vs wait).
+- **Phase 1, issuer request intake (T-611), no in-platform payment.** A "Request an attestation" form scoped to supported claim types (or a generic Tier-2 request with a document/source pointer). Records the request; the operator reviews falsifiability and posts on-chain; the issuer gets the claim ID and on-chain attestation back. Honest interim of the self-serve vision. Gated on OP-9 decision (build now vs wait).
 
 - **Phase 2, custodial paid flow (T-612).** In-platform payment -> custodial backend posts the claim (posting key) and runs the attestor -> returns the on-chain attestation + trace + verify link. The v3.2 "custodial paid requests" item. Gated on the x402 payment-rail decision and explicit operator authorization of a custodial key model (OP-9). Fail-closed dedupe; only supported, data-wired claim types auto-attest.
 
