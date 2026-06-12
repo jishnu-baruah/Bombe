@@ -687,9 +687,9 @@ function TechnicalDetail({
 
           <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
             This is a recorded walkthrough, replayed so you can follow each behavior end to end. The
-            verdict is computed from the evidence; the model only narrates. The hashes shown here are
-            from the demo trace. For live attestations you can re-derive and check on-chain yourself,
-            use the Verify page with a real claim id.
+            verdict is computed from the evidence; the model only narrates. The hashes shown here
+            are from the demo trace. For live attestations you can re-derive and check on-chain
+            yourself, use the Verify page with a real claim id.
           </p>
         </div>
       )}
