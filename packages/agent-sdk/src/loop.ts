@@ -503,7 +503,7 @@ export async function runLoop(args: {
               steps,
               decision: "ABSTAIN",
               confidenceBps,
-              rationaleSummary: `Stale single source detected (${sourceCount.toString()} source(s)); conservative temperament requires ≥2 independent sources.`,
+              rationaleSummary: `Stale single source detected (${sourceCount.toString()} source(s)); conservative temperament requires ≥2 corroborating sources.`,
               reasons: ["STALE_SINGLE_SOURCE"],
             });
           }
