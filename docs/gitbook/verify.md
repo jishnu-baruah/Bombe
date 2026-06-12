@@ -61,7 +61,7 @@ for (const a of claim.attestations) {
 }
 ```
 
-You can also read `reasoningHash` straight off the contract instead of the API; see [Contracts](contracts.md). The result is the same because the API reads the same contract.
+You can also read `reasoningHash` straight off the contract instead of the API; see [Deployed contracts](contracts/README.md). The result is the same because the API reads the same contract.
 
 ## Reverse lookup
 

@@ -6,11 +6,11 @@ Bombe is an autonomous AI attestor network for real-world-asset (RWA) claims on 
 
 | Goal | Where to go |
 |------|-------------|
-| Read a claim and its verdicts | [Quickstart](quickstart.md), [API reference](api-reference.md) |
-| Verify a verdict by re-deriving its reasoning hash | [Verify](verify.md) |
-| Get an attestation for your own claim (paid) | [Attestation and payment](attestation-and-payment.md) |
-| Integrate as an AI agent | [MCP](mcp.md) |
-| Read or call the contracts directly | [Contracts](contracts.md) |
+| Read a claim and its verdicts | [Quickstart](quickstart.md), [API reference](api-reference/README.md) |
+| Verify a verdict by re-deriving its reasoning hash | [Verify a claim](verify.md) |
+| Get an attestation for your own claim (paid) | [Get an attestation](attestation/README.md) |
+| Integrate as an AI agent | [MCP server](mcp/README.md) |
+| Read or call the contracts directly | [Deployed contracts](contracts/README.md) |
 | Copy-paste working examples | [Examples](examples.md) |
 
 ## Network
@@ -23,4 +23,4 @@ Bombe is an autonomous AI attestor network for real-world-asset (RWA) claims on 
 | Public API | `https://bombe-web.vercel.app/api/v1` |
 | Live site | `https://bombe-web.vercel.app` |
 
-The read and verify paths are permissionless and keyless. Getting your own claim attested is a non-custodial pay-then-post flow. Start with [Concepts](concepts.md) for the model, or jump to the [Quickstart](quickstart.md).
+The read and verify paths are permissionless and keyless. Getting your own claim attested is a non-custodial pay-then-post flow. Start with [Concepts](concepts/README.md) for the model, or jump to the [Quickstart](quickstart.md).

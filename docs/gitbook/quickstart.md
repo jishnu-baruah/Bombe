@@ -84,5 +84,5 @@ console.log(verify.results[0].status); // "verified"
 ## Next
 
 - Want the hash math yourself? [Verify a claim](verify.md).
-- Want your own claim attested? [Attestation and payment](attestation-and-payment.md).
-- Every endpoint: [API reference](api-reference.md).
+- Want your own claim attested? [Get an attestation](attestation/README.md).
+- Every endpoint: [API reference](api-reference/README.md).
