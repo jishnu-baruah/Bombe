@@ -79,9 +79,10 @@ export async function recordRequest(r: AttestationRequest): Promise<boolean> {
 export async function getPayerByClaimId(claimId: string): Promise<string | null> {
   if (!dbEnabled()) return null;
   const m = /-REQ-([0-9a-fA-F]{6,})$/.exec(claimId);
-  if (!m) return null;
+  const hex = m?.[1];
+  if (!hex) return null;
   await ensureTable();
-  const prefix = `0x${m[1].toLowerCase()}%`;
+  const prefix = `0x${hex.toLowerCase()}%`;
   const rows = (await sql()`
     SELECT payer FROM attestation_requests
     WHERE payment_tx_hash LIKE ${prefix}

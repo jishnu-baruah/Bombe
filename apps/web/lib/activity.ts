@@ -354,9 +354,14 @@ function metaFromTrace(traceJson: string): TraceMeta {
   try {
     const t = JSON.parse(traceJson) as Record<string, unknown>;
     const claim = (t.claim ?? t) as Record<string, unknown>;
-    let claimType =
-      (claim.claimType as string) ?? (t.claimType as string) ?? (claim.type as string);
-    let asset = (claim.asset as string) ?? (t.asset as string) ?? (claim.symbol as string);
+    let claimType: string | undefined =
+      (claim.claimType as string | undefined) ??
+      (t.claimType as string | undefined) ??
+      (claim.type as string | undefined);
+    let asset: string | undefined =
+      (claim.asset as string | undefined) ??
+      (t.asset as string | undefined) ??
+      (claim.symbol as string | undefined);
 
     // Reasoning-trace format: claimType + asset live inside steps[].observation.
     if (!claimType || !asset) {
