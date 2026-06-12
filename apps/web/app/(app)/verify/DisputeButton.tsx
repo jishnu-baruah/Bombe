@@ -46,7 +46,7 @@ export function DisputeButton({ claimId, accused }: { claimId: string; accused: 
   }
 
   if (state === "done") {
-    return <p className="text-[12px] text-[#7ee08a] mt-2 leading-[1.5] max-w-md">✓ {msg}</p>;
+    return <p className="text-[12px] text-[#7ee08a] mt-2 leading-[1.5] max-w-[28rem]">✓ {msg}</p>;
   }
 
   if (!open) {
@@ -62,7 +62,7 @@ export function DisputeButton({ claimId, accused }: { claimId: string; accused: 
   }
 
   return (
-    <div className="rounded-[12px] border border-white/[0.08] bg-[#0a0a0a] p-4 mt-2 max-w-md">
+    <div className="w-full max-w-[28rem] rounded-[12px] border border-white/[0.08] bg-[#0a0a0a] p-4 mt-2">
       <p className="text-[12px] text-muted-foreground mb-3 leading-[1.5]">
         Why is this verdict wrong? A vetted dispute is carried on-chain as a bonded AgentSlashing
         challenge that registered attestors vote on.
