@@ -261,10 +261,15 @@ function OnChainRecord({
           <p className="text-muted-foreground/70 text-[12px] mb-1">traceURI</p>
           <Mono value={attestation.traceURI} />
         </div>
-        <div>
-          <p className="text-muted-foreground/70 text-[12px] mb-1">txHash</p>
-          <ExplorerLink type="tx" value={attestation.txHash} />
-        </div>
+        {/* The attest tx hash is not recoverable from a contract read, so live
+            attestations carry a zero placeholder. Show the row only when a real
+            tx hash is present (rather than a zero link that goes nowhere). */}
+        {!/^0x0+$/.test(attestation.txHash) && (
+          <div>
+            <p className="text-muted-foreground/70 text-[12px] mb-1">txHash</p>
+            <ExplorerLink type="tx" value={attestation.txHash} />
+          </div>
+        )}
         {attestation.skillHash !== null && (
           <div>
             <p className="text-muted-foreground/70 text-[12px] mb-1">

@@ -9,6 +9,7 @@ const footerLinks: Record<
     { name: "Live Race", href: "/live" },
     { name: "Verify", href: "/verify" },
     { name: "Explorer", href: "/explorer" },
+    { name: "Capabilities", href: "/#capabilities" },
     { name: "For issuers", href: "/issuers" },
   ],
   Developers: [
