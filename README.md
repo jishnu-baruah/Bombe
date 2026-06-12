@@ -151,7 +151,7 @@ _Generated: 2026-06-12_
 ### Test Counts
 
 - 77 forge tests
-- 765 vitest tests
+- 771 vitest tests
 
 ### Operator Items
 
