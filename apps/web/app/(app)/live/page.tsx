@@ -1,26 +1,29 @@
 "use client";
 
 /**
- * /live, T-603 flagship race view.
+ * /live — "Split stage" race view, redesigned for human comprehension.
  *
- * Layout: 5 columns (desktop ≥640px) / stacked tap-to-expand cards (≤380px).
- * Columns: Reflector · Rotor · Stator · Plugboard (EXTERNAL RUNTIME) · Human queue.
+ * A theater layout: ONE claim on screen at a time, auto-advancing A→D.
+ *   LEFT panel  = THE CLAIM, stated as a plain-English question + the real
+ *                 numbers in human terms + a words-not-enums tier chip.
+ *   RIGHT panel = THE PANEL of attestors, each a row that reacts live:
+ *                 Checking… → a plain result word + a colored dot + a one-line
+ *                 plain reason.
+ *   BELOW       = a bold verdict banner stating the outcome AND what it proves.
  *
- * Each column streams AGENT_STEP events (thought/action) ending in a decision chip:
- *   VALID green / REJECTED red / ABSTAIN amber + reason / BLOCKED BY PROTOCOL purple.
- * Footer per agent: elapsed ms + cost.
+ * The technical detail (real step trace, hashes, raw values) lives behind a
+ * single "See the on-chain reasoning" expander per claim, hidden by default.
  *
- * Guided Demo button: auto-advances A→D with ~5s pauses and toast narration.
- * Manual "Next claim" control (client-gated; real operator key gating is T-606).
+ * Data flow is unchanged from the original: SSE replay via /api/stream?claim=X,
+ * a useReducer event store, the A→D guided auto-advance with pauses, and the
+ * five-attestor set (Reflector, Rotor, Stator, Plugboard, Human Queue).
+ * AgentStepEvent / AgentDoneEvent / HUMAN_QUEUE_UPDATE are consumed exactly as
+ * before — only the PRESENTATION changed.
  *
- * SSE replay driven by /api/stream?claim=X (deterministic, sourced from demo-data.ts).
+ * Client component: must NOT import the @bombe/agent-sdk barrel.
  * PRD §6.6, §6.7, DESIGN.md.
  */
 
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Mono } from "@/components/ui/Mono";
 import { parseEvent } from "@/lib/parseEvent";
 // Import via alias, browser-safe (avoids Node-only @bombe/shared barrel). See next.config.ts.
 import type { AgentDoneEvent, AgentStepEvent, ClaimPostedEvent, SseEvent } from "@bombe-events";
@@ -59,10 +62,7 @@ type RaceAction =
   | { type: "agent_step"; event: AgentStepEvent; claimId: ClaimId; agentId: AgentId }
   | { type: "agent_done"; event: AgentDoneEvent; claimId: ClaimId; agentId: AgentId }
   | { type: "human_queue"; claimId: ClaimId; position: number; estWait: number }
-  | { type: "next_claim" };
-
-// Toast type for narration
-type Toast = { id: number; message: string };
+  | { type: "set_claim"; idx: number };
 
 // ---------------------------------------------------------------------------
 // Agent address → agentId mapping
@@ -76,6 +76,7 @@ const ADDR_TO_AGENT: Record<string, AgentId> = {
   "0xHuma0000000000000000000000000000000000005": "human",
 };
 
+// Panel order: SDK agents first, the external attestor, then the human.
 const AGENTS: AgentId[] = ["reflector", "rotor", "stator", "plugboard", "human"];
 
 function emptyAgentState(): AgentState {
@@ -110,7 +111,7 @@ function makeInitialState(): RaceState {
 }
 
 // ---------------------------------------------------------------------------
-// Reducer
+// Reducer (data plumbing preserved 1:1 with the original)
 // ---------------------------------------------------------------------------
 
 function raceReducer(state: RaceState, action: RaceAction): RaceState {
@@ -118,10 +119,7 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
     case "reset_claim": {
       return {
         ...state,
-        claims: {
-          ...state.claims,
-          [action.claimId]: emptyClaimState(),
-        },
+        claims: { ...state.claims, [action.claimId]: emptyClaimState() },
       };
     }
     case "claim_posted": {
@@ -129,10 +127,7 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
         ...state,
         claims: {
           ...state.claims,
-          [action.claimId]: {
-            ...state.claims[action.claimId],
-            claim: action.event,
-          },
+          [action.claimId]: { ...state.claims[action.claimId], claim: action.event },
         },
       };
     }
@@ -166,13 +161,7 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
           ...state.claims,
           [action.claimId]: {
             ...cs,
-            agents: {
-              ...cs.agents,
-              [action.agentId]: {
-                ...ag,
-                done: action.event,
-              },
-            },
+            agents: { ...cs.agents, [action.agentId]: { ...ag, done: action.event } },
           },
         },
       };
@@ -191,10 +180,10 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
         },
       };
     }
-    case "next_claim": {
+    case "set_claim": {
       return {
         ...state,
-        currentClaimIdx: Math.min(state.currentClaimIdx + 1, CLAIM_IDS.length - 1),
+        currentClaimIdx: Math.max(0, Math.min(action.idx, CLAIM_IDS.length - 1)),
       };
     }
     default:
@@ -203,285 +192,253 @@ function raceReducer(state: RaceState, action: RaceAction): RaceState {
 }
 
 // ---------------------------------------------------------------------------
-// Guided demo narrations per claim
+// Curated plain-language story per claim (A→D teaching arc).
+//
+// Every number below is drawn DIRECTLY from fixtures/demo-data.json:
+//   A — claim A payload (mETH, expectedBps 34, period "30d-fresh"); traces show
+//       two computation paths reconciling to a 0 bps delta within ±2 bps.
+//   B — claim B payload (mETH, expectedBps 34, period "30d-stale"); the value
+//       matches but the single source is stale, so the panel splits.
+//   C — claim C trace observations: servicer report 50,000 USD vs bank
+//       statement 45,000 USD, a 5,000 USD mismatch.
+//   D — claim D payload (FAIR_VALUE, estimatedValue 4,200,000 USD); Plugboard's
+//       trace shows the contract revert JudgmentTierRequiresAbstain.
+//
+// `narration` is the short aria-live / status-strip line. No raw enums, no JSON.
 // ---------------------------------------------------------------------------
 
-const CLAIM_NARRATIONS: Record<ClaimId, string> = {
-  A: "Claim A: mETH yield 34bps, all agents converge on VALID with fresh oracle data.",
-  B: "Claim B: stale feed, Reflector abstains: one stale source isn't enough. Rotor commits anyway.",
-  C: "Claim C: cashflow mismatch $50,000 vs $45,000, every agent rejects the claim.",
-  D: "Claim D: judgment tier, SDK agents abstain. The contract just rejected an external agent's judgment attestation.",
+type ClaimCopy = {
+  question: string;
+  sentences: string[];
+  tierChip: string;
+  narration: string;
+};
+
+const CLAIM_COPY: Record<ClaimId, ClaimCopy> = {
+  A: {
+    question: "Does mETH's reported yield actually check out?",
+    sentences: [
+      "The issuer claims mETH returned 34 basis points (0.34%) over a 30-day window.",
+      "Two separate computation paths over the same ground truth both land on 34 bps, a 0 bps difference, well inside the ±2 bps tolerance.",
+    ],
+    tierChip: "Deterministic fact",
+    narration: "Claim A: a clean yield claim. Every attestor agrees the number checks out.",
+  },
+  B: {
+    question: "The number matches, but is the source fresh enough to trust?",
+    sentences: [
+      "The same mETH claim of 34 bps over a 30-day window, but this time the only feed available is stale.",
+      "The figure still matches, so the panel splits on purpose: the cautious attestors hold back, the bolder one commits.",
+    ],
+    tierChip: "Deterministic fact",
+    narration:
+      "Claim B: the number matches but the source is stale. The panel disagrees by design.",
+  },
+  C: {
+    question: "Do the two documents actually agree on the cash that moved?",
+    sentences: [
+      "The servicer report for pool PC-POOL-1 says 50,000 USD of cashflow for the month.",
+      "The bank statement for the same month adds up to 45,000 USD, a 5,000 USD gap. The documents do not agree.",
+    ],
+    tierChip: "Checkable against documents",
+    narration: "Claim C: the two documents disagree by 5,000 USD. Every attestor rejects it.",
+  },
+  D: {
+    question: "Is this asset really worth 4.2 million dollars?",
+    sentences: [
+      "The claim asks the network to attest a fair value of 4,200,000 USD for pool PC-POOL-1.",
+      "Fair value is a judgment, not a fact anyone can falsify, so it can only ever be an opinion.",
+    ],
+    tierChip: "Judgment, opinion only",
+    narration:
+      "Claim D: a judgment claim. The contract itself blocks an attestation, even from an outside attestor.",
+  },
 };
 
 // ---------------------------------------------------------------------------
-// Decision chip component
+// Per-claim verdict banner: the outcome AND what it proves.
 // ---------------------------------------------------------------------------
 
-function DecisionChip({ done }: { done: AgentDoneEvent }) {
-  const { decision, blockedByProtocol } = done;
+type VerdictTone = "valid" | "rejected" | "split" | "blocked";
 
-  if (blockedByProtocol) {
-    return (
-      <div className="flex flex-col gap-1">
-        <Badge variant="BLOCKED_BY_PROTOCOL" />
-        <span className="text-[11px] text-[#7c3aed] font-mono">JudgmentTierRequiresAbstain</span>
-        <Badge variant="ABSTAIN" label="ABSTAIN (resubmit)" />
-      </div>
-    );
-  }
-
-  if (decision === "VALID") return <Badge variant="VALID" />;
-  if (decision === "REJECTED") return <Badge variant="REJECTED" />;
-  // ABSTAIN
-  return <Badge variant="ABSTAIN" />;
-}
-
-// ---------------------------------------------------------------------------
-// Agent footer (elapsed ms + cost)
-// ---------------------------------------------------------------------------
-
-function AgentFooter({ done }: { done: AgentDoneEvent }) {
-  return (
-    <div className="mt-3 pt-3 border-t border-white/[0.08] flex items-center justify-between gap-2 flex-wrap">
-      <span className="text-[11px] font-mono text-muted-foreground/70">{done.latencyMs}ms</span>
-      <span className="text-[11px] font-mono text-muted-foreground/70">
-        {done.costUsd > 0 ? `$${done.costUsd.toFixed(4)}` : "-"}
-      </span>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Step feed (thought/action list)
-// ---------------------------------------------------------------------------
-
-function StepFeed({ steps }: { steps: AgentStepEvent[] }) {
-  if (steps.length === 0) {
-    return <p className="text-muted-foreground/70 text-[12px] italic">Waiting for first step…</p>;
-  }
-  return (
-    <ul className="flex flex-col gap-2">
-      {steps.map((s) => (
-        <li key={`${s.agentAddr}-${s.step}`} className="text-[12px]">
-          <span className="text-[#9296f5] font-mono text-[11px] mr-1">#{s.step}</span>
-          <span className="text-muted-foreground">{s.thought}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Single agent column
-// ---------------------------------------------------------------------------
-
-interface AgentColumnProps {
-  agentId: AgentId;
-  state: AgentState;
-  isExternal?: boolean;
-  humanQueuePosition?: number | null;
-  humanQueueEstWait?: number | null;
-  expanded: boolean;
-  onToggle: () => void;
-}
-
-const AGENT_LABELS: Record<AgentId, string> = {
-  reflector: "Reflector",
-  rotor: "Rotor",
-  stator: "Stator",
-  plugboard: "Plugboard",
-  human: "Human Queue",
+type Verdict = {
+  tone: VerdictTone;
+  headline: string;
+  proves: string;
 };
 
-function AgentColumn({
-  agentId,
-  state,
-  isExternal,
-  humanQueuePosition,
-  humanQueueEstWait,
-  expanded,
-  onToggle,
-}: AgentColumnProps) {
-  const isHuman = agentId === "human";
-  const label = AGENT_LABELS[agentId];
-  const { steps, done } = state;
+const VERDICT: Record<ClaimId, Verdict> = {
+  A: {
+    tone: "valid",
+    headline: "Attested true — the yield is real.",
+    proves:
+      "When the evidence is clean and reproducible, the whole panel converges on the same answer.",
+  },
+  B: {
+    tone: "split",
+    headline: "A split panel, by design — not an error.",
+    proves:
+      "Bombe is a panel, not one oracle. Cautious attestors abstain on a stale source while a bolder one commits, and the disagreement is recorded in the open for anyone to weigh.",
+  },
+  C: {
+    tone: "rejected",
+    headline: "Rejected — the documents do not match.",
+    proves: "A falsifiable claim that fails the check is rejected, unanimously and on the record.",
+  },
+  D: {
+    tone: "blocked",
+    headline: "The contract blocked the attestation itself.",
+    proves:
+      "The Bombe agents abstain on judgment. When an outside attestor we did not write tried to attest anyway, the contract reverted it. Safety lives at the contract layer, not in any one agent's good behavior.",
+  },
+};
 
-  // Status indicator
-  let status: "idle" | "running" | "done" = "idle";
-  if (done) status = "done";
-  else if (steps.length > 0) status = "running";
+// ---------------------------------------------------------------------------
+// Plain-language status vocabulary (replaces JSON / raw enums).
+// ---------------------------------------------------------------------------
 
-  const statusDot =
-    status === "done"
-      ? "bg-[#428619]"
-      : status === "running"
-        ? "bg-[#494fdf] animate-pulse"
-        : "bg-[#3a3d40]";
+type PlainStatus = {
+  word: string;
+  dot: string;
+  text: string;
+  glyph: string;
+};
 
+function plainStatus(done: AgentDoneEvent | null): PlainStatus | null {
+  if (!done) return null;
+  if (done.blockedByProtocol) {
+    return { word: "Blocked", dot: "#a78bfa", text: "#c4b5fd", glyph: "⊘" };
+  }
+  switch (done.decision) {
+    case "VALID":
+      return { word: "Agrees", dot: "#86c95f", text: "#86c95f", glyph: "✓" };
+    case "REJECTED":
+      return { word: "Rejects", dot: "#e23b4a", text: "#f08591", glyph: "✗" };
+    default:
+      return { word: "Abstains", dot: "#d4a017", text: "#d4a017", glyph: "—" };
+  }
+}
+
+// One-line plain-English reason per (claim, agent), grounded in the real trace.
+// We never surface the raw rationaleSummary (it carries enums / the word
+// "independent"); these are honest human paraphrases of the same evidence.
+const AGENT_REASON: Record<ClaimId, Partial<Record<AgentId, string>>> = {
+  A: {
+    reflector: "Cross-checked two paths, both fresh, both say 34 bps.",
+    rotor: "Oracle is fresh and the math matches. Confident yes.",
+    stator: "Fresh feed shows 34 bps. Matches the claim.",
+    plugboard: "Outside runtime fetched the yield and got 34 bps too.",
+    human: "Reviewed the evidence and agrees.",
+  },
+  B: {
+    reflector: "Only one source and it is stale, so it won't commit.",
+    rotor: "The value matches, so it commits despite the staleness.",
+    stator: "A single stale feed is too thin to stand behind.",
+    plugboard: "Stale, but the number checks, so it commits.",
+    human: "Not enough fresh evidence to sign off.",
+  },
+  C: {
+    reflector: "Report says 50,000, statement says 45,000. Mismatch.",
+    rotor: "The two documents disagree by 5,000 USD.",
+    stator: "Cross-referenced both docs, they do not match.",
+    plugboard: "Outside runtime found the same 5,000 USD gap.",
+    human: "Confirmed the documents conflict.",
+  },
+  D: {
+    reflector: "Fair value is an opinion, so it won't attest.",
+    rotor: "No falsifiable fact here, so it abstains.",
+    stator: "A valuation cannot be proven, so it abstains.",
+    plugboard: "Tried to attest, the contract reverted it, then abstained.",
+    human: "Judgment call, not something to attest.",
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Attestor identity (name + role + kind label, plain words).
+// ---------------------------------------------------------------------------
+
+type AgentKind = "sdk" | "external" | "human";
+
+const AGENT_META: Record<AgentId, { name: string; role: string; kind: AgentKind }> = {
+  reflector: { name: "Reflector", role: "Cautious SDK agent", kind: "sdk" },
+  rotor: { name: "Rotor", role: "Decisive SDK agent", kind: "sdk" },
+  stator: { name: "Stator", role: "Lean SDK agent", kind: "sdk" },
+  plugboard: { name: "Plugboard", role: "External attestor we did not write", kind: "external" },
+  human: { name: "Human Queue", role: "A person reviewing", kind: "human" },
+};
+
+const KIND_LABEL: Record<AgentKind, string> = {
+  sdk: "SDK agent",
+  external: "External attestor",
+  human: "Human",
+};
+
+// ---------------------------------------------------------------------------
+// Small presentational helpers
+// ---------------------------------------------------------------------------
+
+function KindChip({ kind }: { kind: AgentKind }) {
+  const color =
+    kind === "external" ? "#c4b5fd" : kind === "human" ? "#00c89a" : "var(--muted-foreground)";
+  const bg =
+    kind === "external"
+      ? "rgba(124,58,237,0.12)"
+      : kind === "human"
+        ? "rgba(0,168,126,0.12)"
+        : "rgba(255,255,255,0.06)";
   return (
-    <Card
-      variant="feature-dark"
-      className="flex flex-col gap-3 p-4 min-w-0 h-full"
-      data-testid={`agent-column-${agentId}`}
+    <span
+      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-[0.14em] flex-shrink-0"
+      style={{ color, backgroundColor: bg }}
     >
-      {/* Column header (toggles the card body on mobile; body always visible ≥sm) */}
-      <button
-        type="button"
-        className="flex items-center justify-between gap-2 w-full text-left bg-transparent border-0 p-0 cursor-pointer sm:cursor-default"
-        onClick={onToggle}
-        aria-expanded={expanded}
-      >
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot}`} />
-          <span className="font-semibold text-[14px] truncate">{label}</span>
-        </div>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          {isExternal && <Badge variant="EXTERNAL_RUNTIME" className="text-[10px]" />}
-          {isHuman && <Badge variant="HUMAN" className="text-[10px]" />}
-          {!isHuman && !isExternal && <Badge variant="AI" className="text-[10px]" />}
-          {/* Toggle chevron on mobile */}
-          <span className="sm:hidden text-muted-foreground/70 text-[11px]">
-            {expanded ? "▲" : "▼"}
-          </span>
-        </div>
-      </button>
-
-      {/* Expandable body, always visible ≥sm, toggle on mobile */}
-      <div className={`${expanded ? "block" : "hidden"} sm:block flex-1 flex flex-col gap-3`}>
-        {/* Human queue special rendering */}
-        {isHuman ? (
-          <div className="flex flex-col gap-2">
-            {humanQueuePosition !== null && humanQueuePosition !== undefined ? (
-              <>
-                <p className="text-[12px] text-muted-foreground">
-                  {humanQueuePosition === 0
-                    ? "Human attestor is reviewing…"
-                    : `Queue position: ${humanQueuePosition}`}
-                </p>
-                {humanQueueEstWait !== null &&
-                  humanQueueEstWait !== undefined &&
-                  humanQueueEstWait > 0 && (
-                    <p className="text-[11px] text-muted-foreground/70 font-mono">
-                      est. {humanQueueEstWait} min
-                    </p>
-                  )}
-              </>
-            ) : (
-              <p className="text-muted-foreground/70 text-[12px] italic">Waiting for claim…</p>
-            )}
-
-            {done && (
-              <div className="mt-2 flex flex-col gap-2">
-                <DecisionChip done={done} />
-                <AgentFooter done={done} />
-              </div>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Step feed */}
-            <div className="flex-1 min-h-[60px] max-h-[160px] overflow-y-auto pr-1">
-              <StepFeed steps={steps} />
-            </div>
-
-            {/* Decision chip + footer */}
-            {done ? (
-              <div className="flex flex-col gap-2">
-                <DecisionChip done={done} />
-                <AgentFooter done={done} />
-              </div>
-            ) : (
-              <div className="h-8 flex items-center">
-                {steps.length > 0 && (
-                  <span className="text-[11px] text-[#9296f5] font-mono animate-pulse">
-                    thinking…
-                  </span>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </Card>
+      {KIND_LABEL[kind]}
+    </span>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Claim header card
+// Progress rail (Claim 1..4)
 // ---------------------------------------------------------------------------
 
-function ClaimHeader({ claim }: { claim: ClaimPostedEvent }) {
-  const tierVariant = `tier-${claim.tier}` as "tier-1" | "tier-2" | "tier-3";
-  const payloadStr = JSON.stringify(claim.payload, null, 0);
-
-  return (
-    <div
-      className="rounded-[12px] border border-white/[0.12] bg-[#16181a] px-5 py-4 flex flex-wrap items-center gap-3"
-      data-testid="claim-header"
-    >
-      <Badge variant={tierVariant} />
-      <span className="font-semibold text-[14px]">{claim.claimType}</span>
-      <span className="text-muted-foreground text-[13px]">{claim.asset}</span>
-      <Mono value={payloadStr} truncate showCopy={false} className="text-[11px]" />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Toast notification
-// ---------------------------------------------------------------------------
-
-function ToastList({ toasts }: { toasts: Toast[] }) {
-  if (toasts.length === 0) return null;
-  return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center pointer-events-none max-w-[90vw]">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          className="bg-[#16181a] border border-white/[0.12] text-foreground/90 text-[13px] px-5 py-3 rounded-full shadow-lg animate-fade-in"
-          data-testid="toast"
-        >
-          {t.message}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Claim progress tabs
-// ---------------------------------------------------------------------------
-
-function ClaimTabs({
+function ProgressRail({
   currentIdx,
-  completedIdx,
+  unlockedIdx,
   onSelect,
 }: {
   currentIdx: number;
-  completedIdx: number;
+  unlockedIdx: number;
   onSelect: (idx: number) => void;
 }) {
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex items-center gap-2 sm:gap-3" aria-label="Claim progress">
       {CLAIM_IDS.map((id, i) => {
         const isActive = i === currentIdx;
-        const isComplete = i <= completedIdx;
+        const isUnlocked = i <= unlockedIdx;
+        const reachable = i <= unlockedIdx + 1;
         return (
           <button
             key={id}
             type="button"
+            disabled={!reachable}
             onClick={() => onSelect(i)}
-            className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors cursor-pointer ${
-              isActive
-                ? "bg-[#494fdf] text-white"
-                : isComplete
-                  ? "bg-[#16181a] text-[#c9c9cd] hover:bg-[#3a3d40]"
-                  : "bg-[#16181a] text-[#3a3d40] cursor-not-allowed"
+            aria-current={isActive ? "step" : undefined}
+            className={`group flex-1 flex flex-col gap-2 text-left transition-opacity ${
+              reachable ? "cursor-pointer" : "cursor-not-allowed opacity-40"
             }`}
-            disabled={i > completedIdx + 1 && !isActive}
-            data-testid={`claim-tab-${id}`}
+            data-testid={`rail-step-${id}`}
           >
-            {id}
+            <span
+              className={`h-1.5 w-full rounded-full transition-colors ${
+                isActive ? "bg-[#494fdf]" : isUnlocked ? "bg-white/40" : "bg-white/[0.10]"
+              }`}
+            />
+            <span
+              className={`text-[11px] font-mono uppercase tracking-[0.16em] ${
+                isActive ? "text-foreground" : "text-muted-foreground/70"
+              }`}
+            >
+              Claim {i + 1}
+            </span>
           </button>
         );
       })}
@@ -490,7 +447,256 @@ function ClaimTabs({
 }
 
 // ---------------------------------------------------------------------------
-// SSE hook for a single claim replay
+// LEFT: the claim, as a plain-English question.
+// ---------------------------------------------------------------------------
+
+function ClaimStage({ claimId, posted }: { claimId: ClaimId; posted: boolean }) {
+  const copy = CLAIM_COPY[claimId];
+  return (
+    <div className="flex flex-col gap-7" data-testid="claim-stage">
+      <div className="flex items-center gap-3">
+        <span className="eyebrow">The claim</span>
+        <span
+          className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium"
+          style={{ backgroundColor: "rgba(73,79,223,0.12)", color: "#9296f5" }}
+        >
+          {copy.tierChip}
+        </span>
+      </div>
+
+      <h2
+        className="font-display balance text-[clamp(28px,4vw,46px)] leading-[1.06] text-foreground"
+        data-testid="claim-question"
+      >
+        {posted ? copy.question : "Loading the claim…"}
+      </h2>
+
+      {posted && (
+        <div className="flex flex-col gap-4 max-w-[34rem]">
+          {copy.sentences.map((s) => (
+            <p key={s} className="pretty text-[17px] leading-relaxed text-muted-foreground">
+              {s}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RIGHT: the panel — one reactive row per attestor.
+// ---------------------------------------------------------------------------
+
+function AttestorRow({
+  claimId,
+  agentId,
+  state,
+  humanQueuePosition,
+}: {
+  claimId: ClaimId;
+  agentId: AgentId;
+  state: AgentState;
+  humanQueuePosition: number | null;
+}) {
+  const meta = AGENT_META[agentId];
+  const status = plainStatus(state.done);
+  const checking = !state.done && (state.steps.length > 0 || humanQueuePosition !== null);
+  const reason = state.done ? AGENT_REASON[claimId][agentId] : null;
+
+  return (
+    <div
+      className="flex items-start gap-4 rounded-[16px] border border-white/[0.08] bg-[#16181a] px-5 py-4 transition-colors"
+      data-testid={`attestor-row-${agentId}`}
+    >
+      {/* Status dot */}
+      <span className="mt-1.5 flex-shrink-0" aria-hidden="true">
+        {status ? (
+          <span
+            className="block w-2.5 h-2.5 rounded-full"
+            style={{ backgroundColor: status.dot }}
+          />
+        ) : checking ? (
+          <span className="block w-2.5 h-2.5 rounded-full bg-[#494fdf] animate-pulse" />
+        ) : (
+          <span className="block w-2.5 h-2.5 rounded-full bg-white/15" />
+        )}
+      </span>
+
+      {/* Identity + reason */}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className="font-semibold text-[15px] text-foreground">{meta.name}</span>
+          <KindChip kind={meta.kind} />
+        </div>
+        <p className="text-[12.5px] text-muted-foreground/70 mt-0.5">{meta.role}</p>
+
+        {reason && (
+          <p className="text-[13.5px] text-muted-foreground leading-snug mt-2">{reason}</p>
+        )}
+      </div>
+
+      {/* Result word */}
+      <div className="flex-shrink-0 text-right min-w-[88px]" data-testid={`status-${agentId}`}>
+        {status ? (
+          <span
+            className="inline-flex items-center gap-1.5 text-[15px] font-semibold"
+            style={{ color: status.text }}
+          >
+            {status.word}
+            <span aria-hidden="true">{status.glyph}</span>
+          </span>
+        ) : checking ? (
+          <span className="text-[14px] text-[#9296f5] animate-pulse">Checking…</span>
+        ) : (
+          <span className="text-[13px] text-muted-foreground/50">Waiting</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Verdict banner.
+// ---------------------------------------------------------------------------
+
+const VERDICT_STYLE: Record<VerdictTone, { border: string; bg: string; accent: string }> = {
+  valid: { border: "rgba(134,201,95,0.30)", bg: "rgba(134,201,95,0.06)", accent: "#86c95f" },
+  rejected: { border: "rgba(226,59,74,0.30)", bg: "rgba(226,59,74,0.06)", accent: "#f08591" },
+  split: { border: "rgba(73,79,223,0.32)", bg: "rgba(73,79,223,0.07)", accent: "#9296f5" },
+  blocked: { border: "rgba(167,139,250,0.34)", bg: "rgba(124,58,237,0.07)", accent: "#c4b5fd" },
+};
+
+function VerdictBanner({ claimId }: { claimId: ClaimId }) {
+  const v = VERDICT[claimId];
+  const s = VERDICT_STYLE[v.tone];
+  return (
+    <div
+      className="rounded-[20px] border px-7 py-7 lg:px-9 lg:py-8"
+      style={{ borderColor: s.border, backgroundColor: s.bg }}
+      data-testid="verdict-banner"
+    >
+      <span
+        className="font-mono text-[11px] uppercase tracking-[0.2em]"
+        style={{ color: s.accent }}
+      >
+        The verdict
+      </span>
+      <h3 className="font-display text-[clamp(22px,3vw,32px)] leading-[1.12] text-foreground mt-3 mb-3 balance">
+        {v.headline}
+      </h3>
+      <p className="pretty text-[15.5px] leading-relaxed text-muted-foreground max-w-[52rem]">
+        {v.proves}
+      </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// "See the on-chain reasoning" expander (the technical detail, hidden by default).
+// ---------------------------------------------------------------------------
+
+function renderValue(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return String(v);
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return "";
+  }
+}
+
+function TechnicalDetail({
+  claim,
+  agents,
+}: {
+  claim: ClaimPostedEvent | null;
+  agents: Record<AgentId, AgentState>;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!claim) return null;
+
+  return (
+    <div className="rounded-[16px] border border-white/[0.08] bg-[#0d0e0f]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-6 py-4 text-left cursor-pointer"
+        data-testid="tech-toggle"
+      >
+        <span className="text-[14px] font-medium text-foreground">See the on-chain reasoning</span>
+        <span className="text-muted-foreground/70 text-[12px] font-mono">
+          {open ? "Hide" : "Show"}
+        </span>
+      </button>
+
+      {open && (
+        <div className="px-6 pb-6 flex flex-col gap-6 border-t border-white/[0.06] pt-5">
+          {/* Raw claim payload */}
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">
+              Claim payload
+            </p>
+            <pre className="text-[12px] font-mono text-[#9296f5] whitespace-pre-wrap break-all leading-relaxed">
+              tier {claim.tier} · {claim.claimType} · {claim.asset}
+              {"\n"}
+              {JSON.stringify(claim.payload, null, 2)}
+            </pre>
+          </div>
+
+          {/* Per-agent traces + hashes */}
+          {AGENTS.map((agentId) => {
+            const a = agents[agentId];
+            if (!a.done && a.steps.length === 0) return null;
+            return (
+              <div key={agentId} className="border-t border-white/[0.06] pt-4">
+                <p className="font-mono text-[11px] text-foreground mb-2">
+                  {AGENT_META[agentId].name}
+                </p>
+                {a.steps.length > 0 && (
+                  <ol className="flex flex-col gap-1.5 mb-3">
+                    {a.steps.map((s) => (
+                      <li
+                        key={`${s.agentAddr}-${s.step}`}
+                        className="text-[12px] text-muted-foreground"
+                      >
+                        <span className="text-[#9296f5] font-mono mr-1.5">#{s.step}</span>
+                        {s.thought}
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {a.done && (
+                  <div className="flex flex-col gap-1 text-[11px] font-mono text-muted-foreground/70">
+                    <span>
+                      decision: <span className="text-foreground">{a.done.decision}</span>
+                      {a.done.blockedByProtocol ? " (blocked by protocol)" : ""}
+                    </span>
+                    <span>confidence: {(a.done.confidenceBps / 100).toFixed(0)}%</span>
+                    <span className="break-all">reasoningHash: {a.done.reasoningHash}</span>
+                    <span>
+                      {a.done.latencyMs} ms ·{" "}
+                      {a.done.costUsd > 0 ? `$${a.done.costUsd.toFixed(4)}` : "no model cost"}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+            Replayed deterministically from the demo trace. The verdict is computed from the
+            evidence; the model only narrates. Every reasoning hash is what lands on-chain.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SSE hook for a single claim replay (unchanged behavior).
 // ---------------------------------------------------------------------------
 
 function useClaimStream(
@@ -509,7 +715,6 @@ function useClaimStream(
     setConnected(false);
     setDone(false);
 
-    // Close any previous stream
     if (esRef.current) {
       esRef.current.close();
       esRef.current = null;
@@ -548,37 +753,20 @@ function useClaimStream(
 
 export default function LivePage() {
   const [raceState, dispatch] = useReducer(raceReducer, undefined, makeInitialState);
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const toastCounterRef = useRef(0);
   const [guidedRunning, setGuidedRunning] = useState(false);
   const [guidedDone, setGuidedDone] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [streamClaimId, setStreamClaimId] = useState<ClaimId | null>(null);
-  // Track how far the user has manually unlocked
   const [unlockedIdx, setUnlockedIdx] = useState(0);
-  // Expanded state for mobile (index of expanded agent column)
-  const [expandedAgents, setExpandedAgents] = useState<Record<AgentId, boolean>>({
-    reflector: true,
-    rotor: true,
-    stator: true,
-    plugboard: true,
-    human: true,
-  });
+  const [statusLine, setStatusLine] = useState<string>("");
 
-  // currentClaimIdx is always in [0, 3], CLAIM_IDS always has 4 entries, safe non-null assertion
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
+
   const currentClaimId = CLAIM_IDS[raceState.currentClaimIdx] as ClaimId;
   const currentClaimState = raceState.claims[currentClaimId];
 
-  // ---- Toast helpers -------------------------------------------------------
-
-  const addToast = useCallback((message: string) => {
-    const id = ++toastCounterRef.current;
-    setToasts((prev) => [...prev, { id, message }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 5000);
-  }, []);
-
-  // ---- SSE event handler ---------------------------------------------------
+  // ---- SSE event handler (unchanged routing) -------------------------------
 
   const handleSseEvent = useCallback((event: SseEvent) => {
     const claimId = "claimId" in event ? (event.claimId as ClaimId) : null;
@@ -588,14 +776,10 @@ export default function LivePage() {
       dispatch({ type: "claim_posted", event, claimId });
     } else if (event.kind === "AGENT_STEP") {
       const agentId = ADDR_TO_AGENT[event.agentAddr];
-      if (agentId) {
-        dispatch({ type: "agent_step", event, claimId, agentId });
-      }
+      if (agentId) dispatch({ type: "agent_step", event, claimId, agentId });
     } else if (event.kind === "AGENT_DONE") {
       const agentId = ADDR_TO_AGENT[event.agentAddr];
-      if (agentId) {
-        dispatch({ type: "agent_done", event, claimId, agentId });
-      }
+      if (agentId) dispatch({ type: "agent_done", event, claimId, agentId });
     } else if (event.kind === "HUMAN_QUEUE_UPDATE") {
       dispatch({
         type: "human_queue",
@@ -606,80 +790,72 @@ export default function LivePage() {
     }
   }, []);
 
-  // ---- Stream hook ---------------------------------------------------------
-
-  const { done: streamDone } = useClaimStream(streamClaimId, handleSseEvent);
-
-  // When current stream finishes in guided mode, advance to next claim
-  const streamDoneRef = useRef(streamDone);
-  streamDoneRef.current = streamDone;
+  useClaimStream(streamClaimId, handleSseEvent);
 
   // ---- Start a single claim stream -----------------------------------------
 
-  const startClaim = useCallback(
-    (idx: number) => {
-      const id = CLAIM_IDS[idx] as ClaimId;
-      dispatch({ type: "reset_claim", claimId: id });
-      setStreamClaimId(id);
-      addToast(CLAIM_NARRATIONS[id]);
-    },
-    [addToast],
-  );
+  const startClaim = useCallback((idx: number) => {
+    const id = CLAIM_IDS[idx] as ClaimId;
+    dispatch({ type: "reset_claim", claimId: id });
+    dispatch({ type: "set_claim", idx });
+    setStreamClaimId(id);
+    setStatusLine(CLAIM_COPY[id].narration);
+  }, []);
 
-  // ---- Guided Demo ---------------------------------------------------------
+  // ---- Guided demo: auto-advance A→D with pauses (pausable) -----------------
 
   const runGuidedDemo = useCallback(async () => {
     setGuidedRunning(true);
     setGuidedDone(false);
-    dispatch({ type: "next_claim" }); // reset to idx 0 (no-op if already 0)
+    setPaused(false);
 
     for (let i = 0; i < CLAIM_IDS.length; i++) {
-      const id = CLAIM_IDS[i] as ClaimId;
-      // Set current claim index
-      for (let j = raceState.currentClaimIdx; j < i; j++) {
-        dispatch({ type: "next_claim" });
-      }
-      setUnlockedIdx(i);
+      setUnlockedIdx((prev) => Math.max(prev, i));
       startClaim(i);
-      addToast(`▶ Claim ${id}: ${CLAIM_NARRATIONS[id]}`);
 
-      // Wait ~5s for the stream to settle (the stream itself takes ~4-5s per claim)
-      await new Promise<void>((resolve) => setTimeout(resolve, 5500));
+      // Wait ~5.5s for the stream to settle, honoring pause without skipping.
+      let waited = 0;
+      const tick = 250;
+      const target = 5500;
+      while (waited < target || pausedRef.current) {
+        await new Promise<void>((resolve) => setTimeout(resolve, tick));
+        if (!pausedRef.current) waited += tick;
+      }
     }
 
     setGuidedRunning(false);
     setGuidedDone(true);
-    addToast("Guided demo complete, all 4 claims A→D processed.");
-  }, [startClaim, addToast, raceState.currentClaimIdx]);
+    setStatusLine("Walkthrough complete. All four claims A through D have been judged.");
+  }, [startClaim]);
 
-  // ---- Manual "Next claim" -------------------------------------------------
+  // ---- Manual controls -----------------------------------------------------
 
   function handleNextClaim() {
     const nextIdx = raceState.currentClaimIdx + 1;
     if (nextIdx >= CLAIM_IDS.length) return;
-    setUnlockedIdx(nextIdx);
-    dispatch({ type: "next_claim" });
+    setUnlockedIdx((prev) => Math.max(prev, nextIdx));
     startClaim(nextIdx);
+  }
+
+  function handlePrevClaim() {
+    const prevIdx = raceState.currentClaimIdx - 1;
+    if (prevIdx < 0) return;
+    startClaim(prevIdx);
   }
 
   function handleSelectClaim(idx: number) {
     if (idx > unlockedIdx + 1) return;
-    if (idx > raceState.currentClaimIdx) {
-      dispatch({ type: "next_claim" });
-    }
+    setUnlockedIdx((prev) => Math.max(prev, idx));
     startClaim(idx);
   }
 
-  // ---- Mobile expand toggle ------------------------------------------------
+  // ---- Derived -------------------------------------------------------------
 
-  function toggleAgent(id: AgentId) {
-    setExpandedAgents((prev) => ({ ...prev, [id]: !prev[id] }));
-  }
-
-  // ---- Derived --------------------------------------------------------------
-
+  const claimPosted = currentClaimState.claim !== null;
   const allDone = AGENTS.every((a) => currentClaimState.agents[a].done !== null);
+  const atFirstClaim = raceState.currentClaimIdx <= 0;
   const atLastClaim = raceState.currentClaimIdx >= CLAIM_IDS.length - 1;
+  const started = streamClaimId !== null;
 
   // ---------------------------------------------------------------------------
   // Render
@@ -687,138 +863,155 @@ export default function LivePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── Hero band ── */}
-      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-8 border-b border-white/[0.08]">
-        <div className="max-w-[1200px] mx-auto">
-          <span className="eyebrow block mb-6">Bombe · Live Race View</span>
-          <h1 className="font-display balance text-[clamp(36px,6vw,56px)] leading-[1.0] text-foreground mb-4">
-            Agent Race
-          </h1>
-          <p className="pretty text-base text-muted-foreground max-w-2xl leading-relaxed mb-6">
-            Watch four attestors race on each claim, Reflector, Rotor, Stator (SDK agents),
-            Plugboard (external runtime), and a Human Queue. Outcomes are deterministic and
-            reproducible.
-          </p>
-
-          {/* Controls */}
-          <div className="flex flex-wrap gap-3 items-center">
-            {/* Guided Demo */}
-            <Button
-              variant="primary"
-              onClick={() => {
-                void runGuidedDemo();
-              }}
-              disabled={guidedRunning}
-              data-testid="guided-demo-btn"
-            >
-              {guidedRunning ? "Running…" : guidedDone ? "Replay Demo" : "Guided Demo A→D"}
-            </Button>
-
-            {/* Manual Next claim */}
-            {!guidedRunning && !atLastClaim && (
-              <Button variant="outline-dark" onClick={handleNextClaim} data-testid="next-claim-btn">
-                Next claim →
-              </Button>
-            )}
-
-            {/* Start first claim if nothing running */}
-            {!streamClaimId && !guidedRunning && (
-              <Button
-                variant="outline-dark"
-                onClick={() => {
-                  setUnlockedIdx(0);
-                  startClaim(0);
-                }}
-                data-testid="start-btn"
-              >
-                Start Claim A
-              </Button>
-            )}
+      {/* ── Header band ── */}
+      <section className="px-6 lg:px-12 pt-12 lg:pt-16 pb-8 border-b border-white/[0.08]">
+        <div className="max-w-[1200px] mx-auto flex flex-col gap-7">
+          <div>
+            <span className="eyebrow block mb-5">Bombe · Live walkthrough</span>
+            <h1 className="font-display balance text-[clamp(34px,5.5vw,54px)] leading-[1.02] text-foreground mb-4">
+              Watch a panel judge a claim.
+            </h1>
+            <p className="pretty text-base text-muted-foreground max-w-2xl leading-relaxed">
+              Four claims, one at a time. For each, a panel of attestors decides whether it holds
+              up, and you see exactly why. No jargon required.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ── Race content ── */}
-      <section className="px-6 lg:px-12 py-6">
-        <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
-          {/* Claim tabs */}
-          <ClaimTabs
+          {/* Progress rail */}
+          <ProgressRail
             currentIdx={raceState.currentClaimIdx}
-            completedIdx={unlockedIdx}
+            unlockedIdx={unlockedIdx}
             onSelect={handleSelectClaim}
           />
 
-          {/* Claim header */}
-          {currentClaimState.claim ? (
-            <ClaimHeader claim={currentClaimState.claim} />
-          ) : (
-            <div
-              className="rounded-[12px] border border-white/[0.08] bg-[#16181a] px-5 py-4 text-muted-foreground/70 text-[13px]"
-              data-testid="claim-waiting"
-            >
-              {streamClaimId ? "Loading claim…" : "Press Guided Demo or Start Claim A to begin."}
-            </div>
-          )}
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-3">
+            {!started ? (
+              <button
+                type="button"
+                onClick={() => {
+                  void runGuidedDemo();
+                }}
+                className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-white text-black text-base font-medium transition-all duration-150 hover:bg-white/90 active:scale-[0.98] cursor-pointer"
+                data-testid="start-btn"
+              >
+                Start the walkthrough →
+              </button>
+            ) : (
+              <>
+                {guidedRunning ? (
+                  <button
+                    type="button"
+                    onClick={() => setPaused((p) => !p)}
+                    className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-white text-black text-base font-medium transition-all duration-150 hover:bg-white/90 active:scale-[0.98] cursor-pointer"
+                    data-testid="pause-btn"
+                  >
+                    {paused ? "Resume" : "Pause"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void runGuidedDemo();
+                    }}
+                    className="inline-flex items-center justify-center h-12 px-7 rounded-full bg-white text-black text-base font-medium transition-all duration-150 hover:bg-white/90 active:scale-[0.98] cursor-pointer"
+                    data-testid="guided-demo-btn"
+                  >
+                    {guidedDone ? "Replay walkthrough" : "Auto-play A→D"}
+                  </button>
+                )}
 
-          {/* 5-column grid (desktop) / stacked (mobile) */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
-            data-testid="race-grid"
-          >
-            {AGENTS.map((agentId) => (
-              <AgentColumn
-                key={agentId}
-                agentId={agentId}
-                state={currentClaimState.agents[agentId]}
-                isExternal={agentId === "plugboard"}
-                humanQueuePosition={
-                  agentId === "human" ? currentClaimState.humanQueuePosition : undefined
-                }
-                humanQueueEstWait={
-                  agentId === "human" ? currentClaimState.humanQueueEstWait : undefined
-                }
-                expanded={expandedAgents[agentId]}
-                onToggle={() => toggleAgent(agentId)}
-              />
-            ))}
+                <button
+                  type="button"
+                  onClick={handlePrevClaim}
+                  disabled={atFirstClaim || guidedRunning}
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-full border border-white/40 text-base text-foreground transition-all duration-150 hover:border-white/70 hover:bg-foreground/[0.04] active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  data-testid="prev-claim-btn"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextClaim}
+                  disabled={atLastClaim || guidedRunning}
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-full border border-white/40 text-base text-foreground transition-all duration-150 hover:border-white/70 hover:bg-foreground/[0.04] active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  data-testid="next-claim-btn"
+                >
+                  Next claim →
+                </button>
+              </>
+            )}
           </div>
 
-          {/* All-done status */}
-          {allDone && streamClaimId && (
-            <div
-              className="text-center text-[13px] text-[#428619] font-mono py-4"
-              data-testid="claim-complete"
-            >
-              ✓ Claim {currentClaimId} complete
-              {!atLastClaim && !guidedRunning && (
-                <span className="text-muted-foreground/70">, click Next claim to continue</span>
-              )}
-            </div>
-          )}
-
-          {/* Guided demo progress */}
-          {guidedDone && (
-            <div
-              className="text-center text-[13px] text-muted-foreground py-2"
-              data-testid="guided-done"
-            >
-              Guided demo finished. All 4 claims processed.
-            </div>
-          )}
+          {/* Status line (announced for screen readers) */}
+          <p
+            aria-live="polite"
+            className="text-[13px] text-muted-foreground/70 min-h-[1.2em]"
+            data-testid="status-line"
+          >
+            {statusLine}
+          </p>
         </div>
       </section>
 
-      {/* Toast notifications */}
-      <ToastList toasts={toasts} />
+      {/* ── Split stage ── */}
+      <section className="px-6 lg:px-12 py-10 lg:py-14">
+        <div className="max-w-[1200px] mx-auto flex flex-col gap-8">
+          {!started ? (
+            <div
+              className="rounded-[20px] border border-white/[0.08] bg-[#16181a] px-8 py-16 text-center"
+              data-testid="idle-prompt"
+            >
+              <p className="text-muted-foreground text-[16px]">
+                Press <span className="text-foreground">Start the walkthrough</span> to watch the
+                panel judge the first claim.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid lg:grid-cols-[1fr_1.05fr] gap-8 lg:gap-12 items-start">
+                {/* LEFT: the claim */}
+                <div className="lg:sticky lg:top-10">
+                  <ClaimStage claimId={currentClaimId} posted={claimPosted} />
+                </div>
 
-      {/* Responsive CSS fade-in animation (inline, no external dep) */}
-      <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fade-in 0.25s ease forwards; }
-      `}</style>
+                {/* RIGHT: the panel */}
+                <div className="flex flex-col gap-4" data-testid="the-panel">
+                  <span className="eyebrow block">The panel</span>
+                  {AGENTS.map((agentId) => (
+                    <AttestorRow
+                      key={agentId}
+                      claimId={currentClaimId}
+                      agentId={agentId}
+                      state={currentClaimState.agents[agentId]}
+                      humanQueuePosition={
+                        agentId === "human" ? currentClaimState.humanQueuePosition : null
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Verdict banner — appears once the panel has finished */}
+              {allDone && <VerdictBanner claimId={currentClaimId} />}
+
+              {/* On-chain reasoning expander */}
+              <TechnicalDetail claim={currentClaimState.claim} agents={currentClaimState.agents} />
+
+              {/* End-of-walkthrough note */}
+              {guidedDone && atLastClaim && (
+                <p
+                  className="text-center text-[14px] text-muted-foreground py-2"
+                  data-testid="guided-done"
+                >
+                  That is the whole arc: a clean yes, a split panel, a rejection, and a claim the
+                  contract refused to let anyone attest.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
