@@ -12,14 +12,14 @@ import { RequestAttestationForm } from "./RequestAttestationForm";
 
 export default function RequestPage() {
   return (
-    <div className="bg-[#000000] text-[#ffffff] min-h-screen">
-      <section className="px-6 pt-[120px] pb-[88px]">
+    <div className="bg-background text-foreground min-h-screen">
+      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
         <div className="max-w-2xl mx-auto">
-          <p className="eyebrow mb-4">Request an attestation</p>
-          <h1 className="text-[clamp(30px,5vw,46px)] font-semibold leading-[1.1] tracking-[-0.6px] mb-4 balance">
+          <span className="eyebrow block mb-6">Request an attestation</span>
+          <h1 className="font-display balance text-[clamp(30px,5vw,46px)] leading-[1.1] text-foreground mb-4">
             Get your yield claim attested on-chain.
           </h1>
-          <p className="text-[17px] text-[rgba(255,255,255,0.6)] leading-[1.55] mb-8 pretty">
+          <p className="pretty text-lg text-muted-foreground leading-relaxed mb-8">
             Compose a yield claim for a supported asset, connect your own wallet, and pay the fee
             from it. Bombe attestors check it against on-chain data and sign the verdict, which you
             can verify yourself. We never hold your funds.
@@ -27,19 +27,19 @@ export default function RequestPage() {
 
           <RequestAttestationForm />
 
-          <p className="text-[13px] text-[#505a63] mt-8 leading-[1.6]">
+          <p className="text-[13px] text-muted-foreground/70 mt-8 leading-[1.6]">
             Featured assets are attested automatically. Any other RWA yield with a public data
             source is attestable too: browse{" "}
             <a
               href="https://bombe-web.vercel.app/api/v1/discover?rwaOnly=1"
               target="_blank"
               rel="noreferrer"
-              className="text-[#494fdf] hover:text-[#6b70e8]"
+              className="text-[#9296f5] hover:text-white transition-colors"
             >
               the discovery API
             </a>{" "}
             and pass its descriptor. Already integrated? Read the{" "}
-            <Link href="/integrate" className="text-[#494fdf] hover:text-[#6b70e8]">
+            <Link href="/integrate" className="text-[#9296f5] hover:text-white transition-colors">
               integration guide
             </Link>
             .

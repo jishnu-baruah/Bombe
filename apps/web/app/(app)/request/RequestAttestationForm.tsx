@@ -186,13 +186,13 @@ export function RequestAttestationForm() {
 
   return (
     <div className="max-w-2xl">
-      <div className="rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 mb-6">
+      <div className="rounded-[20px] bg-[#16181a] border border-white/[0.08] p-6 mb-6">
         <label className="block mb-4">
-          <span className="block text-[13px] text-[rgba(255,255,255,0.72)] mb-1.5">Asset</span>
+          <span className="block text-[13px] text-muted-foreground mb-1.5">Asset</span>
           <select
             value={asset}
             onChange={(e) => setAsset(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] focus:outline-none focus:border-[#494fdf]"
+            className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-white/[0.08] text-[15px] text-foreground focus:outline-none focus:border-[#494fdf] transition-colors"
           >
             {assets.map((a) => (
               <option key={a.id} value={a.id}>
@@ -204,7 +204,7 @@ export function RequestAttestationForm() {
 
         <div className="grid sm:grid-cols-2 gap-4 mb-2">
           <label className="block">
-            <span className="block text-[13px] text-[rgba(255,255,255,0.72)] mb-1.5">
+            <span className="block text-[13px] text-muted-foreground mb-1.5">
               Asserted yield (bps)
             </span>
             <input
@@ -212,17 +212,17 @@ export function RequestAttestationForm() {
               value={assertedBps}
               onChange={(e) => setAssertedBps(e.target.value)}
               placeholder="e.g. 355"
-              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] font-mono placeholder:text-[#505a63] focus:outline-none focus:border-[#494fdf]"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-white/[0.08] text-[15px] text-foreground font-mono placeholder:text-muted-foreground/70 focus:outline-none focus:border-[#494fdf] transition-colors"
             />
           </label>
           <label className="block">
-            <span className="block text-[13px] text-[rgba(255,255,255,0.72)] mb-1.5">
+            <span className="block text-[13px] text-muted-foreground mb-1.5">
               Data range (window)
             </span>
             <select
               value={windowDays}
               onChange={(e) => setWindowDays(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-[rgba(255,255,255,0.1)] text-[15px] text-[#ffffff] focus:outline-none focus:border-[#494fdf]"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#0a0a0a] border border-white/[0.08] text-[15px] text-foreground focus:outline-none focus:border-[#494fdf] transition-colors"
             >
               <option value="7">7 days</option>
               <option value="30">30 days</option>
@@ -232,17 +232,17 @@ export function RequestAttestationForm() {
             </select>
           </label>
         </div>
-        <p className="text-[12px] text-[#505a63] mt-2">
+        <p className="text-[12px] text-muted-foreground/70 mt-2">
           The window is always shown with the verdict; a short window is never described as a 30-day
           yield.
         </p>
       </div>
 
-      <div className="rounded-[16px] bg-[#0f1012] border border-[rgba(255,255,255,0.06)] p-5 mb-6">
-        <p className="text-[11px] text-[#505a63] font-mono uppercase tracking-[0.5px] mb-2">
+      <div className="rounded-[16px] bg-[#0f1012] border border-white/[0.08] p-5 mb-6">
+        <p className="text-[11px] text-muted-foreground/70 font-mono uppercase tracking-[0.5px] mb-2">
           what gets posted on-chain
         </p>
-        <pre className="text-[12px] text-[#8d969e] font-mono whitespace-pre-wrap break-all">
+        <pre className="text-[12px] text-muted-foreground font-mono whitespace-pre-wrap break-all">
           {JSON.stringify(
             {
               asset,
@@ -254,8 +254,8 @@ export function RequestAttestationForm() {
             2,
           )}
         </pre>
-        <p className="text-[13px] text-[rgba(255,255,255,0.6)] mt-3">
-          Fee: <span className="font-mono text-[#ffffff]">{PRICE_MNT} MNT</span> paid from your
+        <p className="text-[13px] text-muted-foreground mt-3">
+          Fee: <span className="font-mono text-foreground">{PRICE_MNT} MNT</span> paid from your
           wallet. Posting is done by the protocol operator key (the contract only accepts posts from
           an authorized role); you receive the on-chain attestation back, funds never custodied.
         </p>
@@ -280,7 +280,7 @@ export function RequestAttestationForm() {
           </Button>
         )}
         {account && (
-          <span className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">
+          <span className="text-[13px] text-muted-foreground font-mono">
             {account.slice(0, 8)}…{account.slice(-6)} connected
           </span>
         )}
@@ -294,13 +294,13 @@ export function RequestAttestationForm() {
       {status.kind === "done" && (
         <div className="mt-6 rounded-[14px] border border-[rgba(63,185,80,0.3)] bg-[rgba(63,185,80,0.06)] px-5 py-4">
           <p className="text-[14px] text-[#7ee08a] mb-2">{status.message}</p>
-          <p className="text-[12px] text-[rgba(255,255,255,0.6)] font-mono break-all mb-2">
+          <p className="text-[12px] text-muted-foreground font-mono break-all mb-2">
             payment tx: {status.txHash}
           </p>
           {status.claimId && (
             <Link
               href={`/verify?q=${encodeURIComponent(status.claimId)}`}
-              className="text-[13px] text-[#494fdf] hover:text-[#6b70e8]"
+              className="text-[13px] text-[#9296f5] hover:text-white transition-colors"
             >
               Track and verify your attestation →
             </Link>

@@ -62,15 +62,15 @@ local === a.reasoningHash; // true means the verdict was not edited`,
 
 export default function IntegratePage() {
   return (
-    <div className="bg-[#000000] text-[#ffffff]">
+    <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="px-6 pt-[140px] pb-[72px]">
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-5">Integrate</p>
-          <h1 className="text-[clamp(40px,7vw,80px)] font-semibold leading-[1.04] tracking-[-1.4px] text-[#ffffff] mb-8 balance">
+      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">Integrate</span>
+          <h1 className="font-display balance text-[clamp(40px,7vw,80px)] leading-[1.04] text-foreground mb-8">
             Four steps. Read it, verify it, trust it.
           </h1>
-          <p className="text-[18px] text-[rgba(255,255,255,0.65)] leading-[1.56] max-w-[40rem] mb-10 pretty">
+          <p className="pretty text-lg text-muted-foreground leading-relaxed max-w-[40rem] mb-10">
             Consuming an attestation is a handful of read calls against one contract. No service to
             run, no account to create. Here is the whole shape of it before you open the full guide.
           </p>
@@ -83,31 +83,26 @@ export default function IntegratePage() {
       </section>
 
       {/* Benefits strip */}
-      <section className="px-6 pb-[24px]">
-        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="px-6 lg:px-12 pb-6">
+        <div className="max-w-[1200px] mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {BENEFITS.map((b) => (
             <div
               key={b.title}
-              className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5"
+              className="rounded-[16px] bg-[#16181a] border border-white/[0.08] p-5 transition-all duration-200 hover:border-white/[0.16]"
             >
-              <div className="text-[22px] mb-3" style={{ color: "#494fdf" }}>
-                {b.icon}
-              </div>
-              <h3 className="text-[15px] font-semibold mb-1.5 tracking-[-0.1px]">{b.title}</h3>
-              <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5]">{b.body}</p>
+              <div className="text-[22px] mb-3 text-[#494fdf]">{b.icon}</div>
+              <h3 className="font-display text-base text-foreground mb-1.5">{b.title}</h3>
+              <p className="text-[13px] text-muted-foreground leading-[1.5]">{b.body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Steps */}
-      <section
-        className="px-6 py-[72px] mt-[40px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">The read path</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-12 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 mt-10 border-t border-white/[0.08] bg-band">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">The read path</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-12">
             Permissionless, today.
           </h2>
 
@@ -115,18 +110,18 @@ export default function IntegratePage() {
             {STEPS.map((s) => (
               <div
                 key={s.n}
-                className="grid md:grid-cols-[1fr_1.2fr] gap-6 items-center rounded-[20px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-6 md:p-8"
+                className="grid md:grid-cols-[1fr_1.2fr] gap-6 items-center rounded-[20px] bg-[#16181a] border border-white/[0.08] p-6 md:p-8 transition-all duration-200 hover:border-white/[0.16]"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="font-mono text-[14px] text-[#494fdf] tabular">{s.n}</span>
-                    <h3 className="text-[20px] font-semibold tracking-[-0.2px]">{s.title}</h3>
+                    <span className="font-mono text-[14px] text-[#9296f5] tabular">{s.n}</span>
+                    <h3 className="font-display text-xl text-foreground">{s.title}</h3>
                   </div>
-                  <p className="text-[15px] text-[rgba(255,255,255,0.60)] leading-[1.56] max-w-[28rem]">
+                  <p className="pretty text-[15px] text-muted-foreground leading-relaxed max-w-[28rem]">
                     {s.body}
                   </p>
                 </div>
-                <pre className="rounded-[12px] bg-[#0a0a0a] border border-[rgba(255,255,255,0.06)] p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-[rgba(255,255,255,0.82)] font-mono">
+                <pre className="rounded-[12px] bg-[#0a0a0a] border border-white/[0.08] p-4 overflow-x-auto text-[12.5px] leading-[1.6] text-muted-foreground font-mono">
                   <code>{s.code}</code>
                 </pre>
               </div>
@@ -136,13 +131,13 @@ export default function IntegratePage() {
       </section>
 
       {/* Headless agent access */}
-      <section className="px-6 py-[72px]">
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">For agents</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">For agents</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             Headless, end to end.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.6)] leading-[1.56] max-w-[40rem] mb-8 pretty">
+          <p className="pretty text-base text-muted-foreground leading-relaxed max-w-[40rem] mb-8">
             An AI agent can use Bombe with no human: discover assets, read a verdict, verify it, and
             even pay for a new attestation, over a keyless JSON API or an MCP server. The
             integration contract is in{" "}
@@ -150,12 +145,15 @@ export default function IntegratePage() {
               href="https://github.com/jishnu-baruah/Bombe/blob/main/SKILL.md"
               target="_blank"
               rel="noreferrer"
-              className="text-[#494fdf] hover:text-[#6b70e8]"
+              className="text-[#9296f5] hover:text-white transition-colors"
             >
               SKILL.md
             </a>
             ; the MCP server is{" "}
-            <code className="font-mono text-[13px] text-[#8d969e]">@bombe/mcp</code>.
+            <code className="font-mono text-xs px-2.5 py-1 rounded-[8px] border border-white/[0.12] text-muted-foreground">
+              @bombe/mcp
+            </code>
+            .
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -188,12 +186,10 @@ export default function IntegratePage() {
             ].map((x) => (
               <div
                 key={x.t}
-                className="rounded-[16px] bg-[#16181a] border border-[rgba(255,255,255,0.06)] p-5"
+                className="rounded-[16px] bg-[#16181a] border border-white/[0.08] p-5 transition-all duration-200 hover:border-white/[0.16]"
               >
-                <code className="font-mono text-[13px] text-[#ffffff]">{x.t}</code>
-                <p className="text-[13px] text-[rgba(255,255,255,0.55)] leading-[1.5] mt-2">
-                  {x.b}
-                </p>
+                <code className="font-mono text-[13px] text-foreground">{x.t}</code>
+                <p className="text-[13px] text-muted-foreground leading-[1.5] mt-2">{x.b}</p>
               </div>
             ))}
           </div>
@@ -201,25 +197,22 @@ export default function IntegratePage() {
       </section>
 
       {/* Real, auditable reasoning */}
-      <section
-        className="px-6 py-[72px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <p className="eyebrow mb-4">Real reasoning, deterministic verdict</p>
-          <h2 className="text-[clamp(28px,4vw,40px)] font-semibold leading-[1.15] tracking-[-0.4px] mb-4 balance">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08] bg-band">
+        <div className="max-w-[1200px] mx-auto">
+          <span className="eyebrow block mb-6">Real reasoning, deterministic verdict</span>
+          <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
             A real model explains; the math decides.
           </h2>
-          <p className="text-[16px] text-[rgba(255,255,255,0.6)] leading-[1.56] max-w-[40rem] mb-8 pretty">
+          <p className="pretty text-base text-muted-foreground leading-relaxed max-w-[40rem] mb-8">
             Each attestation carries a genuine, model-authored train of thought that reasons over
             the real fetched evidence and cites each source by link, so it is auditable. The verdict
             itself is not the model&apos;s opinion: it is a deterministic reconciliation you can
             rerun, and the whole trace is hashed on-chain. Pay to attest your own supported yield at{" "}
-            <Link href="/request" className="text-[#494fdf] hover:text-[#6b70e8]">
+            <Link href="/request" className="text-[#9296f5] hover:text-white transition-colors">
               /request
             </Link>
             , then check any verdict at{" "}
-            <Link href="/verify" className="text-[#494fdf] hover:text-[#6b70e8]">
+            <Link href="/verify" className="text-[#9296f5] hover:text-white transition-colors">
               /verify
             </Link>
             .
@@ -228,14 +221,14 @@ export default function IntegratePage() {
       </section>
 
       {/* Honest note on posting */}
-      <section className="px-6 py-[72px]">
-        <div className="max-w-6xl mx-auto">
+      <section className="px-6 lg:px-12 py-20 lg:py-28">
+        <div className="max-w-[1200px] mx-auto">
           <div className="rounded-[20px] border border-[rgba(73,79,223,0.25)] bg-[rgba(73,79,223,0.06)] p-8 max-w-[44rem]">
-            <p className="eyebrow mb-3">Posting a claim</p>
-            <p className="text-[16px] text-[rgba(255,255,255,0.72)] leading-[1.56] pretty">
+            <span className="eyebrow block mb-3">Posting a claim</span>
+            <p className="pretty text-base text-muted-foreground leading-relaxed">
               Reading and verifying are open to anyone. To get a new attestation you pay the fee
               from your own wallet at{" "}
-              <Link href="/request" className="text-[#494fdf] hover:text-[#6b70e8]">
+              <Link href="/request" className="text-[#9296f5] hover:text-white transition-colors">
                 /request
               </Link>{" "}
               and the network posts the claim and attests it for you (the contract only accepts
@@ -248,16 +241,13 @@ export default function IntegratePage() {
       </section>
 
       {/* CTA */}
-      <section
-        className="px-6 py-[88px] border-t border-[rgba(255,255,255,0.06)]"
-        style={{ background: "#0a0a0a" }}
-      >
-        <div className="max-w-6xl mx-auto">
+      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08] bg-band">
+        <div className="max-w-[1200px] mx-auto">
           <div className="max-w-[36rem]">
-            <h2 className="font-semibold leading-[1.05] tracking-[-0.48px] mb-6 text-[#ffffff] text-[clamp(32px,5vw,56px)] balance">
+            <h2 className="font-display balance text-[clamp(32px,5vw,56px)] leading-[1.05] text-foreground mb-6">
               See the whole thing.
             </h2>
-            <p className="text-[18px] text-[rgba(255,255,255,0.60)] leading-[1.56] mb-10 max-w-[34rem] pretty">
+            <p className="pretty text-lg text-muted-foreground leading-relaxed mb-10 max-w-[34rem]">
               The full guide has the exact signatures, the live addresses, and an end-to-end example
               you can run against Mantle Sepolia.
             </p>

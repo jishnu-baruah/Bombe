@@ -242,9 +242,9 @@ function DecisionChip({ done }: { done: AgentDoneEvent }) {
 
 function AgentFooter({ done }: { done: AgentDoneEvent }) {
   return (
-    <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-between gap-2 flex-wrap">
-      <span className="text-[11px] font-mono text-[#505a63]">{done.latencyMs}ms</span>
-      <span className="text-[11px] font-mono text-[#505a63]">
+    <div className="mt-3 pt-3 border-t border-white/[0.08] flex items-center justify-between gap-2 flex-wrap">
+      <span className="text-[11px] font-mono text-muted-foreground/70">{done.latencyMs}ms</span>
+      <span className="text-[11px] font-mono text-muted-foreground/70">
         {done.costUsd > 0 ? `$${done.costUsd.toFixed(4)}` : "-"}
       </span>
     </div>
@@ -257,14 +257,14 @@ function AgentFooter({ done }: { done: AgentDoneEvent }) {
 
 function StepFeed({ steps }: { steps: AgentStepEvent[] }) {
   if (steps.length === 0) {
-    return <p className="text-[#3a3d40] text-[12px] italic">Waiting for first step…</p>;
+    return <p className="text-muted-foreground/70 text-[12px] italic">Waiting for first step…</p>;
   }
   return (
     <ul className="flex flex-col gap-2">
       {steps.map((s) => (
         <li key={`${s.agentAddr}-${s.step}`} className="text-[12px]">
-          <span className="text-[#494fdf] font-mono text-[11px] mr-1">#{s.step}</span>
-          <span className="text-[rgba(255,255,255,0.72)]">{s.thought}</span>
+          <span className="text-[#9296f5] font-mono text-[11px] mr-1">#{s.step}</span>
+          <span className="text-muted-foreground">{s.thought}</span>
         </li>
       ))}
     </ul>
@@ -340,7 +340,9 @@ function AgentColumn({
           {isHuman && <Badge variant="HUMAN" className="text-[10px]" />}
           {!isHuman && !isExternal && <Badge variant="AI" className="text-[10px]" />}
           {/* Toggle chevron on mobile */}
-          <span className="sm:hidden text-[#505a63] text-[11px]">{expanded ? "▲" : "▼"}</span>
+          <span className="sm:hidden text-muted-foreground/70 text-[11px]">
+            {expanded ? "▲" : "▼"}
+          </span>
         </div>
       </button>
 
@@ -351,7 +353,7 @@ function AgentColumn({
           <div className="flex flex-col gap-2">
             {humanQueuePosition !== null && humanQueuePosition !== undefined ? (
               <>
-                <p className="text-[12px] text-[rgba(255,255,255,0.72)]">
+                <p className="text-[12px] text-muted-foreground">
                   {humanQueuePosition === 0
                     ? "Human attestor is reviewing…"
                     : `Queue position: ${humanQueuePosition}`}
@@ -359,13 +361,13 @@ function AgentColumn({
                 {humanQueueEstWait !== null &&
                   humanQueueEstWait !== undefined &&
                   humanQueueEstWait > 0 && (
-                    <p className="text-[11px] text-[#505a63] font-mono">
+                    <p className="text-[11px] text-muted-foreground/70 font-mono">
                       est. {humanQueueEstWait} min
                     </p>
                   )}
               </>
             ) : (
-              <p className="text-[#3a3d40] text-[12px] italic">Waiting for claim…</p>
+              <p className="text-muted-foreground/70 text-[12px] italic">Waiting for claim…</p>
             )}
 
             {done && (
@@ -391,7 +393,7 @@ function AgentColumn({
             ) : (
               <div className="h-8 flex items-center">
                 {steps.length > 0 && (
-                  <span className="text-[11px] text-[#494fdf] font-mono animate-pulse">
+                  <span className="text-[11px] text-[#9296f5] font-mono animate-pulse">
                     thinking…
                   </span>
                 )}
@@ -414,12 +416,12 @@ function ClaimHeader({ claim }: { claim: ClaimPostedEvent }) {
 
   return (
     <div
-      className="rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[#16181a] px-5 py-4 flex flex-wrap items-center gap-3"
+      className="rounded-[12px] border border-white/[0.12] bg-[#16181a] px-5 py-4 flex flex-wrap items-center gap-3"
       data-testid="claim-header"
     >
       <Badge variant={tierVariant} />
       <span className="font-semibold text-[14px]">{claim.claimType}</span>
-      <span className="text-[#8d969e] text-[13px]">{claim.asset}</span>
+      <span className="text-muted-foreground text-[13px]">{claim.asset}</span>
       <Mono value={payloadStr} truncate showCopy={false} className="text-[11px]" />
     </div>
   );
@@ -436,7 +438,7 @@ function ToastList({ toasts }: { toasts: Toast[] }) {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="bg-[#16181a] border border-[rgba(255,255,255,0.12)] text-[rgba(255,255,255,0.9)] text-[13px] px-5 py-3 rounded-full shadow-lg animate-fade-in"
+          className="bg-[#16181a] border border-white/[0.12] text-foreground/90 text-[13px] px-5 py-3 rounded-full shadow-lg animate-fade-in"
           data-testid="toast"
         >
           {t.message}
@@ -684,15 +686,15 @@ export default function LivePage() {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-[#000000] text-[#ffffff]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* ── Hero band ── */}
-      <section className="px-6 pt-[88px] pb-8 border-b border-[rgba(255,255,255,0.06)]">
+      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-8 border-b border-white/[0.08]">
         <div className="max-w-[1200px] mx-auto">
-          <p className="eyebrow mb-4">Bombe · Live Race View</p>
-          <h1 className="text-[clamp(36px,6vw,56px)] font-semibold leading-[1.0] tracking-[-0.5px] mb-4 balance">
+          <span className="eyebrow block mb-6">Bombe · Live Race View</span>
+          <h1 className="font-display balance text-[clamp(36px,6vw,56px)] leading-[1.0] text-foreground mb-4">
             Agent Race
           </h1>
-          <p className="text-[rgba(255,255,255,0.60)] text-[16px] max-w-2xl leading-[1.5] mb-6 pretty">
+          <p className="pretty text-base text-muted-foreground max-w-2xl leading-relaxed mb-6">
             Watch four attestors race on each claim, Reflector, Rotor, Stator (SDK agents),
             Plugboard (external runtime), and a Human Queue. Outcomes are deterministic and
             reproducible.
@@ -737,7 +739,7 @@ export default function LivePage() {
       </section>
 
       {/* ── Race content ── */}
-      <section className="px-4 sm:px-6 py-6">
+      <section className="px-6 lg:px-12 py-6">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
           {/* Claim tabs */}
           <ClaimTabs
@@ -751,7 +753,7 @@ export default function LivePage() {
             <ClaimHeader claim={currentClaimState.claim} />
           ) : (
             <div
-              className="rounded-[12px] border border-[rgba(255,255,255,0.06)] bg-[#16181a] px-5 py-4 text-[#3a3d40] text-[13px]"
+              className="rounded-[12px] border border-white/[0.08] bg-[#16181a] px-5 py-4 text-muted-foreground/70 text-[13px]"
               data-testid="claim-waiting"
             >
               {streamClaimId ? "Loading claim…" : "Press Guided Demo or Start Claim A to begin."}
@@ -789,7 +791,7 @@ export default function LivePage() {
             >
               ✓ Claim {currentClaimId} complete
               {!atLastClaim && !guidedRunning && (
-                <span className="text-[#505a63]">, click Next claim to continue</span>
+                <span className="text-muted-foreground/70">, click Next claim to continue</span>
               )}
             </div>
           )}
@@ -797,7 +799,7 @@ export default function LivePage() {
           {/* Guided demo progress */}
           {guidedDone && (
             <div
-              className="text-center text-[13px] text-[rgba(255,255,255,0.72)] py-2"
+              className="text-center text-[13px] text-muted-foreground py-2"
               data-testid="guided-done"
             >
               Guided demo finished. All 4 claims processed.
