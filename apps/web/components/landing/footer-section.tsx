@@ -8,12 +8,17 @@ const footerLinks: Record<
   Product: [
     { name: "Live Race", href: "/live" },
     { name: "Verify", href: "/verify" },
+    { name: "Explorer", href: "/explorer" },
     { name: "For issuers", href: "/issuers" },
   ],
   Developers: [
+    {
+      name: "Documentation",
+      href: "https://jishnus-organization-1.gitbook.io/bombe/",
+      external: true,
+    },
     { name: "Integration guide", href: "/integrate" },
     { name: "API schema", href: "/api/v1/schema", external: true },
-    { name: "Issuers", href: "/issuers" },
     { name: "Request attestation", href: "/request" },
   ],
   Protocol: [

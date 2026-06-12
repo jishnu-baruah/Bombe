@@ -253,11 +253,11 @@ export default function IntegratePage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <a
-                href="https://github.com/jishnu-baruah/Bombe/blob/main/docs/INTEGRATION.md"
+                href="https://jishnus-organization-1.gitbook.io/bombe/"
                 target="_blank"
                 rel="noreferrer"
               >
-                <Button variant="primary">Open the full guide →</Button>
+                <Button variant="primary">Read the docs →</Button>
               </a>
               <Link href="/live">
                 <Button variant="outline-dark">Watch a live attestation</Button>
