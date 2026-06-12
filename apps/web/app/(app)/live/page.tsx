@@ -529,10 +529,10 @@ function AttestorRow({
           <span className="font-semibold text-[15px] text-foreground">{meta.name}</span>
           <KindChip kind={meta.kind} />
         </div>
-        <p className="text-[12.5px] text-muted-foreground/70 mt-0.5">{meta.role}</p>
+        <p className="text-[12.5px] text-muted-foreground mt-0.5">{meta.role}</p>
 
         {reason && (
-          <p className="text-[13.5px] text-muted-foreground leading-snug mt-2">{reason}</p>
+          <p className="text-[14.5px] text-foreground/90 leading-snug mt-2">{reason}</p>
         )}
       </div>
 
@@ -549,7 +549,7 @@ function AttestorRow({
         ) : checking ? (
           <span className="text-[14px] text-[#9296f5] animate-pulse">Checking…</span>
         ) : (
-          <span className="text-[13px] text-muted-foreground/50">Waiting</span>
+          <span className="text-[13px] text-muted-foreground/70">Waiting</span>
         )}
       </div>
     </div>
@@ -685,7 +685,7 @@ function TechnicalDetail({
             );
           })}
 
-          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+          <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
             This is a recorded walkthrough, replayed so you can follow each behavior end to end. The
             verdict is computed from the evidence; the model only narrates. The hashes shown here
             are from the demo trace. For live attestations you can re-derive and check on-chain
@@ -977,6 +977,10 @@ export default function LivePage() {
               <p className="text-muted-foreground text-[16px]">
                 Press <span className="text-foreground">Start the walkthrough</span> to watch the
                 panel judge the first claim.
+              </p>
+              <p className="text-muted-foreground/70 text-[14px] mt-4 max-w-xl mx-auto leading-relaxed">
+                You will see four claims judged in turn: a clean yes, a split panel, a rejection,
+                and a claim the contract refused to let anyone attest.
               </p>
             </div>
           ) : (
