@@ -3,11 +3,11 @@
   "claimId": "A",
   "steps": [
     {
-      "thought": "I need to verify the mETH 30-day yield claim. I will fetch the primary oracle snapshot first.",
+      "thought": "I need to verify the mETH yield over a 30-day window (windowDays 30) claim. I will fetch the primary oracle snapshot first.",
       "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-fresh" } }
     },
     {
-      "thought": "Primary source shows 34 bps and is fresh. As a conservative agent I require a second independent source. I will fetch the Chainlink price feed as corroboration.",
+      "thought": "Primary source shows 34 bps and is fresh. As a conservative agent I require a second corroborating source. I will fetch the Chainlink price feed as corroboration.",
       "action": {
         "tool": "fetch_chainlink_price",
         "input": { "asset": "mETH", "period": "30d-fresh" }
@@ -18,12 +18,12 @@
       "action": { "tool": "compute_expected", "input": { "observedBps": 34, "expectedBps": 34 } }
     },
     {
-      "thought": "Two independent fresh sources confirm mETH yield is 34 bps, within tolerance. Confidence is very high.",
+      "thought": "Two corroborating fresh sources confirm mETH yield is 34 bps, within tolerance. Confidence is very high.",
       "action": {
         "finalize": {
           "decision": "VALID",
           "confidenceBps": 9500,
-          "rationaleSummary": "Two independent fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance."
+          "rationaleSummary": "Two corroborating fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH yield over a 30-day window (windowDays 30) is 34 bps, matching expected value within ±2 bps tolerance."
         }
       }
     }

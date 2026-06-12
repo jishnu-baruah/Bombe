@@ -3,7 +3,7 @@
   "claimId": "A",
   "steps": [
     {
-      "thought": "Fetching mETH yield — single source check for cost efficiency.",
+      "thought": "Fetching mETH yield, single source check for cost efficiency.",
       "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-fresh" } }
     },
     {
