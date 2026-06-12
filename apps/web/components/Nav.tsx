@@ -11,8 +11,9 @@ import { useState } from "react";
 // One nav for the whole site (landing + app). Links point at the functional /
 // capability surfaces that get demoed and checked. Operator is internal ops and
 // lives in the footer, not the primary nav.
+// "Live" is intentionally not a text link here: the prominent "Watch live" pill
+// CTA already routes to /live, so a separate Live link would be redundant.
 const NAV_LINKS = [
-  { href: "/live", label: "Live" },
   { href: "/verify", label: "Verify" },
   { href: "/issuers", label: "Issuers" },
   { href: "/integrate", label: "Integrate" },
