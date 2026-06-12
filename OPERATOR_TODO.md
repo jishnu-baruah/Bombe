@@ -118,6 +118,23 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Half-done state: Hermes v0.16.0 is installed and reasons (one-shot prompts work), recognizes the bombe-attestor skill (enabled), and the attest tool works standalone. The multi-call agent loop is throttled by the model key's rate limit.
 - To resolve: provide a higher-rate model key (or confirm a paid tier) for the host's ~/.hermes/config.yaml, or point it at the project AI gateway. Then the full agent loop runs end to end.
 
+## OP-15, dormant attestors rotor / stator / human   [open]
+- Date: 2026-06-12
+- Blocks: nothing functionally, but the "multi-agent" / five-attestor framing outruns the on-chain evidence. On-chain truth: only reflector (22 attestations) and the external Plugboard (4, incl. a real REJECTED/VALID disagreement) have ever attested. rotor, stator, and human are registered and funded but have made zero attestations and have no stored traces; each holds only ~0.077 MNT (below the 0.1 floor, so they cannot attest much without a top-up).
+- Decision needed (operator): either (a) fund + activate rotor/stator on a few live claims so the multi-attestor story is real, or (b) keep the copy honest as it stands (the site already labels mETH as "one ground truth, two computation paths", not "independent", and never claims active consensus). Do not relabel as "multi-model consensus" unless three genuinely different models are confirmed (v2 constitution).
+- Half-done state: the leaderboard/claim UI render whatever each agent actually did; dormant agents simply show no activity, which is honest. No code change pending.
+
+## OP-16, on-chain dispute escalation key + economics   [open]
+- Date: 2026-06-12
+- Blocks: the operator-triggered on-chain leg of the dispute flow on the live host. The public dispute intake (POST /api/dispute) and the verify-page button are live and keyless; the operator route POST /api/operator/dispute is wired to sign the real AgentSlashing.openDispute (0.05 MNT bond) but needs a registered challenger key in the Vercel env that is NOT the accused attestor. ATTESTOR_KEY is reflector, which is the accused on most claims, so set a distinct CHALLENGER_KEY (e.g. the Plugboard key, which is registered + funded) for prod escalation.
+- Note: openDispute locks a 0.05 MNT bond and can slash; resolveDispute has economic finality (tie -> agent right, D13). I did not auto-trigger a resolution while unattended. To demonstrate or run a real dispute, set CHALLENGER_KEY and call /api/operator/dispute with { disputeId } (or { claimId, accused }).
+- To resolve: add CHALLENGER_KEY (distinct registered, funded attestor) to the Vercel prod env.
+
+## OP-17, MCP package run/build + docstring   [open]
+- Date: 2026-06-12
+- Blocks: nothing (all 8 MCP tools work end-to-end against the live API, verified by a fresh-context test driving the server over stdio). Minor packaging: packages/mcp has no README, its `start` script and `bin` reference `tsx` which is not a dependency (a fresh machine without a global tsx cannot `pnpm start`), and src/index.ts header says "See SKILL.md" but no SKILL.md exists in the package. The server does run via `node --experimental-strip-types src/index.ts` on Node 24.
+- To resolve: either add `tsx` to the package devDependencies (via the package manager, not a hand-edited lockfile) or add a build step that emits JS for the bin; add a short README; fix the docstring to point at the repo-root SKILL.md.
+
 ## Resolved
 
 ## OP-4, Mantle Sepolia RPC + funded wallets   [done]
