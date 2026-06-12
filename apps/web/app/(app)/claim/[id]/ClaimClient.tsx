@@ -500,9 +500,12 @@ function ClaimHeader({ id, claim }: { id: string; claim: Claim | undefined }) {
           <span className="text-muted-foreground">
             Type: <span className="text-foreground font-mono text-[13px]">{claim.claimType}</span>
           </span>
-          <span className="text-muted-foreground">
-            Submitter: <Mono value={String(claim.submitter)} truncate truncateChars={6} showCopy />
-          </span>
+          {!/^0x0+$/.test(String(claim.submitter)) && (
+            <span className="text-muted-foreground">
+              Submitter:{" "}
+              <Mono value={String(claim.submitter)} truncate truncateChars={6} showCopy />
+            </span>
+          )}
         </div>
         {/* Payload */}
         <div className="mt-4">

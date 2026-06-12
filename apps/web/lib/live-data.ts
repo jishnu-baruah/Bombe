@@ -321,13 +321,29 @@ export async function getClaim(id: string): Promise<Claim | undefined> {
       ? (rawClaimType as ClaimTypeEnum)
       : "YIELD_BPS";
 
+    // The on-chain getClaim struct has no poster field and the claimURI is a bare
+    // pointer, so the inline payload almost never carries a submitter. For a
+    // self-serve REQ claim the meaningful submitter is the payer recorded at
+    // request time; resolve it from the DB. Left as the zero address when unknown
+    // (the claim view hides an unknown submitter rather than showing 0x0).
+    let submitter =
+      (payload.submitter as string | undefined) ?? "0x0000000000000000000000000000000000000000";
+    if (/^0x0+$/.test(submitter)) {
+      try {
+        const { getPayerByClaimId } = await import("./db");
+        const payer = await getPayerByClaimId(id);
+        if (payer) submitter = payer;
+      } catch {
+        // DB is optional; leave the zero sentinel for the UI to hide.
+      }
+    }
+
     const claim: Claim = {
       id,
       tier: onChain.tier as 1 | 2 | 3,
       asset,
       claimType,
-      submitter:
-        (payload.submitter as string | undefined) ?? "0x0000000000000000000000000000000000000000",
+      submitter,
       payload,
       postedAt: (payload.postedAt as number | undefined) ?? Date.now(),
     };
