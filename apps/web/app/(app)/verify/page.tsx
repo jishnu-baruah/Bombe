@@ -44,21 +44,21 @@ function ClaimProof({ result }: { result: LookupResult }) {
             {claim.claimId}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[12px] text-[rgba(255,255,255,0.55)]">
-          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-[rgba(255,255,255,0.08)]">
+        <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-white/[0.08]">
             Tier {claim.tier || "?"}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-[rgba(255,255,255,0.08)]">
+          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-white/[0.08]">
             {claim.closed ? "closed" : "open"}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-[rgba(255,255,255,0.08)]">
+          <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-white/[0.08]">
             {claim.attestorCount} attestor{claim.attestorCount === 1 ? "" : "s"}
           </span>
         </div>
       </div>
 
       {claim.attestations.length === 0 ? (
-        <p className="px-6 py-6 text-[14px] text-[rgba(255,255,255,0.55)]">
+        <p className="px-6 py-6 text-[14px] text-muted-foreground">
           This claim is posted on-chain but has no attestations yet.
         </p>
       ) : (
@@ -72,14 +72,14 @@ function ClaimProof({ result }: { result: LookupResult }) {
               >
                 <div className="flex flex-wrap items-center gap-3 mb-3">
                   <DecisionChip decision={a.decision} />
-                  <span className="text-[13px] text-[rgba(255,255,255,0.55)] tabular">
+                  <span className="text-[13px] text-muted-foreground tabular">
                     confidence {a.confidenceBps} bps
                   </span>
                   <a
                     href={explorerAddressUrl(a.attestor)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[13px] text-[#494fdf] hover:text-[#6b70e8] font-mono transition-colors"
+                    className="text-[13px] text-[#9296f5] hover:text-white font-mono transition-colors"
                   >
                     {a.attestor.slice(0, 10)}…{a.attestor.slice(-6)} →
                   </a>
@@ -88,13 +88,13 @@ function ClaimProof({ result }: { result: LookupResult }) {
                   <dt className="text-muted-foreground">
                     <Gloss def={GLOSSARY.reasoningHash}>reasoning hash</Gloss>
                   </dt>
-                  <dd className="font-mono text-[#8d969e] break-all">{a.reasoningHash}</dd>
+                  <dd className="font-mono text-muted-foreground break-all">{a.reasoningHash}</dd>
                   <dt className="text-muted-foreground">
                     <Gloss def={GLOSSARY.sourcesHash}>sources hash</Gloss>
                   </dt>
-                  <dd className="font-mono text-[#8d969e] break-all">{a.sourcesHash}</dd>
+                  <dd className="font-mono text-muted-foreground break-all">{a.sourcesHash}</dd>
                   <dt className="text-muted-foreground">trace</dt>
-                  <dd className="font-mono text-[#8d969e] break-all">
+                  <dd className="font-mono text-muted-foreground break-all">
                     {a.traceURI || "(not stored yet)"}
                   </dd>
                 </dl>
@@ -104,10 +104,10 @@ function ClaimProof({ result }: { result: LookupResult }) {
         </ul>
       )}
 
-      <div className="px-6 py-4 border-t border-white/[0.08] bg-[rgba(255,255,255,0.02)] flex flex-wrap gap-4 text-[13px]">
+      <div className="px-6 py-4 border-t border-white/[0.08] bg-white/[0.02] flex flex-wrap gap-4 text-[13px]">
         <Link
           href={`/claim/${encodeURIComponent(claim.claimId)}`}
-          className="text-[#494fdf] hover:text-[#6b70e8]"
+          className="text-[#9296f5] hover:text-white transition-colors"
         >
           Open the full trace view →
         </Link>
@@ -115,7 +115,7 @@ function ClaimProof({ result }: { result: LookupResult }) {
           href={`/api/v1/verify/${encodeURIComponent(claim.claimId)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#494fdf] hover:text-[#6b70e8]"
+          className="text-[#9296f5] hover:text-white transition-colors"
         >
           Re-derive the hash via the API →
         </a>
@@ -134,7 +134,7 @@ export default async function VerifyPage({
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
+      <section className="hero-ambient relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
         <div className="max-w-3xl mx-auto">
           <span className="eyebrow block mb-6">Verify</span>
           <h1 className="font-display balance text-4xl lg:text-[56px] leading-[1.05] text-foreground mb-4">
@@ -156,7 +156,7 @@ export default async function VerifyPage({
             />
             <button
               type="submit"
-              className="px-6 py-3 text-[15px] font-semibold bg-[#ffffff] text-[#000000] rounded-full hover:bg-[#e8e8e8] active:scale-[0.98] transition-all"
+              className="px-6 py-3 text-[15px] font-medium bg-white text-black rounded-full hover:bg-white/90 active:scale-[0.98] transition-all"
             >
               Verify
             </button>
@@ -168,19 +168,19 @@ export default async function VerifyPage({
           </p>
 
           {result && !result.found && (
-            <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5 text-[14px] text-[rgba(255,255,255,0.7)]">
+            <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5 text-[14px] text-muted-foreground">
               {result.message ?? "Nothing found for that input."}
             </div>
           )}
 
           {result?.found && result.kind === "txHash" && (
             <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5">
-              <p className="text-[14px] text-[rgba(255,255,255,0.7)] mb-3">{result.message}</p>
+              <p className="text-[14px] text-muted-foreground mb-3">{result.message}</p>
               <a
                 href={result.explorerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[14px] text-[#494fdf] hover:text-[#6b70e8] font-medium"
+                className="text-[14px] text-[#9296f5] hover:text-white font-medium transition-colors"
               >
                 View transaction on Mantle explorer →
               </a>

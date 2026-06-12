@@ -83,10 +83,13 @@
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
 
-  /* ── Landing theme tokens (TASTE-CONTEXT surface hierarchy) ──
-     Used only by the landing page (app/page.tsx + components/landing/*).
+  /* ── Mouli theme tokens (the canonical, live design system) ──
+     The single system used everywhere: the landing (app/page.tsx +
+     components/landing/*) AND every inner app page now share these tokens.
      Level 0 canvas #000, level 1 band #0a0a0a, level 2 card #16181a.
-     Inner app pages keep the explicit dark hexes above. */
+     Brand cobalt #494fdf for large text / icons / featured surfaces;
+     accent-soft #9296f5 for small cobalt text + links on black.
+     See the canonical summary at the top of DESIGN.md. */
   --color-background: #000000;
   --color-foreground: #f5f6f8;
   --color-muted-foreground: #9ba1ad;

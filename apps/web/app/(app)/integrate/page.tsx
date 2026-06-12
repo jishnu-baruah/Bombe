@@ -64,7 +64,7 @@ export default function IntegratePage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
+      <section className="hero-ambient relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
         <div className="max-w-[1200px] mx-auto">
           <span className="eyebrow block mb-6">Integrate</span>
           <h1 className="font-display balance text-[clamp(40px,7vw,80px)] leading-[1.04] text-foreground mb-8">

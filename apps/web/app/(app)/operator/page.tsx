@@ -487,7 +487,7 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="hero-ambient relative min-h-screen flex items-center justify-center px-6 bg-background">
       <div className="w-full max-w-[28rem]">
         <p className="text-muted-foreground text-[13px] font-mono mb-4 text-center">
           /operator, access control
@@ -565,10 +565,10 @@ export default function OperatorPage() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-[88px]">
+    <div className="min-h-screen px-6 py-[88px] bg-background">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
+        <div className="hero-ambient relative flex items-start justify-between mb-8 flex-wrap gap-4 -mt-6 pt-6">
           <div>
             <p className="text-muted-foreground text-[13px] font-mono mb-2">/operator</p>
             <h1 className="font-display text-[48px] leading-[1.21] text-foreground">

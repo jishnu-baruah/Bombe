@@ -178,10 +178,10 @@ function MetricCard({
   sub,
 }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-[#0a0a0a] rounded-[12px] px-4 py-3 border border-[rgba(255,255,255,0.06)]">
-      <p className="text-[12px] text-[#8d969e] mb-1 uppercase tracking-[0.5px]">{label}</p>
-      <p className="text-[24px] font-semibold text-[#ffffff] leading-[1.2]">{value}</p>
-      {sub && <p className="text-[12px] text-[rgba(255,255,255,0.40)] mt-0.5">{sub}</p>}
+    <div className="bg-[#0a0a0a] rounded-[12px] px-4 py-3 border border-white/[0.08]">
+      <p className="text-[12px] text-muted-foreground mb-1 uppercase tracking-[0.5px]">{label}</p>
+      <p className="text-[24px] font-semibold text-foreground leading-[1.2]">{value}</p>
+      {sub && <p className="text-[12px] text-muted-foreground/70 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -198,21 +198,21 @@ export default async function HealthPage() {
   const totalFailed = health.testReports.reduce((s, r) => s + r.failed, 0);
 
   return (
-    <div className="min-h-screen px-6 py-[88px]">
+    <div className="min-h-screen px-6 py-[88px] bg-background">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
+        <div className="hero-ambient relative flex items-start justify-between mb-8 flex-wrap gap-4 -mt-6 pt-6">
           <div>
-            <p className="text-[#8d969e] text-[13px] font-mono mb-2">/operator/health</p>
-            <h1 className="text-[48px] font-semibold leading-[1.21] tracking-[-0.48px]">
+            <p className="text-muted-foreground text-[13px] font-mono mb-2">/operator/health</p>
+            <h1 className="font-display text-[48px] leading-[1.21] text-foreground">
               Health Dashboard
             </h1>
-            <p className="text-[rgba(255,255,255,0.72)] mt-2 text-[16px]">
+            <p className="text-muted-foreground mt-2 text-[16px]">
               System status, test coverage, and agent observability.
             </p>
           </div>
           <Link href="/operator">
-            <span className="inline-flex items-center px-5 py-[13px] text-[16px] font-semibold bg-[#000000] text-[#ffffff] border border-[#ffffff] rounded-full hover:bg-[#16181a] transition-colors">
+            <span className="inline-flex items-center h-12 px-7 text-base font-medium text-foreground border border-white/40 rounded-full hover:border-white/70 hover:bg-foreground/[0.04] transition-all">
               Operator Console
             </span>
           </Link>
@@ -254,12 +254,14 @@ export default async function HealthPage() {
 
         {/* Test Suite Reports */}
         <Card variant="feature-dark" className="mb-6">
-          <h2 className="text-[20px] font-semibold leading-[1.4] mb-4">Test Suites</h2>
+          <h2 className="font-display text-[20px] leading-[1.4] text-foreground mb-4">
+            Test Suites
+          </h2>
           <div className="space-y-3">
             {health.testReports.map((report) => (
               <div
                 key={report.suite}
-                className="flex items-center justify-between py-3 border-b border-[rgba(255,255,255,0.06)] last:border-0"
+                className="flex items-center justify-between py-3 border-b border-white/[0.08] last:border-0"
               >
                 <div className="flex items-center gap-3">
                   <StatusBadge status={report.status} />
@@ -267,11 +269,11 @@ export default async function HealthPage() {
                 </div>
                 <div className="flex items-center gap-6 text-right">
                   <div>
-                    <p className="text-[13px] text-[rgba(255,255,255,0.72)]">
+                    <p className="text-[13px] text-muted-foreground">
                       {report.passed}/{report.total} passing
                     </p>
                     {report.lastRunAt && (
-                      <p className="text-[11px] text-[#8d969e] font-mono">
+                      <p className="text-[11px] text-muted-foreground font-mono">
                         {new Date(report.lastRunAt).toLocaleString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -289,24 +291,26 @@ export default async function HealthPage() {
 
         {/* System Info */}
         <Card variant="feature-dark" className="mb-6">
-          <h2 className="text-[20px] font-semibold leading-[1.4] mb-4">System</h2>
+          <h2 className="font-display text-[20px] leading-[1.4] text-foreground mb-4">System</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-[12px] text-[#8d969e] uppercase tracking-[0.5px] mb-1">Mode</p>
+              <p className="text-[12px] text-muted-foreground uppercase tracking-[0.5px] mb-1">
+                Mode
+              </p>
               <div className="flex items-center gap-2">
                 <StatusBadge status={health.mode} />
-                <span className="text-[14px] text-[rgba(255,255,255,0.72)]">
+                <span className="text-[14px] text-muted-foreground">
                   {health.mode === "mock" ? "Deterministic fixture replay" : "Live on-chain"}
                 </span>
               </div>
             </div>
             <div>
-              <p className="text-[12px] text-[#8d969e] uppercase tracking-[0.5px] mb-1">
+              <p className="text-[12px] text-muted-foreground uppercase tracking-[0.5px] mb-1">
                 Plugboard
               </p>
               <div className="flex items-center gap-2">
                 <StatusBadge status={health.plugboardStatus} />
-                <span className="text-[14px] text-[rgba(255,255,255,0.72)]">
+                <span className="text-[14px] text-muted-foreground">
                   {health.plugboardStatus === "replaying"
                     ? "Fixture replay (mock)"
                     : health.plugboardStatus === "frozen"
@@ -318,16 +322,20 @@ export default async function HealthPage() {
               </div>
             </div>
             <div>
-              <p className="text-[12px] text-[#8d969e] uppercase tracking-[0.5px] mb-1">Chain</p>
-              <p className="text-[14px] text-[rgba(255,255,255,0.72)]">Mantle Sepolia (5003)</p>
+              <p className="text-[12px] text-muted-foreground uppercase tracking-[0.5px] mb-1">
+                Chain
+              </p>
+              <p className="text-[14px] text-muted-foreground">Mantle Sepolia (5003)</p>
             </div>
           </div>
         </Card>
 
         {/* Agent Stats */}
         <Card variant="feature-dark" className="mb-6">
-          <h2 className="text-[20px] font-semibold leading-[1.4] mb-4">Agent Observability</h2>
-          <p className="text-[13px] text-[rgba(255,255,255,0.40)] mb-4">
+          <h2 className="font-display text-[20px] leading-[1.4] text-foreground mb-4">
+            Agent Observability
+          </h2>
+          <p className="text-[13px] text-muted-foreground/70 mb-4">
             {health.mode === "mock"
               ? "Stub latencies, no live telemetry in mock mode."
               : "Live telemetry per agent per epoch."}
@@ -335,37 +343,34 @@ export default async function HealthPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[14px]">
               <thead>
-                <tr className="border-b border-[rgba(255,255,255,0.08)]">
-                  <th className="text-left text-[12px] text-[#8d969e] uppercase tracking-[0.5px] pb-2 pr-4">
+                <tr className="border-b border-white/[0.08]">
+                  <th className="text-left text-[12px] text-muted-foreground uppercase tracking-[0.5px] pb-2 pr-4">
                     Agent
                   </th>
-                  <th className="text-right text-[12px] text-[#8d969e] uppercase tracking-[0.5px] pb-2 pr-4">
+                  <th className="text-right text-[12px] text-muted-foreground uppercase tracking-[0.5px] pb-2 pr-4">
                     Avg Latency
                   </th>
-                  <th className="text-right text-[12px] text-[#8d969e] uppercase tracking-[0.5px] pb-2 pr-4">
+                  <th className="text-right text-[12px] text-muted-foreground uppercase tracking-[0.5px] pb-2 pr-4">
                     Errors
                   </th>
-                  <th className="text-right text-[12px] text-[#8d969e] uppercase tracking-[0.5px] pb-2">
+                  <th className="text-right text-[12px] text-muted-foreground uppercase tracking-[0.5px] pb-2">
                     Failovers
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {health.agentStats.map((agent) => (
-                  <tr
-                    key={agent.agentId}
-                    className="border-b border-[rgba(255,255,255,0.04)] last:border-0"
-                  >
+                  <tr key={agent.agentId} className="border-b border-white/[0.06] last:border-0">
                     <td className="py-2.5 pr-4 font-semibold capitalize">{agent.agentId}</td>
-                    <td className="py-2.5 pr-4 text-right font-mono text-[rgba(255,255,255,0.72)]">
+                    <td className="py-2.5 pr-4 text-right font-mono text-muted-foreground">
                       {agent.avgLatencyMs >= 60000
                         ? `${(agent.avgLatencyMs / 60000).toFixed(1)}m`
                         : `${agent.avgLatencyMs.toLocaleString()}ms`}
                     </td>
-                    <td className="py-2.5 pr-4 text-right font-mono text-[rgba(255,255,255,0.72)]">
+                    <td className="py-2.5 pr-4 text-right font-mono text-muted-foreground">
                       {agent.errorCount}
                     </td>
-                    <td className="py-2.5 text-right font-mono text-[rgba(255,255,255,0.72)]">
+                    <td className="py-2.5 text-right font-mono text-muted-foreground">
                       {agent.failoverCount}
                     </td>
                   </tr>

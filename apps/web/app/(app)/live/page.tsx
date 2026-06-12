@@ -864,7 +864,7 @@ export default function LivePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Header band ── */}
-      <section className="px-6 lg:px-12 pt-12 lg:pt-16 pb-8 border-b border-white/[0.08]">
+      <section className="hero-ambient relative px-6 lg:px-12 pt-12 lg:pt-16 pb-8 border-b border-white/[0.08]">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-7">
           <div>
             <span className="eyebrow block mb-5">Bombe · Live walkthrough</span>

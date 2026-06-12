@@ -1,3 +1,23 @@
+# CANONICAL: the Mouli design system (the only live system)
+
+This is the source of truth for how the site looks. The LIVE, CANONICAL implementation is the **Mouli** dark system: the same tokens drive the landing page AND every inner app page. The rest of this file (the Revolut analysis below) is the originating research that Mouli was distilled from; it is kept for reference only. **When this file and the canonical summary below disagree, the Mouli system wins.** The implementation source of truth is `apps/web/app/globals.css` (the Mouli theme tokens + `.landing` blocks) and `apps/web/components/landing/*`.
+
+## Mouli token list (follow these exactly)
+
+- **Canvas / surfaces:** pure-black canvas `#000000` (token `bg-background`); bands `#0a0a0a` (`bg-band`); cards `#16181a` (`bg-[#16181a]`), hairline `border-white/[0.08]`, hover `border-white/[0.16]` + `shadow-[0_12px_40px_rgba(0,0,0,0.5)]`.
+- **Text:** `text-foreground` (`#f5f6f8`) and `text-muted-foreground` (`#9ba1ad`). Never use raw `text-[rgba(255,255,255,0.x)]`.
+- **Brand cobalt:** `#494fdf` for large text, icons, and featured surfaces; `#9296f5` (token `accent-soft`) for SMALL cobalt text and links on black (raw `#494fdf` is not readable small). Featured surface inversion: `bg-[#494fdf] text-white shadow-[0_16px_60px_rgba(73,79,223,0.35)]`.
+- **Type:** `.font-display` (Inter 600, -0.03em tracking) for ALL headings; `.eyebrow` (cobalt mono uppercase) for section labels; `.pretty` / `.balance` for wrapping. No ad-hoc `font-semibold tracking-[...]` headings.
+- **Buttons:** white pill primary (`bg-white text-black rounded-full h-12 px-7 font-medium`); outline pill secondary (`border border-white/40 rounded-full`).
+- **Radius:** cards `rounded-[20px]`; inputs / chips `rounded-[8px]` / `rounded-[12px]`; pills `rounded-full`.
+- **Layout:** container `max-w-[1200px] mx-auto px-6 lg:px-12`; section rhythm `py-20 lg:py-28`.
+- **Depth (atmosphere):** subtle violet radial glows + a faint noise overlay. The reusable `.hero-ambient` class (in `globals.css`) places a restrained violet glow behind a page's hero/title; the landing CTA uses a stronger cobalt glow `radial-gradient(ellipse 55% 90% at 78% 45%, rgba(73,79,223,0.22)...)`; `.noise-overlay::after` carries fractal noise at ~0.03 opacity. Every inner app page shares the same `.hero-ambient` depth as the landing.
+- **Semantic status colors (encode meaning, not theme; never remap):** verdict green `#86c95f` / `#428619`, amber `#d4a017` / `#b09000`, red `#e23b4a`, contract-revert violet `#7c3aed`, plus the live-race status dots.
+
+Everything below this line is the original Revolut analysis, retained for reference.
+
+---
+
 ---
 version: alpha
 name: Revolut-design-analysis
