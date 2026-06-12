@@ -25,10 +25,11 @@ import {
   type TraceStep,
   getTrace,
 } from "@/lib/demo-data";
+import { hashCanonical } from "@/lib/hash";
 import { verifyTraceHash } from "@/lib/verify-hash";
 import type { Claim } from "@bombe/shared";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // Note: `use` removed, params are now pre-resolved by the server wrapper (page.tsx)
 
 // ---------------------------------------------------------------------------
@@ -211,9 +212,9 @@ function DecisionBlock({
       <p className="text-muted-foreground text-[15px] leading-[1.5] mb-4">
         {trace.final.rationaleSummary}
       </p>
-      {trace.final.reasons.length > 0 && (
+      {(trace.final.reasons ?? []).length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {trace.final.reasons.map((r) => (
+          {(trace.final.reasons ?? []).map((r) => (
             <span
               key={r}
               className="font-mono text-[12px] text-[#b09000] bg-[rgba(176,144,0,0.08)] px-2 py-1 rounded-[8px]"
@@ -294,11 +295,29 @@ function OnChainRecord({
 
 type VerifyState = "idle" | "match" | "mismatch";
 
-function VerifyHashButton({ trace }: { trace: StoredTrace }) {
+function VerifyHashButton({
+  trace,
+  expectedHash,
+}: {
+  trace: StoredTrace;
+  // For live traces the reasoningHash is not embedded in the trace body; the
+  // expected value is the on-chain attestation hash, passed in here. When
+  // omitted (bundled demo trace), the hash is the one embedded in the trace.
+  expectedHash?: string;
+}) {
   const [state, setState] = useState<VerifyState>("idle");
 
   function handleVerify() {
-    const result = verifyTraceHash(trace);
+    let result: VerifyState;
+    if (expectedHash) {
+      try {
+        result = hashCanonical(trace) === expectedHash ? "match" : "mismatch";
+      } catch {
+        result = "mismatch";
+      }
+    } else {
+      result = verifyTraceHash(trace);
+    }
     setState(result);
   }
 
@@ -358,24 +377,62 @@ function AgentPanel({
   claimId: string;
   attestations: AttestationRecord[];
 }) {
-  const trace = getTrace(claimId, agentId);
+  const bundled = getTrace(claimId, agentId);
   const attestation = attestations.find((a) => a.agentId === agentId);
+  const [liveTrace, setLiveTrace] = useState<StoredTrace | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  if (!trace || !attestation) {
+  // Live claims store their trace in Neon (served by /api/trace/[claimId]/[agent]),
+  // not bundled client-side. When there is an on-chain attestation but no demo
+  // fixture, fetch the real trace so the page shows it (and can verify its hash).
+  useEffect(() => {
+    if (bundled || !attestation) return;
+    let cancelled = false;
+    setLoading(true);
+    fetch(`/api/trace/${encodeURIComponent(claimId)}/${encodeURIComponent(agentId)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((raw: unknown) => {
+        if (cancelled || !raw || typeof raw !== "object" || "error" in raw) return;
+        setLiveTrace(raw as StoredTrace);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [bundled, attestation, claimId, agentId]);
+
+  if (!attestation) {
     return (
       <div className="py-8 text-muted-foreground/70 text-[14px]">
-        No trace data available for {agentId} on claim {claimId}.
+        {AGENT_LABELS[agentId]} has not attested this claim.
       </div>
     );
   }
 
+  const trace = bundled ?? liveTrace;
+  if (!trace) {
+    return (
+      <div className="py-8 text-muted-foreground/70 text-[14px]">
+        {loading ? "Loading trace…" : `No trace data available for ${agentId} on claim ${claimId}.`}
+      </div>
+    );
+  }
+
+  const steps = (trace.steps ?? []) as TraceStep[];
   return (
     <div>
       {/* Step list */}
-      {trace.steps.length > 0 ? (
+      {steps.length > 0 ? (
         <div className="space-y-4 mb-6">
-          {(trace.steps as TraceStep[]).map((step, i) => (
-            <StepCard key={`step-${i}-${step.thought.slice(0, 16)}`} step={step} index={i} />
+          {steps.map((step, i) => (
+            <StepCard
+              key={`step-${i}-${String(step.thought).slice(0, 16)}`}
+              step={step}
+              index={i}
+            />
           ))}
         </div>
       ) : (
@@ -392,8 +449,12 @@ function AgentPanel({
       {/* On-chain record */}
       <OnChainRecord attestation={attestation} trace={trace} />
 
-      {/* Verify-hash button (PRD §14.4) */}
-      <VerifyHashButton trace={trace} />
+      {/* Verify-hash button (PRD §14.4). Bundled traces embed the hash; live
+          traces verify against the on-chain attestation reasoningHash. */}
+      <VerifyHashButton
+        trace={trace}
+        expectedHash={bundled ? undefined : attestation.reasoningHash}
+      />
     </div>
   );
 }
