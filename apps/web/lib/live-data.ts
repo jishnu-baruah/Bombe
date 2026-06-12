@@ -495,6 +495,15 @@ export function getPlugboardSkillHash(): `0x${string}` {
 
 function buildAddrToAgent(): Map<string, string> {
   const m = new Map<string, string>();
+  // Seed from the canonical deployment identities so attestations label as
+  // reflector/rotor/stator/plugboard/human even when no AGENT_ADDRS/AGENT_KEYS
+  // env is present (e.g. on the production host, which only sets the keys it
+  // needs to sign). Without this the attestor showed as a raw 0x address and the
+  // claim page could not match an attestation to its agent tab.
+  for (const [addr, agentId] of Object.entries(CANONICAL_AGENT_BY_ADDR)) {
+    m.set(addr, agentId);
+  }
+  // Overlay any env-provided agents (covers a future redeploy to new addresses).
   for (const { address, agentId } of getKnownAgentAddresses()) {
     m.set(address.toLowerCase(), agentId);
   }
