@@ -107,3 +107,27 @@ explorer base: https://sepolia.mantlescan.xyz/tx
 | attest tx | `0x86fe2ceb78a52514b764dd07a17f312337b14f4a707bba5447c640491bd1440f` |
 | reasoningHash (on-chain == local) | `0x0cd7a4b4ab182a6e2b3d1c95aef65c11205666d952752d01c48ae3dec6b29cbd` |
 | Source | DefiLlama reported APY; labeled single source, full transparency (D4a) |
+
+---
+
+## External Plugboard attestor, LIVE on-chain proof
+
+The external Plugboard attestor (an attestor the Bombe team did not write) now has LIVE on-chain
+proof, not just deterministic replay. It is driven by an LLM (Mistral) via `scripts/plugboard-live.ts`,
+which classifies each claim by tier, gathers evidence through the tool gateway, and submits a real
+`attest()` transaction on Mantle Sepolia. This demonstrates that Bombe's contract-layer safety holds
+against an agent the team did not author: a Tier-1 falsifiable claim attests cleanly, while a Tier-3
+judgment claim is rejected on-chain by the contract.
+
+| Field | Value |
+|-------|-------|
+| Plugboard wallet | [`0x58826a9FCb6956332D0833b9175CE40A7587957e`](https://sepolia.mantlescan.xyz/address/0x58826a9FCb6956332D0833b9175CE40A7587957e) |
+| Runtime | External (Hermes), LLM-driven by Mistral via `scripts/plugboard-live.ts` |
+| Tier-1 attestation (success) | [`0xc1d726a2290e8bb9da3634b042a2e36e3c74326e60a4b5cc933a4b2fbe3be87a`](https://sepolia.mantlescan.xyz/tx/0xc1d726a2290e8bb9da3634b042a2e36e3c74326e60a4b5cc933a4b2fbe3be87a) |
+| Tier-3 judgment attestation (reverted) | [`0x44bb6b906d92cc62048525c85eea4ed12b14d8c8efc18da17696d0ee75543829`](https://sepolia.mantlescan.xyz/tx/0x44bb6b906d92cc62048525c85eea4ed12b14d8c8efc18da17696d0ee75543829) |
+| Tier-3 revert reason | `JudgmentTierRequiresAbstain` (contract enforced the abstain rule) |
+
+The Tier-1 transaction is a successful on-chain attestation by the external attestor. The Tier-3
+transaction was reverted on-chain with `JudgmentTierRequiresAbstain`, proving that the contract,
+not the agent, enforces the abstain-on-judgment rule. Explorer base:
+https://sepolia.mantlescan.xyz/tx

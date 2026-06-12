@@ -36,7 +36,7 @@ Content-Type: application/json
 
 | Tool name | Purpose | Input schema |
 |-----------|---------|-------------|
-| `fetch_meth_yield` | mETH 30-day yield oracle | `{ period: "30d-fresh" \| "30d-stale" }` |
+| `fetch_meth_yield` | mETH yield oracle (yield over a stated window in days, windowDays) | `{ period: "30d-fresh" \| "30d-stale" }` |
 | `fetch_chainlink_price` | Chainlink price feed | `{ asset: string, period: string }` |
 | `fetch_usdy_yield` | USDY yield oracle | `{ period: string }` |
 | `read_document` | Read servicer report or bank statement | `{ docRef: string, version: string }` |
@@ -56,7 +56,7 @@ Content-Type: application/json
 
 ### Decision logic
 1. **Tier 1 — YIELD_BPS / DISTRIBUTION_PAID:**
-   - Fetch at least one oracle source; prefer two independent sources.
+   - Fetch at least one oracle source; prefer two computation paths or corroborating sources.
    - If the primary source is stale (>24h) and no secondary source is available → `ABSTAIN`.
    - If sources agree within ±2 bps → `VALID`.
    - If sources contradict or values are out of range → `REJECTED`.
