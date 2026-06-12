@@ -30,7 +30,7 @@ const variantClasses: Record<ButtonVariant, string> = {
     "bg-transparent text-foreground border border-white/40 hover:border-white/70 hover:bg-foreground/[0.04] active:scale-[0.98] px-7 h-12 text-base font-medium leading-[1.5] rounded-full transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]",
   // button-pill-sm: sub-nav chips / filter pills
   "pill-sm":
-    "bg-[#16181a] text-[rgba(255,255,255,0.72)] hover:bg-[#3a3d40] hover:text-[#ffffff] active:scale-[0.97] px-4 py-2 h-9 text-[14px] font-semibold leading-[1.43] rounded-full transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]",
+    "bg-[#16181a] text-muted-foreground hover:bg-[#3a3d40] hover:text-foreground active:scale-[0.97] px-4 py-2 h-9 text-[14px] font-semibold leading-[1.43] rounded-full transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]",
 };
 
 export function Button({ variant = "primary", className = "", children, ...props }: ButtonProps) {

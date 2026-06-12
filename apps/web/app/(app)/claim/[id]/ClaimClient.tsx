@@ -478,7 +478,7 @@ function ClaimHeader({ id, claim }: { id: string; claim: Claim | undefined }) {
   }
 
   return (
-    <section className="px-6 lg:px-12 py-20 lg:py-28 border-b border-white/[0.08]">
+    <section className="hero-ambient relative px-6 lg:px-12 py-20 lg:py-28 border-b border-white/[0.08]">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/verify"

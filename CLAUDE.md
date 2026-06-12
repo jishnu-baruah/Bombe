@@ -5,7 +5,7 @@ Auto-loads each session. Read it, then follow it. The PRD is the source of truth
 ## Project one-liner
 
 Bombe is an autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sepolia (chain id 5003)**. Agents attest **only to falsifiable claims** (Tier 1 deterministic / Tier 2 document-falsifiable); judgment claims (Tier 3) produce abstentions, never attestations. **Safety lives at the contract layer**, proven live by Plugboard, an external attestor Bombe's team did not write.
-- Thesis & non-goals: `CONTEXT.md`. Full spec: `docs/bombe-prd.md`. Submission spec: `HACKATHON.md`. Web design system: `DESIGN.md`.
+- Thesis & non-goals: `CONTEXT.md`. Full spec: `docs/bombe-prd.md`. Submission spec: `HACKATHON.md`. Web design system: the canonical Mouli summary at the TOP of `DESIGN.md` is the single styling source of truth (pure-black canvas, cobalt `#494fdf` / `#9296f5`-small, `#16181a` cards, `.font-display`, `.eyebrow`, the violet-glow + noise depth via `.hero-ambient`, white-pill buttons); the implementation lives in `apps/web/app/globals.css`. The Revolut analysis lower in `DESIGN.md` is reference only.
 
 ## Shipping target (D16)
 

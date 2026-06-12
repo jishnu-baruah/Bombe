@@ -136,7 +136,7 @@ export default function IssuersPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero */}
-      <section className="relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
+      <section className="hero-ambient relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-24">
         <div className="max-w-[1200px] mx-auto">
           <span className="eyebrow block mb-5">For issuers</span>
           <h1 className="font-display balance text-[clamp(40px,7vw,88px)] leading-[1.02] text-foreground mb-8">

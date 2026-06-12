@@ -13,7 +13,7 @@ import { RequestAttestationForm } from "./RequestAttestationForm";
 export default function RequestPage() {
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <section className="px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
+      <section className="hero-ambient relative px-6 lg:px-12 pt-12 lg:pt-20 pb-20 lg:pb-28">
         <div className="max-w-2xl mx-auto">
           <span className="eyebrow block mb-6">Request an attestation</span>
           <h1 className="font-display balance text-[clamp(30px,5vw,46px)] leading-[1.1] text-foreground mb-4">
