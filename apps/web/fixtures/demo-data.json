@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-06-11T09:36:55.026Z",
+  "_generated": "2026-06-12T02:32:42.997Z",
   "_note": "ALL hashes computed via hashCanonical — NEVER hand-typed (PRD §15.4 guardrail)",
   "plugboardSkillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd",
   "claims": [
@@ -61,7 +61,7 @@
         "claimId": "A",
         "decision": "VALID",
         "confidenceBps": 9500,
-        "reasoningHash": "0x1dfc38a696a4a2b465ee57c69940618d854591751280ffc9162995b423c9b932",
+        "reasoningHash": "0xdd9bb9deda0ae6c485edd03c9624da5e4d3badff213ed6e644b9189eaaa1d5f7",
         "sourcesHash": "0x3b514100cf3a816057fb9540009b7474ade9df2e912cb5a9cae491705bc95b80",
         "traceURI": "mock://reflector/A",
         "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
@@ -93,7 +93,7 @@
         "claimId": "A",
         "decision": "VALID",
         "confidenceBps": 9000,
-        "reasoningHash": "0x2c214e0d50f77a8d599b0eaac010249200f8df8ed8e70d4658049a388b0dc7e1",
+        "reasoningHash": "0xf94bb5934f97caa354b9061baacbb00d67cc83917913f779541b5b43bfc29e3f",
         "sourcesHash": "0x4210a9b1d580b0760e30dcdcada370175f0ee953335bf980a181da6084d6625c",
         "traceURI": "mock://stator/A",
         "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
@@ -159,7 +159,7 @@
         "claimId": "B",
         "decision": "VALID",
         "confidenceBps": 7500,
-        "reasoningHash": "0x9f95fc5344cd63a990a3d32933b9487a027770b455c84937b6454e44cff71e88",
+        "reasoningHash": "0x4250c4db207f82ce9574267ca98d1db21de10c5a567c1bcdfc4f05db74397082",
         "sourcesHash": "0xa3a3d34b52cdc7bd0d3c8ba55e44ba25e1e38b11007cdc49fa62ee9b089fb3a6",
         "traceURI": "mock://rotor/B",
         "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
@@ -175,7 +175,7 @@
         "claimId": "B",
         "decision": "ABSTAIN",
         "confidenceBps": 2000,
-        "reasoningHash": "0x4c367e33cf637192928e4c45c197cb23a62d326b13264fc672e96d38fd880047",
+        "reasoningHash": "0x5cb130da3a2416e26a0d9d41fe1ccacd16176881e2b3bf543ce5a3747547c004",
         "sourcesHash": "0x4210a9b1d580b0760e30dcdcada370175f0ee953335bf980a181da6084d6625c",
         "traceURI": "mock://stator/B",
         "txHash": "0x3333333333333333333333333333333333333333333333333333333333333333",
@@ -225,7 +225,7 @@
         "claimId": "C",
         "decision": "REJECTED",
         "confidenceBps": 9500,
-        "reasoningHash": "0x734558f01429145bd04cb3863e000e3ecb5ca5022632dc3b46dcd4d793bdf096",
+        "reasoningHash": "0x7db1352cac989aeab763c3adf4a70f50107fae0833bdc6ddc16fd3d7b910da2f",
         "sourcesHash": "0x150fc22964ba73a0eea4244c8b8437039e91c3f9f34c18c549c784d465afe6ce",
         "traceURI": "mock://reflector/C",
         "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
@@ -241,7 +241,7 @@
         "claimId": "C",
         "decision": "REJECTED",
         "confidenceBps": 9500,
-        "reasoningHash": "0xc029497fe06482899226ac87a54d9463fd47e9dbcae2407922f15dee4ad69940",
+        "reasoningHash": "0x45ccbae2a16abd3d781917523beec110ed7bc16ef747c60da001beed11ad9b63",
         "sourcesHash": "0x15179ad1687b24e29e9708c90cf05e0285fdac4078d78b14cd4ea7ed1135a968",
         "traceURI": "mock://rotor/C",
         "txHash": "0x2222222222222222222222222222222222222222222222222222222222222222",
@@ -490,7 +490,7 @@
         "steps": [
           {
             "step": 0,
-            "thought": "I need to verify the mETH 30-day yield claim. I will fetch the primary oracle snapshot first.",
+            "thought": "I need to verify the mETH yield over a 30-day window (windowDays 30) claim. I will fetch the primary oracle snapshot first.",
             "action": {
               "tool": "fetch_meth_yield",
               "input": {
@@ -512,7 +512,7 @@
           },
           {
             "step": 1,
-            "thought": "Primary source shows 34 bps and is fresh. As a conservative agent I require a second independent source. I will fetch the Chainlink price feed as corroboration.",
+            "thought": "Primary source shows 34 bps and is fresh. As a conservative agent I require a second corroborating source. I will fetch the Chainlink price feed as corroboration.",
             "action": {
               "tool": "fetch_chainlink_price",
               "input": {
@@ -558,12 +558,12 @@
           },
           {
             "step": 3,
-            "thought": "Two independent fresh sources confirm mETH yield is 34 bps, within tolerance. Confidence is very high.",
+            "thought": "Two corroborating fresh sources confirm mETH yield is 34 bps, within tolerance. Confidence is very high.",
             "action": {
               "finalize": {
                 "decision": "VALID",
                 "confidenceBps": 9500,
-                "rationaleSummary": "Two independent fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance."
+                "rationaleSummary": "Two corroborating fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH yield over a 30-day window (windowDays 30) is 34 bps, matching expected value within ±2 bps tolerance."
               }
             },
             "observation": {
@@ -575,10 +575,10 @@
         "final": {
           "decision": "VALID",
           "confidenceBps": 9500,
-          "rationaleSummary": "Two independent fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance.",
+          "rationaleSummary": "Two corroborating fresh oracle sources (chainlink primary and chainlink secondary) both confirm mETH yield over a 30-day window (windowDays 30) is 34 bps, matching expected value within ±2 bps tolerance.",
           "reasons": []
         },
-        "reasoningHash": "0x1dfc38a696a4a2b465ee57c69940618d854591751280ffc9162995b423c9b932"
+        "reasoningHash": "0xdd9bb9deda0ae6c485edd03c9624da5e4d3badff213ed6e644b9189eaaa1d5f7"
       },
       "rotor": {
         "traceVersion": "1.0",
@@ -661,7 +661,7 @@
         "steps": [
           {
             "step": 0,
-            "thought": "Fetching mETH yield — single source check for cost efficiency.",
+            "thought": "Fetching mETH yield, single source check for cost efficiency.",
             "action": {
               "tool": "fetch_meth_yield",
               "input": {
@@ -703,7 +703,7 @@
           "rationaleSummary": "Fresh oracle confirms mETH yield is 34 bps, matching expected value within tolerance.",
           "reasons": []
         },
-        "reasoningHash": "0x2c214e0d50f77a8d599b0eaac010249200f8df8ed8e70d4658049a388b0dc7e1"
+        "reasoningHash": "0xf94bb5934f97caa354b9061baacbb00d67cc83917913f779541b5b43bfc29e3f"
       },
       "plugboard": {
         "traceVersion": "1.0",
@@ -873,7 +873,7 @@
               "finalize": {
                 "decision": "VALID",
                 "confidenceBps": 7500,
-                "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified — committing."
+                "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified, committing."
               }
             },
             "observation": {
@@ -885,10 +885,10 @@
         "final": {
           "decision": "VALID",
           "confidenceBps": 7500,
-          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified — committing.",
+          "rationaleSummary": "Oracle confirms mETH yield is 34 bps matching expected value. Data is stale but value is verified, committing.",
           "reasons": []
         },
-        "reasoningHash": "0x9f95fc5344cd63a990a3d32933b9487a027770b455c84937b6454e44cff71e88"
+        "reasoningHash": "0x4250c4db207f82ce9574267ca98d1db21de10c5a567c1bcdfc4f05db74397082"
       },
       "stator": {
         "traceVersion": "1.0",
@@ -919,7 +919,7 @@
           },
           {
             "step": 1,
-            "thought": "The oracle data is marked stale and returned low confidence. As a cost-optimised agent I abstain when the available evidence is insufficient — a single stale source is not reliable enough to commit.",
+            "thought": "The oracle data is marked stale and returned low confidence. As a cost-optimised agent I abstain when the available evidence is insufficient. A single stale source is not reliable enough to commit.",
             "action": {
               "finalize": {
                 "decision": "ABSTAIN",
@@ -939,7 +939,7 @@
           "rationaleSummary": "Single stale oracle source returned low confidence. Insufficient evidence to commit. Abstaining.",
           "reasons": ["MODEL_ABSTAIN"]
         },
-        "reasoningHash": "0x4c367e33cf637192928e4c45c197cb23a62d326b13264fc672e96d38fd880047"
+        "reasoningHash": "0x5cb130da3a2416e26a0d9d41fe1ccacd16176881e2b3bf543ce5a3747547c004"
       },
       "plugboard": {
         "traceVersion": "1.0",
@@ -1104,12 +1104,12 @@
           },
           {
             "step": 3,
-            "thought": "The delta is 5,000 — well outside tolerance. Both documents have been read and hashed. The cashflow claim is clearly false. Finalizing REJECTED with very high confidence.",
+            "thought": "The delta is 5,000, well outside tolerance. Both documents have been read and hashed. The cashflow claim is clearly false. Finalizing REJECTED with very high confidence.",
             "action": {
               "finalize": {
                 "decision": "REJECTED",
                 "confidenceBps": 9500,
-                "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD — a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED."
+                "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD, a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED."
               }
             },
             "observation": {
@@ -1121,10 +1121,10 @@
         "final": {
           "decision": "REJECTED",
           "confidenceBps": 9500,
-          "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD — a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED.",
+          "rationaleSummary": "Servicer report claims cashflowTotal 50,000 USD but bank statement lineItemsTotal is 45,000 USD, a 5,000 USD mismatch. Both documents were read and cross-referenced. Cashflow match claim is REJECTED.",
           "reasons": []
         },
-        "reasoningHash": "0x734558f01429145bd04cb3863e000e3ecb5ca5022632dc3b46dcd4d793bdf096"
+        "reasoningHash": "0x7db1352cac989aeab763c3adf4a70f50107fae0833bdc6ddc16fd3d7b910da2f"
       },
       "rotor": {
         "traceVersion": "1.0",
@@ -1205,7 +1205,7 @@
           },
           {
             "step": 2,
-            "thought": "Bank statement shows 45,000 — mismatch of 5,000. Rejecting immediately.",
+            "thought": "Bank statement shows 45,000, a mismatch of 5,000. Rejecting immediately.",
             "action": {
               "finalize": {
                 "decision": "REJECTED",
@@ -1225,7 +1225,7 @@
           "rationaleSummary": "Servicer report (50,000 USD) does not match bank statement (45,000 USD). Cashflow claim REJECTED.",
           "reasons": []
         },
-        "reasoningHash": "0xc029497fe06482899226ac87a54d9463fd47e9dbcae2407922f15dee4ad69940"
+        "reasoningHash": "0x45ccbae2a16abd3d781917523beec110ed7bc16ef747c60da001beed11ad9b63"
       },
       "stator": {
         "traceVersion": "1.0",
