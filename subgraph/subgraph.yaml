@@ -22,7 +22,7 @@ dataSources:
     source:
       address: "0xf2473a0a55D997233C8fBF987c197e7d2180470A"
       abi: AgentAttestation
-      startBlock: 20000000
+      startBlock: 39592000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
