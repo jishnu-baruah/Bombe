@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-06-12T02:32:42.997Z",
+  "_generated": "2026-06-12T02:43:30.393Z",
   "_note": "ALL hashes computed via hashCanonical — NEVER hand-typed (PRD §15.4 guardrail)",
   "plugboardSkillHash": "0x20321230545ddf23e02d334ca80048a2b8dcc885d15d62132bb249ef3081a8fd",
   "claims": [
@@ -143,7 +143,7 @@
         "claimId": "B",
         "decision": "ABSTAIN",
         "confidenceBps": 9000,
-        "reasoningHash": "0x28d86ba019c6e3d969c4c8938e9c8fd71d4d0336ae3a4108bf054de8a9655f2b",
+        "reasoningHash": "0x973e8e098d3adadc9e7710a869f3c1e2ce290d3813bffb69ff0bc56c409b9d6f",
         "sourcesHash": "0x4acf10ab3c89c93042204595d8e6f5daea9238af08ca2f9bc593685a3eeefa37",
         "traceURI": "mock://reflector/B",
         "txHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
@@ -811,10 +811,10 @@
         "final": {
           "decision": "ABSTAIN",
           "confidenceBps": 9000,
-          "rationaleSummary": "Stale single source detected (1 source(s)); conservative temperament requires ≥2 independent sources.",
+          "rationaleSummary": "Stale single source detected (1 source(s)); conservative temperament requires ≥2 corroborating sources.",
           "reasons": ["STALE_SINGLE_SOURCE"]
         },
-        "reasoningHash": "0x28d86ba019c6e3d969c4c8938e9c8fd71d4d0336ae3a4108bf054de8a9655f2b"
+        "reasoningHash": "0x973e8e098d3adadc9e7710a869f3c1e2ce290d3813bffb69ff0bc56c409b9d6f"
       },
       "rotor": {
         "traceVersion": "1.0",
