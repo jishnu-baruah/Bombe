@@ -105,12 +105,12 @@ describe("Landing page", () => {
     expect(els.length).toBeGreaterThan(0);
   });
 
-  it("renders CTAs with links to /live and /leaderboard", async () => {
+  it("renders CTAs with links to /live and /issuers", async () => {
     await renderPage();
     const links = screen.getAllByRole("link");
     const hrefs = links.map((l) => l.getAttribute("href"));
     expect(hrefs).toContain("/live");
-    expect(hrefs).toContain("/leaderboard");
+    expect(hrefs).toContain("/issuers");
   });
 
   it("renders BLOCKED BY PROTOCOL badge text", async () => {

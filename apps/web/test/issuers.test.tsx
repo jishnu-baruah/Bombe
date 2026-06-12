@@ -37,11 +37,11 @@ describe("Issuers page", () => {
     expect(screen.getAllByText(/abstain/i).length).toBeGreaterThan(0);
   });
 
-  it("links to the integrate and leaderboard pages", () => {
+  it("links to the integrate and verify pages", () => {
     render(<IssuersPage />);
     const hrefs = screen.getAllByRole("link").map((l) => l.getAttribute("href"));
     expect(hrefs).toContain("/integrate");
-    expect(hrefs).toContain("/leaderboard");
+    expect(hrefs).toContain("/verify");
   });
 
   it("does not leak internal task identifiers", () => {
