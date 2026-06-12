@@ -380,7 +380,10 @@ function AgentPanel({
   const bundled = getTrace(claimId, agentId);
   const attestation = attestations.find((a) => a.agentId === agentId);
   const [liveTrace, setLiveTrace] = useState<StoredTrace | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Start in the loading state when a live fetch is pending (attested, no demo
+  // fixture) so the first paint shows "Loading trace" rather than flashing the
+  // "No trace data" fallback before hydration runs the fetch.
+  const [loading, setLoading] = useState(!bundled && !!attestation);
 
   // Live claims store their trace in Neon (served by /api/trace/[claimId]/[agent]),
   // not bundled client-side. When there is an on-chain attestation but no demo
