@@ -64,22 +64,25 @@ const now = Date.now();
 // The Plugboard agent's model reasons over the claim (real LLM call, Mistral).
 async function reason(claim: unknown): Promise<{ decision: string; why: string }> {
   const sys =
-    "You are Plugboard, an EXTERNAL attestor agent on the Bombe network. Rules: Tier 1 claims are deterministic facts (attest VALID or REJECTED). Tier 3 claims are judgment or opinion (fair value, ratings) and you MUST ABSTAIN. Respond with STRICT JSON only: {\"decision\":\"VALID\"|\"REJECTED\"|\"ABSTAIN\",\"why\":\"one short sentence\"}.";
-  const r = await fetch(`${ENV.NARRATOR_PRIMARY_BASE_URL ?? "https://api.mistral.ai/v1"}/chat/completions`, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${ENV.NARRATOR_PRIMARY_KEY}`,
-      "content-type": "application/json",
+    'You are Plugboard, an EXTERNAL attestor agent on the Bombe network. Rules: Tier 1 claims are deterministic facts (attest VALID or REJECTED). Tier 3 claims are judgment or opinion (fair value, ratings) and you MUST ABSTAIN. Respond with STRICT JSON only: {"decision":"VALID"|"REJECTED"|"ABSTAIN","why":"one short sentence"}.';
+  const r = await fetch(
+    `${ENV.NARRATOR_PRIMARY_BASE_URL ?? "https://api.mistral.ai/v1"}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${ENV.NARRATOR_PRIMARY_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: ENV.NARRATOR_PRIMARY_MODEL ?? "mistral-small-latest",
+        temperature: 0.1,
+        messages: [
+          { role: "system", content: sys },
+          { role: "user", content: `Claim: ${JSON.stringify(claim)}` },
+        ],
+      }),
     },
-    body: JSON.stringify({
-      model: ENV.NARRATOR_PRIMARY_MODEL ?? "mistral-small-latest",
-      temperature: 0.1,
-      messages: [
-        { role: "system", content: sys },
-        { role: "user", content: `Claim: ${JSON.stringify(claim)}` },
-      ],
-    }),
-  });
+  );
   const j = await r.json();
   const text: string = j.choices?.[0]?.message?.content ?? "";
   try {
@@ -150,23 +153,44 @@ if (bal < parseEther("0.1")) {
 
 // 1) Tier-1: a deterministic yield claim. Plugboard reasons + attests for real.
 const t1Id = `PB-T1-${now}`;
-const t1Claim = { asset: "mETH", claimType: "YIELD_BPS", assertedBps: 192, windowDays: 31, tier: 1 };
+const t1Claim = {
+  asset: "mETH",
+  claimType: "YIELD_BPS",
+  assertedBps: 192,
+  windowDays: 31,
+  tier: 1,
+};
 console.log(`\n=== TIER 1: ${t1Id} ===`);
 console.log(`post: ${tx(await postClaim(t1Id, 1, t1Claim))}`);
 const r1 = await reason(t1Claim);
 console.log(`Plugboard/Mistral decision: ${r1.decision} - ${r1.why}`);
-const a1 = await plugboardAttest(t1Id, VALID, { agent: "plugboard", claim: t1Claim, reasoning: r1 });
+const a1 = await plugboardAttest(t1Id, VALID, {
+  agent: "plugboard",
+  claim: t1Claim,
+  reasoning: r1,
+});
 console.log(`attest tx: ${tx(a1.h)}  => status: ${a1.status}`);
 
 // 2) Tier-3: a judgment claim. Plugboard attempts VALID; the contract must revert.
 const t3Id = `PB-T3-${now}`;
-const t3Claim = { asset: "PrivatePool-1", claimType: "FAIR_VALUE", assertedValueUsd: 4_200_000, tier: 3 };
+const t3Claim = {
+  asset: "PrivatePool-1",
+  claimType: "FAIR_VALUE",
+  assertedValueUsd: 4_200_000,
+  tier: 3,
+};
 console.log(`\n=== TIER 3: ${t3Id} (judgment) ===`);
 console.log(`post: ${tx(await postClaim(t3Id, 3, t3Claim))}`);
 const r3 = await reason(t3Claim);
 console.log(`Plugboard/Mistral decision: ${r3.decision} - ${r3.why}`);
-console.log("Plugboard now ATTEMPTS to attest VALID on the judgment claim (testing the contract guard)...");
-const a3 = await plugboardAttest(t3Id, VALID, { agent: "plugboard", claim: t3Claim, reasoning: r3 });
+console.log(
+  "Plugboard now ATTEMPTS to attest VALID on the judgment claim (testing the contract guard)...",
+);
+const a3 = await plugboardAttest(t3Id, VALID, {
+  agent: "plugboard",
+  claim: t3Claim,
+  reasoning: r3,
+});
 console.log(`attest tx: ${tx(a3.h)}  => status: ${a3.status}`);
 console.log(
   a3.status === "reverted"
