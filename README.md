@@ -6,9 +6,29 @@ Autonomous AI attestor network for real-world-asset (RWA) claims on **Mantle Sep
 - Full spec: [docs/bombe-prd.md](docs/bombe-prd.md)
 - Hackathon submission: [HACKATHON.md](HACKATHON.md) · Live deployment: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md)
 - For issuers: [/issuers](https://bombe-web.vercel.app/issuers) · Integration guide: [docs/INTEGRATION.md](docs/INTEGRATION.md)
+- **Integration docs (GitBook):** [docs/gitbook](docs/gitbook/README.md) (concepts, quickstart, API reference, verify, payment, MCP, contracts)
 - Model accuracy benchmarks: [docs/BENCHMARKS.md](docs/BENCHMARKS.md)
 - Honest readiness assessment: [docs/MARKET-READINESS.md](docs/MARKET-READINESS.md)
 - **Live site:** https://bombe-web.vercel.app · **Explorer:** https://sepolia.mantlescan.xyz
+
+---
+
+## Concepts
+
+Bombe attests only to **falsifiable** claims and refuses opinions. Every claim carries a tier, and the tier decides what answers are allowed:
+
+| Tier | Claim | Allowed decisions |
+|------|-------|-------------------|
+| 1 | Deterministic (e.g. annualized yield in bps) | VALID, REJECTED, ABSTAIN |
+| 2 | Document-falsifiable (e.g. a treasury rate) | VALID, REJECTED, ABSTAIN |
+| 3 | Judgment / opinion | ABSTAIN only, enforced on-chain |
+
+- **Deterministic verdict, model-written narrative.** The verdict is computed by a reconciler that compares evidence legs within a documented tolerance, then compares to the asserted value. The model only writes the human-readable rationale; it cannot change the decision. Consensus is over evidence values, not opinions.
+- **Contract-enforced safety.** A Tier-3 claim cannot receive a VALID or REJECTED: `AgentAttestation.attest` reverts with `JudgmentTierRequiresAbstain`. This is a contract invariant, proven live by Plugboard, an external attestor Bombe did not write.
+- **Verifiable by a stranger.** `reasoningHash = keccak256(canonicalJson(trace))` is stored on-chain, so anyone can re-derive it from the published trace.
+- **Honest framing.** mETH is one ground truth via two computation paths (never "independent"); `windowDays` is always shown and a short window is never called a "30-day yield".
+
+Full integration docs: [docs/gitbook](docs/gitbook/README.md).
 
 ---
 
@@ -56,34 +76,48 @@ A zero-dependency consumer (no Bombe imports, just `fetch`) lives at `scripts/te
 
 ---
 
-## Architecture
+## Architecture (work in progress)
 
-```
-                          claim posted (issuer / operator / scheduler)
-                                          |
-                                          v
-              +----------------------------------------------------+
-              |   3 reference SDK agents     external + human        |
-              |   Reflector / Rotor / Stator   Plugboard   Human     |
-              |   (gather evidence, write trace, sign attestation)   |
-              +----------------------------------------------------+
-                                          |
-            deterministic Tier-1 verdict (reconcile evidence, then compare)
-                                          |  reasoningHash = keccak256(canonicalJson(trace))
-                                          v
-        +--------------------------------------------------------------+
-        |                  Mantle Sepolia contracts                     |
-        |  AgentRegistry  AgentAttestation  TuringLeaderboard  Slashing |
-        |  (bond/rep)     (attest, tier-3    (settle, trust    (burn/    |
-        |                  revert guard)      score)            redistribute) |
-        +--------------------------------------------------------------+
-                          |                         |
-                    indexer (viem)            web app + public API
-                          |                         |
-                     read model            /live /leaderboard /claim/[id] /api/v1
+The live flow, from an issuer paying a fee to anyone verifying the result. This diagram is descriptive of the current build and will keep evolving.
+
+```mermaid
+flowchart TD
+    A[Issuer pays fee from own wallet<br/>non-custodial, to receiving address] --> B[POST /api/v1/request<br/>with payment tx hash]
+    B --> C{Payment verified on-chain?}
+    C -- no --> X[Reject 400 / 409]
+    C -- yes --> D[Posting key posts claim on-chain<br/>postClaim, OPERATOR_ROLE]
+    D --> E[Attestor agents gather live evidence<br/>Reflector / Rotor / Stator]
+    E --> F[Deterministic reconciler computes verdict<br/>model writes the narrative only]
+    F --> G[attest on-chain<br/>reasoningHash = keccak256 canonicalJson trace]
+    G --> H[Store trace, self-authenticating]
+    H --> I[Anyone verifies via /verify<br/>re-derive the hash]
+
+    subgraph Mantle Sepolia contracts
+        D
+        G
+        S[TuringLeaderboard settle + trust score<br/>AgentSlashing seize stake]
+    end
+    G -.-> S
 ```
 
-Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evidence legs within a documented tolerance, then compare to the asserted value), Tier 2 is document-falsifiable, and Tier 3 (judgment) is refused at the contract layer. The verdict is never a model's opinion; models gather evidence and write the rationale, and consensus is over the evidence values. Every trace is hashed and the hash is stored on-chain, so any verdict can be re-derived and checked by a stranger.
+**Live today:** the read and verify paths (`/api/v1`, on-chain reads), the deterministic Tier-1 reconciler, on-chain `postClaim` + `attest`, the `reasoningHash` and self-authenticating trace storage, the live NAV and document checks, and the MCP server. The self-serve pay-then-post path verifies payment on-chain always; automatic posting runs when the operator enables it, otherwise the verified request is recorded for operator fulfilment.
+
+**Planned:** permissionless `postClaim` (today it is role-gated), broader claim types beyond `YIELD_BPS` in self-serve, and a global on-chain claim index (reads currently probe a bounded recent claim set).
+
+Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evidence legs within a documented tolerance, then compare to the asserted value), Tier 2 is document-falsifiable, and Tier 3 (judgment) is refused at the contract layer. The verdict is never a model's opinion; models gather evidence and write the rationale, and consensus is over the evidence values.
+
+### Contracts (Mantle Sepolia, chain 5003)
+
+Verified on Mantlescan; source readable at each address.
+
+| Contract | Address | Role |
+|----------|---------|------|
+| AgentRegistry | [`0x0cB936d55eB3CADF0C8984F8adAEd180734C7246`](https://sepolia.mantlescan.xyz/address/0x0cB936d55eB3CADF0C8984F8adAEd180734C7246) | register attestors, bond accounting (`MIN_BOND` 0.1 MNT) |
+| AgentAttestation | [`0xf2473a0a55D997233C8fBF987c197e7d2180470A`](https://sepolia.mantlescan.xyz/address/0xf2473a0a55D997233C8fBF987c197e7d2180470A) | post claims + attest; Tier-3 ABSTAIN-only guard |
+| AgentSlashing | [`0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864`](https://sepolia.mantlescan.xyz/address/0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864) | Tier-1 slashing + Tier-2 dispute resolution |
+| TuringLeaderboard | [`0xE5A157c349A6540C300D6CEcbe391A81EEEec018`](https://sepolia.mantlescan.xyz/address/0xE5A157c349A6540C300D6CEcbe391A81EEEec018) | Tier-1 settlement + per-agent trust score |
+
+Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALID/REJECTED attestation (0 for ABSTAIN). Details and the full deployment record: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) and [docs/gitbook/contracts.md](docs/gitbook/contracts.md).
 
 ---
 

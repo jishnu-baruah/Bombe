@@ -4,6 +4,10 @@ How to consume and verify Bombe attestations on Mantle Sepolia, and how claims a
 enter the system. The read and verify paths are permissionless and work today. Posting a claim
 runs through the operator for now (see below).
 
+> This page is the contract-level guide (direct viem reads, posting, becoming an attestor).
+> For the HTTP API, the MCP server, the paid-attestation payment flow, and copy-paste examples,
+> see the GitBook set in [docs/gitbook](gitbook/README.md).
+
 ## Quickstart: read a verdict
 
 Permissionless, no keys. `AgentAttestation` is at `0xf2473a0a55D997233C8fBF987c197e7d2180470A`
