@@ -145,6 +145,32 @@ const account = privateKeyToAccount(PB_KEY);
 const wallet = createWalletClient({ account, chain, transport: http(RPC) });
 const ATTEST_LOCK = parseEther("0.02");
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// POST the trace to the self-authenticating store, retrying across RPC
+// propagation. Just after attest, the verify endpoint's chain read may not see
+// the new attestation yet, so the hash check transiently 404s; retry until it
+// lands (or attempts run out).
+async function postTraceWithRetry(trace, attempts = 5) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(`${SITE}/api/v1/trace`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ claimId, attestor: account.address, trace }),
+      });
+      const j = await r.json();
+      if (j.stored === true) return { stored: true, detail: null };
+      if (i < attempts - 1) await sleep(4000);
+      else return { stored: false, detail: j };
+    } catch (e) {
+      if (i < attempts - 1) await sleep(4000);
+      else return { stored: false, detail: String(e) };
+    }
+  }
+  return { stored: false, detail: "exhausted" };
+}
+
 async function main() {
   // 1) Read the claim on-chain (confirms it is posted; carries its tier).
   const claim = await pub.readContract({
@@ -205,6 +231,26 @@ async function main() {
     return;
   }
 
+  // Store-only: (re)publish the trace for an attestation that is already
+  // on-chain, without sending a new attest tx. Used when a prior run's trace
+  // POST raced RPC propagation and never stored. Deterministic trace rebuild, so
+  // the hash matches the on-chain reasoningHash.
+  if (process.argv.includes("--store-only")) {
+    const res = await postTraceWithRetry(trace);
+    console.log(
+      JSON.stringify({
+        ok: res.stored,
+        mode: "store-only",
+        claimId,
+        attestor: account.address,
+        reasoningHash,
+        traceStored: res.stored,
+        storeDetail: res.detail,
+      }),
+    );
+    return;
+  }
+
   const gasOverride = arg("gas");
   const hash = await wallet.sendTransaction({
     account,
@@ -225,18 +271,9 @@ async function main() {
   let stored = false;
   let storeDetail = null;
   if (rc.status === "success") {
-    try {
-      const r = await fetch(`${SITE}/api/v1/trace`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ claimId, attestor: account.address, trace }),
-      });
-      const j = await r.json();
-      stored = j.stored === true;
-      storeDetail = stored ? null : j;
-    } catch (e) {
-      storeDetail = String(e);
-    }
+    const res = await postTraceWithRetry(trace);
+    stored = res.stored;
+    storeDetail = res.detail;
   }
 
   console.log(
