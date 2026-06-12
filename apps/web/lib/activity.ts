@@ -335,14 +335,51 @@ interface TraceMeta {
   asset?: string;
 }
 
+// The live attestor trace records the measured quantity as a `metric` inside
+// each reasoning step's observation (e.g. "annualized_yield_bps"), not as a
+// top-level claimType. Map the metric onto a claim type label for the table.
+const METRIC_TO_TYPE: Array<[RegExp, string]> = [
+  [/yield/i, "YIELD_BPS"],
+  [/nav|fair.?value|price/i, "FAIR_VALUE"],
+];
+
+function deriveTypeFromMetric(metric: unknown): string | undefined {
+  if (typeof metric !== "string") return undefined;
+  for (const [re, type] of METRIC_TO_TYPE) if (re.test(metric)) return type;
+  return undefined;
+}
+
 /** Pull claimType/asset out of a stored trace JSON without dumping it on screen. */
 function metaFromTrace(traceJson: string): TraceMeta {
   try {
     const t = JSON.parse(traceJson) as Record<string, unknown>;
     const claim = (t.claim ?? t) as Record<string, unknown>;
-    const claimType =
-      (claim.claimType as string) ?? (t.claimType as string) ?? (claim.type as string);
-    const asset = (claim.asset as string) ?? (t.asset as string) ?? (claim.symbol as string);
+    let claimType: string | undefined =
+      (claim.claimType as string | undefined) ??
+      (t.claimType as string | undefined) ??
+      (claim.type as string | undefined);
+    let asset: string | undefined =
+      (claim.asset as string | undefined) ??
+      (t.asset as string | undefined) ??
+      (claim.symbol as string | undefined);
+
+    // Reasoning-trace format: claimType + asset live inside steps[].observation.
+    if (!claimType || !asset) {
+      const steps = Array.isArray(t.steps) ? (t.steps as Array<Record<string, unknown>>) : [];
+      for (const s of steps) {
+        const obs = s.observation as Record<string, unknown> | undefined;
+        if (!obs) continue;
+        if (!claimType) claimType = deriveTypeFromMetric(obs.metric);
+        if (!asset && typeof obs.asset === "string") asset = obs.asset;
+        if (claimType && asset) break;
+      }
+    }
+    // Asset of last resort: claim ids are "{ASSET}-...".
+    if (!asset && typeof t.claimId === "string") {
+      const prefix = (t.claimId as string).split("-")[0];
+      if (prefix) asset = prefix;
+    }
+
     return {
       claimType: typeof claimType === "string" ? claimType : undefined,
       asset: typeof asset === "string" ? asset : undefined,

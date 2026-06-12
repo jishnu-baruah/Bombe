@@ -137,10 +137,10 @@ export function CinematicHero({
       />
 
       <div className="hero-text-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 will-change-transform transform-style-3d">
-        <h1 className="text-track gsap-reveal text-3d-matte font-display text-5xl md:text-7xl lg:text-[6rem] tracking-tight mb-2">
+        <h1 className="text-track gsap-reveal text-3d-matte font-display text-5xl md:text-7xl lg:text-[6rem] leading-[1.12] tracking-tight mb-2 pb-[0.06em]">
           {tagline1}
         </h1>
-        <h1 className="text-days gsap-reveal text-silver-matte font-display text-5xl md:text-7xl lg:text-[6rem] tracking-tighter">
+        <h1 className="text-days gsap-reveal text-silver-matte font-display text-5xl md:text-7xl lg:text-[6rem] leading-[1.12] tracking-tighter pb-[0.08em]">
           {tagline2}
         </h1>
         <p className="text-sub gsap-reveal text-muted-foreground text-lg md:text-xl mt-8">

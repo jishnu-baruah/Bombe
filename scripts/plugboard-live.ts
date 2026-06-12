@@ -100,7 +100,7 @@ async function postClaim(idStr: string, tier: number, claim: object): Promise<`0
     data: encodeFunctionData({
       abi: AgentAttestationAbi,
       functionName: "postClaim",
-      args: [id32(idStr), tier, hashCanonical(claim), `${SITE}/api/claim/${idStr}`],
+      args: [id32(idStr), tier, hashCanonical(claim), `${SITE}/api/v1/claims/${idStr}`],
     }),
     value: CLAIM_FEE,
     chain,

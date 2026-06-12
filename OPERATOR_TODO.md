@@ -106,6 +106,18 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Half-done state: the scheme registry + discovery + grade system are built and DefiLlama-sourced; rwa.xyz is the one external data source that needs a credential to unlock the non-yield classes.
 - To resolve: provide the rwa.xyz Data API key (or confirm a free tier + base URL); the agent wires the `rwa-xyz` scheme and expands discovery to its asset classes.
 
+## OP-13, top up the Plugboard wallet (live Hermes attestor)   [open]
+- Date: 2026-06-12
+- Blocks: continuous live attestation by the external Nous Hermes Plugboard agent. The on-chain attest bridge is proven (the Hermes host attested mETH-REQ-a9dbaf4521 VALID as Plugboard, tx 0xc8e08f70314e670c10269099b0c618e7976e2882b04c34e10eda748097d6dd23, status success; verify reports match). One attest consumed ~0.089 MNT (0.02 locked stake + heavy Mantle gas).
+- Half-done state: Plugboard wallet 0x58826a9FCb6956332D0833b9175CE40A7587957e is at ~0.0065 MNT, below the 0.1 MNT operational floor. Per the v2 constitution I did not improvise funding. The attest tool runs in --dry-run until funded.
+- To resolve: send MNT to the Plugboard wallet (suggest 0.5-1 MNT for a run of live attests) from an operator-authorized source. Then live attests resume with no code change.
+
+## OP-14, higher-tier model key for the Hermes agent loop   [open]
+- Date: 2026-06-12
+- Blocks: the autonomous Hermes read-decide-attest loop (the agent itself orchestrating, vs the attest tool being invoked directly). A single Hermes agent run makes several model calls (plan + tool use) and the current droplet model key returns HTTP 429 (rate limit exceeded) partway through.
+- Half-done state: Hermes v0.16.0 is installed and reasons (one-shot prompts work), recognizes the bombe-attestor skill (enabled), and the attest tool works standalone. The multi-call agent loop is throttled by the model key's rate limit.
+- To resolve: provide a higher-rate model key (or confirm a paid tier) for the host's ~/.hermes/config.yaml, or point it at the project AI gateway. Then the full agent loop runs end to end.
+
 ## Resolved
 
 ## OP-4, Mantle Sepolia RPC + funded wallets   [done]

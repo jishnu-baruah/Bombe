@@ -17,6 +17,7 @@
 import { AgentAttestationAbi, AgentRegistryAbi, TuringLeaderboardAbi } from "@bombe/shared";
 import type { Claim } from "@bombe/shared";
 import { http, createPublicClient, parseAbi } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepoliaTestnet } from "viem/chains";
 
 import type { AttestationRecord, Decision, LeaderboardRow, StoredTrace } from "./demo-data";
@@ -109,25 +110,53 @@ function decodeDecision(raw: number): Decision {
 
 type AgentEntry = { address: `0x${string}`; agentId: string };
 
+// The deployed attestor addresses, lower-cased → canonical agentId. These are
+// deployment constants (the same identities the trace route resolves names
+// against). Used to label attestations correctly even when AGENT_ADDRS is not
+// set, so live attestations render as reflector/rotor/... not a raw 0x address.
+const CANONICAL_AGENT_BY_ADDR: Record<string, string> = {
+  "0x3ba08c723d41a98339d43ffa01174791eae813fa": "reflector",
+  "0x5e90bd4e238c2ce66d41b6c86f39b791441e69a7": "rotor",
+  "0x3c8612d5d13636de52492c8dfa84b455064c8bf8": "stator",
+  "0x58826a9fcb6956332d0833b9175ce40a7587957e": "plugboard",
+  "0x98fab4c835475c95c797aaee9ce0c03942a524c6": "human",
+};
+
+const POSITIONAL_IDS = ["reflector", "rotor", "stator", "plugboard", "human"] as const;
+
+function labelForAddress(addr: string, index: number): string {
+  return CANONICAL_AGENT_BY_ADDR[addr.toLowerCase()] ?? POSITIONAL_IDS[index] ?? `agent-${index}`;
+}
+
 function getKnownAgentAddresses(): AgentEntry[] {
-  // AGENT_KEYS may be comma-separated private keys; we need the addresses.
-  // However for the leaderboard we can't derive addresses from keys server-side
-  // without viem's privateKeyToAccount (which is fine here — server context).
-  // If AGENT_ADDRS is set (as addresses), use that; otherwise fall back to
-  // deriving from keys.
+  // Preferred: explicit addresses in AGENT_ADDRS (canonical order). Labels are
+  // resolved by the canonical map first, falling back to position.
   const raw = process.env.AGENT_ADDRS ?? process.env.AGENT_ADDRESSES ?? "";
-  if (!raw) return [];
-  const parts = raw
+  if (raw) {
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.startsWith("0x"))
+      .map((addr, i) => ({ address: addr as `0x${string}`, agentId: labelForAddress(addr, i) }));
+  }
+
+  // Fallback: derive addresses from AGENT_KEYS (the private keys are in env) and
+  // label each by the canonical map, so identity is correct regardless of key
+  // order. This is what makes live attestations show their real agent identity.
+  const keys = (process.env.AGENT_KEYS ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s.startsWith("0x"));
-
-  // Map addresses to agentId by position (reflector=0,rotor=1,stator=2,plugboard=3,human=4)
-  const ids = ["reflector", "rotor", "stator", "plugboard", "human"] as const;
-  return parts.map((addr, i) => ({
-    address: addr as `0x${string}`,
-    agentId: ids[i] ?? `agent-${i}`,
-  }));
+  const out: AgentEntry[] = [];
+  for (let i = 0; i < keys.length; i++) {
+    try {
+      const { address } = privateKeyToAccount(keys[i] as `0x${string}`);
+      out.push({ address, agentId: labelForAddress(address, i) });
+    } catch {
+      // skip a malformed key
+    }
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -321,13 +350,29 @@ export async function getClaim(id: string): Promise<Claim | undefined> {
       ? (rawClaimType as ClaimTypeEnum)
       : "YIELD_BPS";
 
+    // The on-chain getClaim struct has no poster field and the claimURI is a bare
+    // pointer, so the inline payload almost never carries a submitter. For a
+    // self-serve REQ claim the meaningful submitter is the payer recorded at
+    // request time; resolve it from the DB. Left as the zero address when unknown
+    // (the claim view hides an unknown submitter rather than showing 0x0).
+    let submitter =
+      (payload.submitter as string | undefined) ?? "0x0000000000000000000000000000000000000000";
+    if (/^0x0+$/.test(submitter)) {
+      try {
+        const { getPayerByClaimId } = await import("./db");
+        const payer = await getPayerByClaimId(id);
+        if (payer) submitter = payer;
+      } catch {
+        // DB is optional; leave the zero sentinel for the UI to hide.
+      }
+    }
+
     const claim: Claim = {
       id,
       tier: onChain.tier as 1 | 2 | 3,
       asset,
       claimType,
-      submitter:
-        (payload.submitter as string | undefined) ?? "0x0000000000000000000000000000000000000000",
+      submitter,
       payload,
       postedAt: (payload.postedAt as number | undefined) ?? Date.now(),
     };
@@ -450,6 +495,15 @@ export function getPlugboardSkillHash(): `0x${string}` {
 
 function buildAddrToAgent(): Map<string, string> {
   const m = new Map<string, string>();
+  // Seed from the canonical deployment identities so attestations label as
+  // reflector/rotor/stator/plugboard/human even when no AGENT_ADDRS/AGENT_KEYS
+  // env is present (e.g. on the production host, which only sets the keys it
+  // needs to sign). Without this the attestor showed as a raw 0x address and the
+  // claim page could not match an attestation to its agent tab.
+  for (const [addr, agentId] of Object.entries(CANONICAL_AGENT_BY_ADDR)) {
+    m.set(addr, agentId);
+  }
+  // Overlay any env-provided agents (covers a future redeploy to new addresses).
   for (const { address, agentId } of getKnownAgentAddresses()) {
     m.set(address.toLowerCase(), agentId);
   }

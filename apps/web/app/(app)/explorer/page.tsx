@@ -55,7 +55,7 @@ function DecisionChip({ decision }: { decision: string | null }) {
 }
 
 function relativeTime(unixSeconds: number | null): string {
-  if (!unixSeconds) return "—";
+  if (!unixSeconds) return "·";
   const diff = Math.floor(Date.now() / 1000) - unixSeconds;
   if (diff < 0) return "just now";
   if (diff < 60) return `${diff}s ago`;
@@ -102,7 +102,7 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
         {claim.claimType ? (
           <span className="font-mono text-[12px]">{claim.claimType}</span>
         ) : (
-          <span className="text-muted-foreground/50">—</span>
+          <span className="text-muted-foreground/50">·</span>
         )}
         {claim.asset ? (
           <span className="block font-mono text-[11px] text-[#9296f5] mt-0.5">{claim.asset}</span>
@@ -126,7 +126,7 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
             {shortAddr(attestor)}
           </a>
         ) : (
-          <span className="text-muted-foreground/50">—</span>
+          <span className="text-muted-foreground/50">·</span>
         )}
         {attestorCount > 1 ? (
           <span className="block text-[11px] text-muted-foreground/60 mt-0.5">
@@ -147,7 +147,7 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
             {shortAddr(headlineTx)} ↗
           </a>
         ) : (
-          <span className="text-muted-foreground/50">—</span>
+          <span className="text-muted-foreground/50">·</span>
         )}
       </div>
 

@@ -69,6 +69,27 @@ export async function recordRequest(r: AttestationRequest): Promise<boolean> {
   return rows.length > 0;
 }
 
+/**
+ * Resolve the payer (the issuer wallet) that paid for a self-serve REQ claim.
+ * Claim ids are `${asset}-REQ-${paymentTxHash.slice(2, 12)}`, so the hex tail
+ * after "-REQ-" identifies the payment tx. The on-chain claim carries no poster
+ * field, so this is how the claim view shows who actually requested the work.
+ * Returns null if the DB is off or no matching request exists.
+ */
+export async function getPayerByClaimId(claimId: string): Promise<string | null> {
+  if (!dbEnabled()) return null;
+  const m = /-REQ-([0-9a-fA-F]{6,})$/.exec(claimId);
+  const hex = m?.[1];
+  if (!hex) return null;
+  await ensureTable();
+  const prefix = `0x${hex.toLowerCase()}%`;
+  const rows = (await sql()`
+    SELECT payer FROM attestation_requests
+    WHERE payment_tx_hash LIKE ${prefix}
+    LIMIT 1`) as Array<{ payer: string }>;
+  return rows[0]?.payer ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // Reasoning-trace storage (T-802 on Neon, no blob store needed).
 // A trace is small JSON; storing it as a row is sufficient and lets /verify
