@@ -14,6 +14,7 @@ import { useState } from "react";
 // "Live" is intentionally not a text link here: the prominent "Watch live" pill
 // CTA already routes to /live, so a separate Live link would be redundant.
 const NAV_LINKS = [
+  { href: "/explorer", label: "Explorer" },
   { href: "/verify", label: "Verify" },
   { href: "/issuers", label: "Issuers" },
   { href: "/integrate", label: "Integrate" },

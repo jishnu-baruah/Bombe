@@ -1,0 +1,41 @@
+# Bombe subgraph schema. Mirrors the shape the /explorer page reads (see
+# apps/web/lib/activity.ts fromSubgraph), so the app can switch to the subgraph
+# by setting SUBGRAPH_URL with no UI change.
+
+type Claim @entity {
+  "The bytes32 claim id (hex). The app decodes UTF-8 string ids for display."
+  id: ID!
+  "Tier: 1 = deterministic, 2 = document-falsifiable, 3 = judgment."
+  tier: Int!
+  "Keccak256 hash of the canonical claim payload (from ClaimPosted)."
+  claimHash: Bytes
+  "Off-chain URI with the full claim details (from ClaimPosted)."
+  claimURI: String
+  "Issuer fee paid on postClaim, in wei."
+  claimFee: BigInt
+  "Best-effort claim type; not on-chain, left null unless enriched off-graph."
+  claimType: String
+  "Best-effort asset symbol; not on-chain, left null unless enriched off-graph."
+  asset: String
+  "True once ClaimClosed has fired for this claim."
+  closed: Boolean!
+  postTxHash: Bytes
+  postedAt: BigInt!
+  postedAtBlock: BigInt!
+  attestations: [Attestation!]! @derivedFrom(field: "claim")
+}
+
+type Attestation @entity {
+  "claimId-attestor, unique per (claim, attestor)."
+  id: ID!
+  claim: Claim!
+  attestor: Bytes!
+  "VALID | REJECTED | ABSTAIN (decoded from the on-chain enum)."
+  decision: String!
+  confidenceBps: Int!
+  "Locked stake in wei; 0 for ABSTAIN."
+  lockedStake: BigInt!
+  txHash: Bytes!
+  attestedAt: BigInt!
+  attestedAtBlock: BigInt!
+}

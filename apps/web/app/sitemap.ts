@@ -4,7 +4,7 @@ const SITE_URL = "https://bombe-web.vercel.app";
 
 // Public, indexable surfaces (the operator console is intentionally excluded).
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = ["", "/live", "/verify", "/issuers", "/integrate", "/request"];
+  const pages = ["", "/live", "/explorer", "/verify", "/issuers", "/integrate", "/request"];
   const human: MetadataRoute.Sitemap = pages.map((route) => ({
     url: `${SITE_URL}${route}`,
     changeFrequency: "weekly",
