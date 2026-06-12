@@ -396,6 +396,9 @@ export function SupportChat() {
                 maxLength={MAX_INPUT_CHARS}
                 placeholder="Ask about Bombe..."
                 aria-label="Message"
+                // Suppress the global cobalt :focus-visible outline (the wrapper's
+                // focus-within border is the affordance); inline beats the unlayered rule.
+                style={{ outline: "none" }}
                 className="max-h-28 min-h-[24px] flex-1 resize-none bg-transparent text-[14px] text-white placeholder:text-white/35 focus:outline-none"
               />
               {isStreaming ? (

@@ -71,14 +71,12 @@ export function Nav() {
             aria-label="Bombe home"
           >
             <img
-              src="/brand/bombe-monogram-gradient.svg"
-              alt=""
-              aria-hidden="true"
-              width={22}
-              height={22}
-              className="h-[22px] w-[22px]"
+              src="/brand/bombe-wordmark-gradient.svg"
+              alt="Bombe"
+              width={92}
+              height={20}
+              className="h-[20px] w-auto"
             />
-            <span className="font-display text-lg text-foreground">Bombe</span>
             <span className="font-mono text-[10px] tracking-[0.18em] text-muted-foreground mt-0.5">
               TESTNET
             </span>
