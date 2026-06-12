@@ -68,7 +68,7 @@ The same reads are served as a small public JSON API, CORS-open and keyless, at 
 | `GET /api/v1/verify/{claimId}` | re-derives the reasoning hash from the published trace and reports `verified` / `mismatch` / `trace_unavailable` |
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/claims/mETH-REQ-a9dbaf4521
 # { "claimId": "...", "posted": true, "attestations": [ { "decision": "VALID", "reasoningHash": "0x...", ... } ] }
 ```
 
