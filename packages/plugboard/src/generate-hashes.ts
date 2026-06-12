@@ -22,7 +22,8 @@ import { hashCanonical } from "@bombe/shared";
 const stepsA = [
   {
     step: 1,
-    thought: "Claim A: mETH 30-day yield 34bps. Fetching primary oracle snapshot.",
+    thought:
+      "Claim A: mETH yield 34bps over a 30-day window (windowDays 30). Fetching primary oracle snapshot.",
     action: { tool: "fetch_meth_yield", input: { period: "30d-fresh" } },
     observation: {
       value: 34,
@@ -50,13 +51,13 @@ const stepsA = [
   },
   {
     step: 3,
-    thought: "Two fresh independent sources confirm 34 bps. Finalizing VALID.",
+    thought: "Two fresh computation paths confirm 34 bps. Finalizing VALID.",
     action: {
       finalize: {
         decision: "VALID",
         confidenceBps: 9200,
         rationaleSummary:
-          "Two independent fresh oracle sources confirm mETH 30-day yield is 34 bps, matching expected value within ±2 bps tolerance.",
+          "Two fresh oracle computation paths confirm mETH yield is 34 bps over a 30-day window (windowDays 30), matching expected value within ±2 bps tolerance.",
       },
     },
   },
@@ -66,7 +67,8 @@ const stepsA = [
 const stepsB = [
   {
     step: 1,
-    thought: "Claim B: mETH 30-day yield 34bps. Fetching oracle — expecting possible staleness.",
+    thought:
+      "Claim B: mETH yield 34bps over a 30-day window (windowDays 30). Fetching oracle, expecting possible staleness.",
     action: { tool: "fetch_meth_yield", input: { period: "30d-stale" } },
     observation: {
       value: 34,

@@ -4,7 +4,7 @@
   "steps": [
     {
       "step": 1,
-      "thought": "Claim B: mETH 30-day yield 34bps. Fetching oracle — expecting possible staleness.",
+      "thought": "Claim B: mETH yield 34bps over a 30-day window (windowDays 30). Fetching oracle, expecting possible staleness.",
       "action": { "tool": "fetch_meth_yield", "input": { "period": "30d-stale" } },
       "observation": {
         "value": 34,
@@ -26,6 +26,6 @@
       }
     }
   ],
-  "traceHash": "0xd1bf27edae5fa5529b6b52f5112e38c160b4c409aaaae35453ff1e29b48a8db4",
+  "traceHash": "0x1b625373707dea365610b6ab722eb6db4653ca127b76cb1f45cb92265dc1fde3",
   "expectedOnChainDecision": "ABSTAIN"
 }
