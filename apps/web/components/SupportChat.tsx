@@ -134,6 +134,77 @@ function Bubble({
   );
 }
 
+/** A human label for the tool currently running, shown as a "checking…" affordance. */
+const TOOL_LABEL: Record<string, string> = {
+  verifyClaim: "Verifying on-chain",
+  recommendAssets: "Checking attestable assets",
+  listCapabilities: "Reading the capability registry",
+};
+
+/**
+ * Render an assistant message from its streamed `parts`. Text parts render as
+ * Markdown; an in-flight tool call renders as a small "checking…" affordance
+ * (never raw JSON). Falls back to `content` for any message without parts.
+ */
+function AssistantMessage({
+  message,
+}: {
+  message: { content: string; parts?: Array<Record<string, unknown>> };
+}) {
+  const parts = message.parts;
+  if (!parts || parts.length === 0) {
+    return (
+      <div className="chat-md">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: MarkdownLink }}>
+          {message.content}
+        </ReactMarkdown>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {parts.map((part, i) => {
+        const type = part.type as string;
+        if (type === "text") {
+          const text = (part.text as string) ?? "";
+          if (!text.trim()) return null;
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: streamed parts have no stable id; order is stable within a message.
+            <div className="chat-md" key={`t-${i}`}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: MarkdownLink }}>
+                {text}
+              </ReactMarkdown>
+            </div>
+          );
+        }
+        if (type === "tool-invocation") {
+          const inv = (part.toolInvocation ?? {}) as {
+            toolName?: string;
+            state?: string;
+          };
+          // Only show the affordance while the tool is running; once it has a
+          // result the model's follow-up text part carries the answer.
+          if (inv.state === "result") return null;
+          const label = (inv.toolName && TOOL_LABEL[inv.toolName]) || "Checking";
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: streamed parts have no stable id; order is stable within a message.
+            <div className="flex items-center gap-2 text-[13px] text-white/55" key={`tool-${i}`}>
+              <span className="flex gap-0.5" aria-hidden="true">
+                <span className="h-1.5 w-1.5 animate-[chat-dot_1s_infinite] rounded-full bg-white/45" />
+                <span className="h-1.5 w-1.5 animate-[chat-dot_1s_0.15s_infinite] rounded-full bg-white/45" />
+                <span className="h-1.5 w-1.5 animate-[chat-dot_1s_0.3s_infinite] rounded-full bg-white/45" />
+              </span>
+              <span>{label}…</span>
+            </div>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
+}
+
 export function SupportChat() {
   const [open, setOpen] = useState(false);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -290,11 +361,7 @@ export function SupportChat() {
                 m.role === "user" || m.role === "assistant" ? (
                   <Bubble key={m.id} role={m.role}>
                     {m.role === "assistant" ? (
-                      <div className="chat-md">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: MarkdownLink }}>
-                          {m.content}
-                        </ReactMarkdown>
-                      </div>
+                      <AssistantMessage message={m} />
                     ) : (
                       <span className="whitespace-pre-wrap">{m.content}</span>
                     )}

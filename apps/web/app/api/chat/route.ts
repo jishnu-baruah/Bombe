@@ -10,11 +10,16 @@
  * "what can you attest" answers track real data. Falls back silently if the
  * registry cannot be summarized.
  *
+ * Tools: the model can call the app's own public JSON API (verify a claim,
+ * recommend attestable assets, read the capability schema) and then narrate the
+ * result in the same streamed turn. maxSteps bounds the call -> summarize loop.
+ *
  * Node runtime: the @bombe/agent-sdk import (used only for the schema summary)
  * pulls node built-ins, so this must not run on the Edge runtime.
  */
 import { resolveChatModel } from "@/lib/chat-model";
 import { buildSystemPrompt } from "@/lib/chat-system-prompt";
+import { buildChatTools } from "@/lib/chat-tools";
 import { type CoreMessage, streamText } from "ai";
 
 export const runtime = "nodejs";
@@ -24,6 +29,9 @@ export const maxDuration = 30;
 const MAX_INPUT_CHARS = 2000; // per-message cap
 const MAX_MESSAGES = 24; // most recent turns sent to the model
 const MAX_OUTPUT_TOKENS = 800;
+// Allow the model to call a tool then narrate its result in the same turn
+// (call tool -> optional second tool -> stream the summary).
+const MAX_STEPS = 4;
 
 interface IncomingMessage {
   role: string;
@@ -94,6 +102,8 @@ export async function POST(req: Request) {
     model: resolved.model,
     system: buildSystemPrompt(schemaSummary()),
     messages,
+    tools: buildChatTools(req),
+    maxSteps: MAX_STEPS,
     maxTokens: MAX_OUTPUT_TOKENS,
     temperature: 0.3,
   });
