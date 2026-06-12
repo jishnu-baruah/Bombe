@@ -270,19 +270,19 @@ type Verdict = {
 const VERDICT: Record<ClaimId, Verdict> = {
   A: {
     tone: "valid",
-    headline: "Attested true — the yield is real.",
+    headline: "Attested true. The yield is real.",
     proves:
       "When the evidence is clean and reproducible, the whole panel converges on the same answer.",
   },
   B: {
     tone: "split",
-    headline: "A split panel, by design — not an error.",
+    headline: "A split panel, by design. Not an error.",
     proves:
       "Bombe is a panel, not one oracle. Cautious attestors abstain on a stale source while a bolder one commits, and the disagreement is recorded in the open for anyone to weigh.",
   },
   C: {
     tone: "rejected",
-    headline: "Rejected — the documents do not match.",
+    headline: "Rejected. The documents do not match.",
     proves: "A falsifiable claim that fails the check is rejected, unanimously and on the record.",
   },
   D: {
@@ -315,7 +315,7 @@ function plainStatus(done: AgentDoneEvent | null): PlainStatus | null {
     case "REJECTED":
       return { word: "Rejects", dot: "#e23b4a", text: "#f08591", glyph: "✗" };
     default:
-      return { word: "Abstains", dot: "#d4a017", text: "#d4a017", glyph: "—" };
+      return { word: "Abstains", dot: "#d4a017", text: "#d4a017", glyph: "○" };
   }
 }
 
@@ -686,8 +686,10 @@ function TechnicalDetail({
           })}
 
           <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
-            Replayed deterministically from the demo trace. The verdict is computed from the
-            evidence; the model only narrates. Every reasoning hash is what lands on-chain.
+            This is a recorded walkthrough, replayed so you can follow each behavior end to end. The
+            verdict is computed from the evidence; the model only narrates. The hashes shown here are
+            from the demo trace. For live attestations you can re-derive and check on-chain yourself,
+            use the Verify page with a real claim id.
           </p>
         </div>
       )}
@@ -763,6 +765,15 @@ export default function LivePage() {
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
 
+  // Keep the active claim in view: when the walkthrough starts or advances to a
+  // new claim, scroll the split stage into view so the viewer never sits on the
+  // header while the panel reacts below the fold. scroll-mt clears the fixed nav.
+  const stageRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (streamClaimId === null) return;
+    stageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [streamClaimId]);
+
   const currentClaimId = CLAIM_IDS[raceState.currentClaimIdx] as ClaimId;
   const currentClaimState = raceState.claims[currentClaimId];
 
@@ -813,10 +824,11 @@ export default function LivePage() {
       setUnlockedIdx((prev) => Math.max(prev, i));
       startClaim(i);
 
-      // Wait ~5.5s for the stream to settle, honoring pause without skipping.
+      // Wait ~10s per claim so a viewer can read the question, watch the panel
+      // react, and absorb the verdict before it advances. Honors pause without skipping.
       let waited = 0;
       const tick = 250;
-      const target = 5500;
+      const target = 10000;
       while (waited < target || pausedRef.current) {
         await new Promise<void>((resolve) => setTimeout(resolve, tick));
         if (!pausedRef.current) waited += tick;
@@ -955,7 +967,7 @@ export default function LivePage() {
       </section>
 
       {/* ── Split stage ── */}
-      <section className="px-6 lg:px-12 py-10 lg:py-14">
+      <section ref={stageRef} className="scroll-mt-28 px-6 lg:px-12 py-10 lg:py-14">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-8">
           {!started ? (
             <div
