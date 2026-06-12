@@ -7,8 +7,10 @@
  */
 
 import { GLOSSARY, Gloss } from "@/components/ui/Gloss";
+import { type DisputeRow, listDisputes } from "@/lib/db";
 import { type LookupResult, explorerAddressUrl, lookup } from "@/lib/public-api";
 import Link from "next/link";
+import { DisputeButton } from "./DisputeButton";
 
 export const revalidate = 30;
 
@@ -30,7 +32,22 @@ function DecisionChip({ decision }: { decision: string }) {
   );
 }
 
-function ClaimProof({ result }: { result: LookupResult }) {
+function DisputeChip({ status }: { status: string }) {
+  const onChain = status === "escalated";
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-full border ${
+        onChain
+          ? "text-[#e0564f] border-[rgba(224,86,79,0.4)] bg-[rgba(224,86,79,0.1)]"
+          : "text-[#d4a017] border-[rgba(212,160,23,0.4)] bg-[rgba(212,160,23,0.1)]"
+      }`}
+    >
+      {onChain ? "disputed on-chain" : "disputed, under review"}
+    </span>
+  );
+}
+
+function ClaimProof({ result, disputes }: { result: LookupResult; disputes: DisputeRow[] }) {
   const claim = result.claim;
   if (!claim) return null;
   return (
@@ -65,6 +82,11 @@ function ClaimProof({ result }: { result: LookupResult }) {
         <ul className="divide-y divide-[rgba(255,255,255,0.05)]">
           {claim.attestations.map((a) => {
             const highlighted = result.matchedAttestor?.toLowerCase() === a.attestor.toLowerCase();
+            const attDisputes = disputes.filter(
+              (d) => d.accused.toLowerCase() === a.attestor.toLowerCase(),
+            );
+            const liveDispute = attDisputes.find((d) => d.status === "escalated");
+            const disputable = a.decision !== "ABSTAIN";
             return (
               <li
                 key={a.attestor}
@@ -83,6 +105,9 @@ function ClaimProof({ result }: { result: LookupResult }) {
                   >
                     {a.attestor.slice(0, 10)}…{a.attestor.slice(-6)} →
                   </a>
+                  {attDisputes.length > 0 && (
+                    <DisputeChip status={liveDispute ? "escalated" : "pending"} />
+                  )}
                 </div>
                 <dl className="grid sm:grid-cols-[140px_1fr] gap-y-1.5 gap-x-4 text-[13px]">
                   <dt className="text-muted-foreground">
@@ -98,6 +123,18 @@ function ClaimProof({ result }: { result: LookupResult }) {
                     {a.traceURI || "(not stored yet)"}
                   </dd>
                 </dl>
+                {liveDispute?.disputeTxHash ? (
+                  <a
+                    href={`https://sepolia.mantlescan.xyz/tx/${liveDispute.disputeTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-[12px] text-[#e0564f] hover:text-white transition-colors mt-2"
+                  >
+                    View the on-chain dispute →
+                  </a>
+                ) : disputable ? (
+                  <DisputeButton claimId={claim.claimId} accused={a.attestor} />
+                ) : null}
               </li>
             );
           })}
@@ -131,6 +168,7 @@ export default async function VerifyPage({
 }) {
   const { q } = await searchParams;
   const result = q ? await lookup(q) : null;
+  const disputes = result?.claim ? await listDisputes(result.claim.claimId) : [];
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -187,7 +225,7 @@ export default async function VerifyPage({
             </div>
           )}
 
-          {result?.found && result.claim && <ClaimProof result={result} />}
+          {result?.found && result.claim && <ClaimProof result={result} disputes={disputes} />}
         </div>
       </section>
     </div>

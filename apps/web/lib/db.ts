@@ -182,3 +182,115 @@ export async function recordAssetRequest(r: AssetRequest): Promise<boolean> {
     RETURNING id`) as unknown[];
   return rows.length > 0;
 }
+
+// ---------------------------------------------------------------------------
+// Disputes. A reader who believes an attestation's verdict is wrong files a
+// dispute against that attestor on that claim. Intake is keyless + public and
+// recorded here ("under review"); an operator then escalates it to the real
+// on-chain AgentSlashing.openDispute (which bonds + can slash). The on-chain
+// dispute primitive is permissioned to registered attestors, so the public
+// surface is the intake and the operator carries it on-chain. Honest: nothing
+// here fakes an on-chain action; the row tracks the real lifecycle.
+// ---------------------------------------------------------------------------
+
+let _disputesInitialized = false;
+
+async function ensureDisputesTable(): Promise<void> {
+  if (_disputesInitialized) return;
+  await sql()`
+    CREATE TABLE IF NOT EXISTS disputes (
+      id SERIAL PRIMARY KEY,
+      claim_id TEXT NOT NULL,
+      accused TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      contact TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      dispute_tx_hash TEXT,
+      onchain_dispute_id TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  _disputesInitialized = true;
+}
+
+export interface DisputeInput {
+  claimId: string;
+  accused: string;
+  reason: string;
+  contact?: string;
+}
+
+export interface DisputeRow {
+  id: number;
+  claimId: string;
+  accused: string;
+  reason: string;
+  status: string;
+  disputeTxHash: string | null;
+  onchainDisputeId: string | null;
+  createdAt: string;
+}
+
+/** Record a dispute against an attestation. Returns the new id, or null if DB is off. */
+export async function recordDispute(d: DisputeInput): Promise<number | null> {
+  if (!dbEnabled()) return null;
+  await ensureDisputesTable();
+  const rows = (await sql()`
+    INSERT INTO disputes (claim_id, accused, reason, contact)
+    VALUES (${d.claimId}, ${d.accused.toLowerCase()}, ${d.reason}, ${d.contact ?? null})
+    RETURNING id`) as { id: number }[];
+  return rows[0]?.id ?? null;
+}
+
+function mapDisputeRow(r: Record<string, unknown>): DisputeRow {
+  return {
+    id: Number(r.id),
+    claimId: String(r.claim_id),
+    accused: String(r.accused),
+    reason: String(r.reason),
+    status: String(r.status),
+    disputeTxHash: (r.dispute_tx_hash as string | null) ?? null,
+    onchainDisputeId: (r.onchain_dispute_id as string | null) ?? null,
+    createdAt: String(r.created_at),
+  };
+}
+
+/** List disputes for one claim (or the most recent across all claims). */
+export async function listDisputes(claimId?: string): Promise<DisputeRow[]> {
+  if (!dbEnabled()) return [];
+  await ensureDisputesTable();
+  const rows = (
+    claimId
+      ? await sql()`
+          SELECT id, claim_id, accused, reason, status, dispute_tx_hash, onchain_dispute_id, created_at
+          FROM disputes WHERE claim_id = ${claimId} ORDER BY created_at DESC`
+      : await sql()`
+          SELECT id, claim_id, accused, reason, status, dispute_tx_hash, onchain_dispute_id, created_at
+          FROM disputes ORDER BY created_at DESC LIMIT 100`
+  ) as Record<string, unknown>[];
+  return rows.map(mapDisputeRow);
+}
+
+/** Fetch one dispute by id. */
+export async function getDispute(id: number): Promise<DisputeRow | null> {
+  if (!dbEnabled()) return null;
+  await ensureDisputesTable();
+  const rows = (await sql()`
+    SELECT id, claim_id, accused, reason, status, dispute_tx_hash, onchain_dispute_id, created_at
+    FROM disputes WHERE id = ${id} LIMIT 1`) as Record<string, unknown>[];
+  return rows[0] ? mapDisputeRow(rows[0]) : null;
+}
+
+/** Mark a dispute escalated on-chain (records the openDispute tx + on-chain id). */
+export async function markDisputeEscalated(
+  id: number,
+  txHash: string,
+  onchainDisputeId: string | null,
+): Promise<void> {
+  if (!dbEnabled()) return;
+  await ensureDisputesTable();
+  await sql()`
+    UPDATE disputes
+    SET status = 'escalated', dispute_tx_hash = ${txHash.toLowerCase()},
+        onchain_dispute_id = ${onchainDisputeId}
+    WHERE id = ${id}`;
+}
