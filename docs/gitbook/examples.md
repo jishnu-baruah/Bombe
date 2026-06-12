@@ -45,7 +45,7 @@ for (const a of res.assets) {
 
 ## 3. Request an attestation (outline)
 
-Non-custodial: pay first, then submit the payment tx hash. Full detail in [Attestation and payment](attestation-and-payment.md).
+Non-custodial: pay first, then submit the payment tx hash. Full detail in [Get an attestation](attestation/README.md).
 
 ```js
 import { createWalletClient, custom, parseEther } from "viem";

@@ -1,36 +1,6 @@
-# MCP server
+# Tools
 
-Bombe ships an MCP (Model Context Protocol) server that exposes the keyless public API as tools, so any MCP-capable agent can discover assets, read a verdict, verify it, and request a paid attestation with no human in the loop.
-
-Package: `@bombe/mcp` (`packages/mcp`). It talks to the live API over HTTPS; by default `https://bombe-web.vercel.app`. Override with the `BOMBE_API` environment variable.
-
-## Connect
-
-The server speaks stdio. Run it directly:
-
-```sh
-node --import tsx packages/mcp/src/index.ts
-# or, from the package
-pnpm --filter @bombe/mcp start
-```
-
-Register it with an MCP client (config shape varies by client):
-
-```json
-{
-  "mcpServers": {
-    "bombe": {
-      "command": "node",
-      "args": ["--import", "tsx", "packages/mcp/src/index.ts"],
-      "env": { "BOMBE_API": "https://bombe-web.vercel.app" }
-    }
-  }
-}
-```
-
-No keys are needed for the read, verify, and check tools. The request tool is paid but still non-custodial: the agent pays from its own wallet and passes the resulting tx hash.
-
-## Tools
+Every tool returns the raw API JSON as text, so the agent reads the same fields documented in the [API reference](../api-reference/README.md).
 
 | Tool | What it does | Keyless |
 |------|--------------|---------|
@@ -43,7 +13,7 @@ No keys are needed for the read, verify, and check tools. The request tool is pa
 | `bombe_verify_claim` | Re-derive the reasoning hash from the trace and compare to on-chain | yes |
 | `bombe_request_attestation` | Request a paid attestation; pay first, then pass the payment tx hash | paid |
 
-### Tool parameters
+## Tool parameters
 
 - `bombe_discover_assets`: `chain?`, `query?`, `rwaOnly?`, `minTvl?`, `limit?`
 - `bombe_check_nav`: `chain`, `contract`, `assertedNav`, `tolerancePct?`
@@ -55,8 +25,8 @@ No keys are needed for the read, verify, and check tools. The request tool is pa
 
 1. `bombe_list_assets` or `bombe_discover_assets` to find what to attest.
 2. `bombe_get_schema` to learn the exact intake shape and tolerances.
-3. Pay the fee on Mantle Sepolia from the agent's own wallet (see [Attestation and payment](attestation-and-payment.md)).
+3. Pay the fee on Mantle Sepolia from the agent's own wallet (see [Get an attestation](../attestation/README.md)).
 4. `bombe_request_attestation` with the payment tx hash.
 5. `bombe_verify_claim` to confirm the on-chain `reasoningHash` re-derives from the trace.
 
-Every tool returns the raw API JSON as text, so the agent reads the same fields documented in the [API reference](api-reference.md).
+Next: [Discovery for agents](discovery.md).
