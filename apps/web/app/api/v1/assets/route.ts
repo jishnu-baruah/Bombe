@@ -27,7 +27,7 @@ export function GET() {
         verified: s.verified,
         claimIdPattern: `${s.symbol}-YYYY-MM-DD`,
       })),
-      discover: "GET /api/v1/discover?rwaOnly=1 — the full attestable universe (open)",
+      discover: "GET /api/v1/discover?rwaOnly=1 : the full attestable universe (open)",
       read: "GET /api/v1/claims/{claimId}; verify with GET /api/v1/verify/{claimId}",
     },
     { headers: CORS },

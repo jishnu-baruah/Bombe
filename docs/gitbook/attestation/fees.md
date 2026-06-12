@@ -8,7 +8,7 @@
 | Receiving address | `0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83` |
 | Chain | Mantle Sepolia, chain id `5003` |
 
-The exact live fee and address are returned by `GET /api/v1/request`. The fee is a single MNT transfer to the receiving address; this is the issuer-facing price. (The on-chain `CLAIM_FEE` of 0.01 MNT and the attestor `ATTEST_LOCK` of 0.02 MNT are paid by the protocol's posting and attestor keys, not by you.)
+The exact live fee (`priceMnt`) is returned by `GET /api/v1/request`; the receiving address is shown on the request form and listed above. The fee is a single MNT transfer to the receiving address; this is the issuer-facing price. (The on-chain `CLAIM_FEE` of 0.01 MNT and the attestor `ATTEST_LOCK` of 0.02 MNT are paid by the protocol's posting and attestor keys, not by you.)
 
 ## Featured vs open assets
 

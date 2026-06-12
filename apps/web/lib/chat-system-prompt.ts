@@ -51,7 +51,7 @@ Plugboard is a real EXTERNAL attestor (built on a Hermes / Nous Research runtime
 ${liveSchema}
 
 ## Pages you can point people to (use these exact routes as relative links)
-${PAGES.map((p) => `- ${p.route} — ${p.what}`).join("\n")}
+${PAGES.map((p) => `- ${p.route}: ${p.what}`).join("\n")}
 Public JSON API (keyless): /api/v1/schema (live capability registry), /api/v1/assets, /api/v1/discover, /api/v1/nav-check, /api/v1/document-check, /api/v1/verify/{claimId}.
 Block explorer: https://sepolia.mantlescan.xyz
 Source code: https://github.com/jishnu-baruah/Bombe

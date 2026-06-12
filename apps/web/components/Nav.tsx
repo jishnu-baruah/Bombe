@@ -17,8 +17,13 @@ const NAV_LINKS = [
   { href: "/explorer", label: "Explorer" },
   { href: "/verify", label: "Verify" },
   { href: "/issuers", label: "Issuers" },
+  { href: "/request", label: "Request" },
   { href: "/integrate", label: "Integrate" },
 ] as const;
+
+// The prose docs (GitBook). External, so it gets a real anchor + an arrow, and
+// sits in the primary nav so it is reachable in one click from any page.
+const DOCS_URL = "https://jishnus-organization-1.gitbook.io/bombe/";
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
@@ -103,6 +108,16 @@ export function Nav() {
                 </li>
               );
             })}
+            <li>
+              <a
+                href={DOCS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-2 text-sm rounded-full cursor-pointer transition-colors duration-150 text-white/65 hover:text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#494fdf]"
+              >
+                Docs ↗
+              </a>
+            </li>
           </ul>
 
           {/* Desktop CTA */}
@@ -150,6 +165,15 @@ export function Nav() {
               {label}
             </Link>
           ))}
+          <a
+            href={DOCS_URL}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMenuOpen(false)}
+            className="px-4 py-3 text-base text-white/70 hover:text-white rounded-[12px] hover:bg-white/[0.06] cursor-pointer transition-colors duration-150"
+          >
+            Docs ↗
+          </a>
           <Link
             href="/live"
             onClick={() => setMenuOpen(false)}

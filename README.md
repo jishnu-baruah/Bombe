@@ -63,7 +63,7 @@ The same reads are served as a small public JSON API, CORS-open and keyless, at 
 
 | Endpoint | Returns |
 |----------|---------|
-| `GET /api/v1/assets` | the tracked assets (mETH, USDY) and the attestation address |
+| `GET /api/v1/assets` | the curated tracked assets and the attestation address |
 | `GET /api/v1/claims/{claimId}` | a claim and every on-chain attestation (decision, confidence, reasoning hash) |
 | `GET /api/v1/verify/{claimId}` | re-derives the reasoning hash from the published trace and reports `verified` / `mismatch` / `trace_unavailable` |
 
@@ -117,7 +117,7 @@ Verified on Mantlescan; source readable at each address.
 | AgentSlashing | [`0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864`](https://sepolia.mantlescan.xyz/address/0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864) | Tier-1 slashing + Tier-2 dispute resolution |
 | TuringLeaderboard | [`0xE5A157c349A6540C300D6CEcbe391A81EEEec018`](https://sepolia.mantlescan.xyz/address/0xE5A157c349A6540C300D6CEcbe391A81EEEec018) | Tier-1 settlement + per-agent trust score |
 
-Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALID/REJECTED attestation (0 for ABSTAIN). Details and the full deployment record: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) and [docs/gitbook/contracts.md](docs/gitbook/contracts.md).
+Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALID/REJECTED attestation (0 for ABSTAIN). Details and the full deployment record: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) and [docs/gitbook/contracts/README.md](docs/gitbook/contracts/README.md).
 
 ---
 

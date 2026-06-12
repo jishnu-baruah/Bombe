@@ -12,7 +12,7 @@ curl https://bombe-web.vercel.app/api/v1/request
 {
   "service": "Bombe self-serve attestation request",
   "method": "POST",
-  "supportedAssets": ["mETH", "USDY"],
+  "supportedAssets": ["mETH", "USDT0", "GHO", "USDY", "LBTC", "WEETH", "..."],
   "claimType": "YIELD_BPS",
   "priceMnt": "0.02",
   "note": "Non-custodial: pay from your own wallet to the receiving address, then POST the payment tx hash ..."

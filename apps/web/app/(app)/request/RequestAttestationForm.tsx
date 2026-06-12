@@ -73,7 +73,7 @@ export function RequestAttestationForm() {
         setAssets(
           j.assets.map((a) => ({
             id: a.symbol,
-            label: `${a.symbol} — ${a.name ?? a.symbol}${a.chain ? ` (${a.chain})` : ""}`,
+            label: `${a.symbol} · ${a.name ?? a.symbol}${a.chain ? ` (${a.chain})` : ""}`,
           })),
         );
       })

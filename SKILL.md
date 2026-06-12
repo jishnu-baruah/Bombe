@@ -20,7 +20,9 @@ the agent can recompute and trust it without trusting Bombe.
 
 ```
 GET /api/v1/assets
--> { "assets": ["mETH","USDY"], "attestationAddress": "0xf247..." }
+-> { "attestation": "0xf247...", "chainId": 5003, "count": 36,
+     "assets": [ { "symbol": "mETH", "name": "Mantle Staked ETH", "chain": "Mantle",
+                   "metric": "annualized_yield_bps", "sources": [...] }, ... ] }
 ```
 
 ## 2. Read a verdict
