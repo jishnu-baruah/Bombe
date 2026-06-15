@@ -2,15 +2,12 @@
 #
 # Indexes the AgentAttestation contract so the /explorer page can read a full,
 # ordered history of claims and attestations without the bounded getLogs range
-# of the no-indexer path. This is the scaling path; it is NOT deployed here
-# (deploying needs the operator's Graph account). See README.md for the exact
-# `graph codegen && graph deploy` commands.
+# of the no-indexer path. Deployed to Mantle's hosted subgraph service; the
+# query endpoint + redeploy command are in docs/DEPLOYMENTS.md, and the web app
+# reads it via SUBGRAPH_URL (with an automatic getLogs fallback).
 #
-# startBlock note: the deploy block of AgentAttestation was not recorded in
-# docs/DEPLOYMENTS.md (deployed 2026-06-06). Set START_BLOCK below to the exact
-# deploy block before deploying; the placeholder is a conservative recent value
-# so a first index does not scan the whole chain. Find the deploy block on the
-# explorer contract-creation tx, then update startBlock here.
+# startBlock is the AgentAttestation creation block (39592000) so a first index
+# does not scan the whole chain.
 specVersion: 0.0.5
 description: Bombe attestor-network activity (claims + attestations) on Mantle Sepolia.
 schema:

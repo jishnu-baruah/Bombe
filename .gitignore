@@ -45,3 +45,6 @@ _shots/
 # Paid-flow posting key (generated locally; never commit)
 .posting-key.json
 _devserver.log
+
+# stray local scratch file (not part of the project)
+data.txt

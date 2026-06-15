@@ -76,7 +76,7 @@ A zero-dependency consumer (no Bombe imports, just `fetch`) lives at `scripts/te
 
 ---
 
-## Architecture (work in progress)
+## Architecture
 
 The live flow, from an issuer paying a fee to anyone verifying the result. This diagram is descriptive of the current build and will keep evolving.
 
@@ -102,7 +102,7 @@ flowchart TD
 
 **Live today:** the read and verify paths (`/api/v1`, on-chain reads), the deterministic Tier-1 reconciler, on-chain `postClaim` + `attest`, the `reasoningHash` and self-authenticating trace storage, the live NAV and document checks, and the MCP server. The self-serve pay-then-post path verifies payment on-chain always; automatic posting runs when the operator enables it, otherwise the verified request is recorded for operator fulfilment.
 
-**Planned:** permissionless `postClaim` (today it is role-gated), broader claim types beyond `YIELD_BPS` in self-serve, and a global on-chain claim index (reads currently probe a bounded recent claim set).
+**Planned:** permissionless `postClaim` (today it is role-gated) and broader claim types beyond `YIELD_BPS` in self-serve. The `/explorer` reads a deployed Graph subgraph (Mantle hosted service) for a full indexed history, with an automatic getLogs fallback.
 
 Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evidence legs within a documented tolerance, then compare to the asserted value), Tier 2 is document-falsifiable, and Tier 3 (judgment) is refused at the contract layer. The verdict is never a model's opinion; models gather evidence and write the rationale, and consensus is over the evidence values.
 
