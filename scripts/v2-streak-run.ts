@@ -94,6 +94,35 @@ function toBytes32(s: string): `0x${string}` {
     .join("")}`;
 }
 
+/**
+ * Store a trace via the self-authenticating endpoint, retrying with backoff. Each
+ * attestor's attest tx propagates to the endpoint's RPC independently, so a single
+ * POST right after attesting can 404 ("no matching on-chain attestation yet") even
+ * though the attestation is valid. Without a retry that trace is lost permanently
+ * (it embeds a wall-clock ts, so it cannot be regenerated). Retry closes that race.
+ */
+async function storeTraceWithRetry(
+  site: string,
+  claimId: string,
+  attestor: string,
+  trace: unknown,
+  attempts = 6,
+): Promise<boolean> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(`${site}/api/v1/trace`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ claimId, attestor, trace }),
+      });
+      const j = (await r.json().catch(() => ({}))) as { stored?: boolean };
+      if (r.ok && j.stored === true) return true;
+    } catch {}
+    if (i < attempts - 1) await new Promise((res) => setTimeout(res, 4000));
+  }
+  return false;
+}
+
 interface Marker {
   lastRunDate: string | null;
   runCount: number;
@@ -308,18 +337,8 @@ async function main(): Promise<void> {
       txHash = attTx;
       console.log(`[v2-streak]   ${asset}: ${decision.verdict} ${EXPLORER}/${attTx}`);
       // Store the trace so the attestation is stranger-verifiable (self-auth endpoint).
-      try {
-        const tr = await fetch(`${SITE}/api/v1/trace`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ claimId, attestor: live.attestor.address, trace }),
-        });
-        console.log(`[v2-streak]   ${asset}: trace stored ${tr.ok ? "ok" : `HTTP ${tr.status}`}`);
-      } catch (e) {
-        console.log(
-          `[v2-streak]   ${asset}: trace store failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
-        );
-      }
+      const stored = await storeTraceWithRetry(SITE, claimId, live.attestor.address, trace);
+      console.log(`[v2-streak]   ${asset}: trace stored ${stored ? "ok" : "FAILED after retries"}`);
 
       // Corroborating attestors (rotor, stator) so the daily claim carries the
       // single-model triple-run redundancy by default. Best-effort and never funds
@@ -383,13 +402,10 @@ async function main(): Promise<void> {
           });
           await live.pub.waitForTransactionReceipt({ hash: exTx });
           console.log(`[v2-streak]   ${asset}: ${ex.id} ${r.decision.verdict} ${EXPLORER}/${exTx}`);
-          try {
-            await fetch(`${SITE}/api/v1/trace`, {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ claimId, attestor: acct.address, trace: r.trace }),
-            });
-          } catch {}
+          const exStored = await storeTraceWithRetry(SITE, claimId, acct.address, r.trace);
+          if (!exStored) {
+            console.log(`[v2-streak]   ${asset}: ${ex.id} trace store FAILED after retries`);
+          }
         } catch (e) {
           console.log(
             `[v2-streak]   ${asset}: ${ex.id} attest failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
