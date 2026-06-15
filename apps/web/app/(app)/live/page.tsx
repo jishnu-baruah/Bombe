@@ -531,9 +531,7 @@ function AttestorRow({
         </div>
         <p className="text-[12.5px] text-muted-foreground mt-0.5">{meta.role}</p>
 
-        {reason && (
-          <p className="text-[14.5px] text-foreground/90 leading-snug mt-2">{reason}</p>
-        )}
+        {reason && <p className="text-[14.5px] text-foreground/90 leading-snug mt-2">{reason}</p>}
       </div>
 
       {/* Result word */}

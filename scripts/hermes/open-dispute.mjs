@@ -30,7 +30,11 @@ for (const line of readFileSync(`${ROOT}/.env.local`, "utf-8").split("\n")) {
   const t = line.trim();
   if (!t || t.startsWith("#")) continue;
   const e = t.indexOf("=");
-  if (e > 0) ENV[t.slice(0, e).trim()] = t.slice(e + 1).trim().replace(/^"|"$/g, "");
+  if (e > 0)
+    ENV[t.slice(0, e).trim()] = t
+      .slice(e + 1)
+      .trim()
+      .replace(/^"|"$/g, "");
 }
 
 const ABI = JSON.parse(
@@ -63,7 +67,11 @@ if (challenger.address.toLowerCase() === accused.toLowerCase()) {
 const hash = await wallet.sendTransaction({
   account: challenger,
   to: SLASHING,
-  data: encodeFunctionData({ abi: ABI, functionName: "openDispute", args: [id32(claimId), accused] }),
+  data: encodeFunctionData({
+    abi: ABI,
+    functionName: "openDispute",
+    args: [id32(claimId), accused],
+  }),
   value: DISPUTE_BOND,
   chain,
 });
