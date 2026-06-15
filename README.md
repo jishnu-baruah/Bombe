@@ -155,7 +155,7 @@ _Generated: 2026-06-15_
 
 ### Operator Items
 
-13 open, 4 resolved (tracked in OPERATOR_TODO.md).
+7 open, 10 resolved (tracked in OPERATOR_TODO.md).
 <!-- PROGRESS:END -->
 
 Refresh the dashboard with `pnpm progress`.
