@@ -99,23 +99,26 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - To resolve: send MNT to the Plugboard wallet (suggest 0.5-1 MNT for a run of live attests) from an operator-authorized source. Then live attests resume with no code change.
 - RESOLVED 2026-06-12: operator funded Plugboard ~10 MNT. Proven from it: the Hermes one-shot attest (mETH-REQ-9ae5173c06) and the on-chain dispute openDispute (dispute 0, tx 0xca7fb2d9...). Wallet now well above the 0.1 MNT floor.
 
-## OP-14, higher-tier model key for the Hermes agent loop   [open]
+## OP-14, higher-tier model key for the Hermes agent loop   [done]
 - Date: 2026-06-12
 - Blocks: the autonomous Hermes read-decide-attest loop (the agent itself orchestrating, vs the attest tool being invoked directly). A single Hermes agent run makes several model calls (plan + tool use) and the current droplet model key returns HTTP 429 (rate limit exceeded) partway through.
 - Half-done state: Hermes v0.16.0 is installed and reasons (one-shot prompts work), recognizes the bombe-attestor skill (enabled), and the attest tool works standalone. The multi-call agent loop is throttled by the model key's rate limit.
 - To resolve: provide a higher-rate model key (or confirm a paid tier) for the host's ~/.hermes/config.yaml, or point it at the project AI gateway. Then the full agent loop runs end to end.
+- RESOLVED 2026-06-15: operator decided the proven one-shot Hermes attestation is sufficient for the submission; no continuous autonomous loop. The live Hermes attest (mETH-REQ-9ae5173c06) + its verifiable trace stands as the proof.
 
-## OP-15, dormant attestors rotor / stator / human   [open]
+## OP-15, dormant attestors rotor / stator / human   [done]
 - Date: 2026-06-12
 - Blocks: nothing functionally, but the "multi-agent" / five-attestor framing outruns the on-chain evidence. On-chain truth: only reflector (22 attestations) and the external Plugboard (4, incl. a real REJECTED/VALID disagreement) have ever attested. rotor, stator, and human are registered and funded but have made zero attestations and have no stored traces; each holds only ~0.077 MNT (below the 0.1 floor, so they cannot attest much without a top-up).
 - Decision needed (operator): either (a) fund + activate rotor/stator on a few live claims so the multi-attestor story is real, or (b) keep the copy honest as it stands (the site already labels mETH as "one ground truth, two computation paths", not "independent", and never claims active consensus). Do not relabel as "multi-model consensus" unless three genuinely different models are confirmed (v2 constitution).
 - Half-done state: the leaderboard/claim UI render whatever each agent actually did; dormant agents simply show no activity, which is honest. No code change pending.
+- RESOLVED 2026-06-15: operator chose to activate. rotor (0x5e90...) + stator (0x3c86...) were funded from the deployer and attested mETH-REQ-01122a8fa5 VALID (txs 0xcf2baaa5..., 0x1a203f02...), traces stored + verified. That claim now carries 3 attestors (reflector + rotor + stator), real single-model triple-run redundancy on-chain. Tool: scripts/hermes/activate-attestors.mjs. (human stays a manual/operator role; not auto-activated.)
 
-## OP-16, on-chain dispute escalation key + economics   [open]
+## OP-16, on-chain dispute escalation key + economics   [done]
 - Date: 2026-06-12
 - Blocks: the operator-triggered on-chain leg of the dispute flow on the live host. The public dispute intake (POST /api/dispute) and the verify-page button are live and keyless; the operator route POST /api/operator/dispute is wired to sign the real AgentSlashing.openDispute (0.05 MNT bond) but needs a registered challenger key in the Vercel env that is NOT the accused attestor. ATTESTOR_KEY is reflector, which is the accused on most claims, so set a distinct CHALLENGER_KEY (e.g. the Plugboard key, which is registered + funded) for prod escalation.
 - Note: openDispute locks a 0.05 MNT bond and can slash; resolveDispute has economic finality (tie -> agent right, D13). I did not auto-trigger a resolution while unattended. To demonstrate or run a real dispute, set CHALLENGER_KEY and call /api/operator/dispute with { disputeId } (or { claimId, accused }).
 - To resolve: add CHALLENGER_KEY (distinct registered, funded attestor) to the Vercel prod env.
+- RESOLVED 2026-06-15: operator chose to keep on-chain dispute escalation script-only (no CHALLENGER_KEY in prod). The on-chain dispute is already proven (dispute 0, tx 0xca7fb2d9...) and the public keyless intake on /verify is the platform-facing flow. Reopen only if a one-click prod escalation is wanted later.
 
 ## OP-17, MCP package run/build + docstring   [open]
 - Date: 2026-06-12
