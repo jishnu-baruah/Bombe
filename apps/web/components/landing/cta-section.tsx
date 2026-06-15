@@ -79,12 +79,26 @@ export function CtaSection() {
               <div className="scene-blend absolute inset-0">
                 <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="absolute inset-0" />
               </div>
-              {/* Same box that was verified to fully cover the canvas-baked Spline
-                  badge, but rendered as an intentional Bombe brand chip (card style,
-                  on-brand) so it reads as deliberate scene branding, not a patch. */}
-              <div className="absolute bottom-2 right-2 z-20 flex h-[52px] w-[190px] items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-[#16181a] shadow-[0_8px_24px_rgba(0,0,0,0.45)] pointer-events-none">
-                <img src="/brand/bombe-monogram-gradient.svg" alt="" className="h-5 w-5" />
-                <img src="/brand/bombe-wordmark-gradient.svg" alt="" className="h-4 w-auto" />
+              {/* Cover the canvas-baked Spline badge with a soft, corner-anchored
+                  fade: fully opaque over the badge at the bottom-right, dissolving
+                  into the scene toward the interior (no hard rectangle edge), with a
+                  subtle Bombe wordmark. The box is large and anchored to the canvas
+                  corner so the opaque core always sits over the badge. */}
+              <div
+                className="pointer-events-none absolute bottom-0 right-0 z-20 flex h-[96px] w-[260px] items-end justify-end p-3.5"
+                style={{
+                  background: "#0a0a0a",
+                  WebkitMaskImage:
+                    "radial-gradient(125% 125% at 100% 100%, #000 60%, transparent 86%)",
+                  maskImage: "radial-gradient(125% 125% at 100% 100%, #000 60%, transparent 86%)",
+                }}
+                aria-hidden="true"
+              >
+                <img
+                  src="/brand/bombe-wordmark-white.svg"
+                  alt=""
+                  className="h-[14px] w-auto opacity-45"
+                />
               </div>
             </div>
           </div>
