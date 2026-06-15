@@ -82,8 +82,9 @@ const ECONOMICS = [
   {
     action: "Post a claim",
     who: "Issuer",
-    amount: "0.01 MNT",
-    purpose: "One-time fee per claim, held until settlement.",
+    amount: "0.02 MNT",
+    purpose:
+      "The issuer's fee, paid from their own wallet at /issuers; covers posting and the attestor stake.",
   },
   {
     action: "Attest VALID or REJECTED",
@@ -332,10 +333,10 @@ export default function IssuersPage() {
         <div className="max-w-[1200px] mx-auto">
           <span className="eyebrow block mb-6">What we cover</span>
           <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
-            {SUPPORTED_FLOOR}+ verified RWA yields. Anything else, one request away.
+            {SUPPORTED_FLOOR}+ attestable RWA yields. Anything else, one request away.
           </h2>
           <p className="pretty text-base text-muted-foreground leading-relaxed mb-10 max-w-[46rem]">
-            The verified catalog spans {SUPPORTED_FLOOR}+ assets across these categories,
+            The attestable catalog spans {SUPPORTED_FLOOR}+ assets across these categories,
             Mantle-native first, each a real source vetted for clean data. Coverage is open, not a
             fixed list: any yield with a public data source is attestable now (browse the live
             universe at{" "}

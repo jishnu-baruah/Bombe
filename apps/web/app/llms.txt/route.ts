@@ -20,7 +20,7 @@ The API is keyless and read-mostly. Every verdict is recomputable: the reasoning
 
 ## Keyless JSON API
 
-- [List assets](${SITE_URL}/api/v1/assets): the curated, verified RWA yields Bombe attests, plus the on-chain attestation contract address and explorer.
+- [List assets](${SITE_URL}/api/v1/assets): the curated, attestable RWA yields Bombe attests, plus the on-chain attestation contract address and explorer.
 - [Discover assets](${SITE_URL}/api/v1/discover): the full open universe of attestable RWA yields as ready-to-attest source descriptors. Filter by chain, symbol query, RWA-only, or min TVL.
 - [NAV check](${SITE_URL}/api/v1/nav-check): read an ERC-4626 vault share price on-chain and deterministically cross-check an asserted NAV.
 - [Document check](${SITE_URL}/api/v1/document-check): Tier-2 cross-check of an asserted tokenized-treasury yield (bps) against the live, hashed US Treasury bill rate.

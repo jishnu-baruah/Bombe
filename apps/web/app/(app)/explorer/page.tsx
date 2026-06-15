@@ -10,6 +10,7 @@
  * Caching: Redis (short TTL) when configured, else Next.js ISR via `revalidate`.
  */
 
+import { CopyButton } from "@/components/ui/CopyButton";
 import { type ActivityClaim, explorerAddressUrl, explorerTxUrl, shortAddr } from "@/lib/activity";
 import { getActivityFeed } from "@/lib/activity-cache";
 import Link from "next/link";
@@ -90,6 +91,7 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
           >
             {claim.claimId}
           </Link>
+          <CopyButton value={claim.claimId} label="Copy claim id" />
           <TierBadge tier={claim.tier} />
         </div>
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
@@ -154,14 +156,17 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
           Tx
         </span>
         {headlineTx ? (
-          <a
-            href={explorerTxUrl(headlineTx)}
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono text-[12px] text-[#9296f5] hover:text-white transition-colors"
-          >
-            {shortAddr(headlineTx)} ↗
-          </a>
+          <span className="inline-flex items-center gap-1.5">
+            <a
+              href={explorerTxUrl(headlineTx)}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-[12px] text-[#9296f5] hover:text-white transition-colors"
+            >
+              {shortAddr(headlineTx)} ↗
+            </a>
+            <CopyButton value={headlineTx} label="Copy transaction hash" />
+          </span>
         ) : (
           <span className="text-muted-foreground/50">pending</span>
         )}
