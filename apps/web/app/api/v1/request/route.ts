@@ -200,6 +200,11 @@ export async function POST(req: Request) {
         windowDays: windowDays as number,
         spec: openSpec,
       });
+      const attestors = ["reflector", ...result.corroborators];
+      const redundancy =
+        attestors.length > 1
+          ? ` ${attestors.length} attestors (${attestors.join(", ")}) re-ran the check and agree.`
+          : "";
       return NextResponse.json(
         {
           ok: true,
@@ -207,8 +212,9 @@ export async function POST(req: Request) {
           claimId: result.claimId,
           decision: result.decision,
           reasoningHash: result.reasoningHash,
+          attestors,
           verifyUrl: `${SITE_URL}/verify?q=${encodeURIComponent(result.claimId)}`,
-          message: `Attested ${result.decision} on-chain. You can verify it yourself.`,
+          message: `Attested ${result.decision} on-chain.${redundancy} You can verify it yourself.`,
         },
         { headers: CORS },
       );

@@ -65,11 +65,16 @@ marks partial or mock.
   The open `spec` path attests any source an issuer supplies; the verdict + provenance are
   real and rerunnable, but a `verified:false` source's trustworthiness is the issuer's, not
   Bombe's. Labeled as such. The featured set is the curated/verified showcase.
-- **Single attestor, single run, not "triple-run".** The live attestation is one
-  deterministic computation posted by one attestor (Reflector). The "single-model triple-run
-  redundancy" and the three reference agents (Reflector/Rotor/Stator) are the demo/benchmark,
-  not the live verdict. Path to real: run the computation N times / N attestors and require
-  agreement, or be explicit that live is single-attestor.
+- **Triple-run redundancy by default when the agent keys are funded.** Both live posting
+  paths (the self-serve `fulfillAttestation` and the daily streak) now attest with Reflector
+  as the required primary, then Rotor and Stator as best-effort corroborating attestors: each
+  independently re-runs the same deterministic reconciler over fresh live data and posts its
+  own verifiable trace. This is single-model triple-run redundancy (one model, three keys
+  re-deriving the verdict), never multi-model consensus. It is conditional, not guaranteed:
+  Rotor/Stator only fire when `AGENT_KEYS` is configured and those wallets hold enough balance;
+  an unfunded or missing extra attestor is skipped (this layer never funds a key), leaving the
+  Reflector attestation intact. So a given claim carries one to three attestors depending on
+  funding. The verdict is still the deterministic reconciler's, never a model's opinion.
 - **Leaderboard live numbers.** The leaderboard reads `lifetimeStats`, which are only
   populated by settlement (`settleTier1`). Settlement is not automated, so live lifetime stats
   can be empty/zero. Path to real: automate settlement against ground truth, or surface the

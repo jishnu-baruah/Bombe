@@ -45,6 +45,8 @@ export interface FulfillResult {
   reasoningHash: string;
   postTx: string;
   attestTx: string;
+  /** Extra attestor ids (rotor/stator) that also attested this claim, best-effort. */
+  corroborators: string[];
 }
 
 /**
@@ -67,7 +69,6 @@ export async function fulfillAttestation(params: {
   const chain = mantleSepoliaTestnet;
   const pub = createPublicClient({ chain, transport: http(RPC_URL) });
   const postWallet = createWalletClient({ account: posting, chain, transport: http(RPC_URL) });
-  const attWallet = createWalletClient({ account: attestor, chain, transport: http(RPC_URL) });
 
   // 1. Deterministic verdict over live data, with a real guided-LLM train of
   //    thought when a gateway is configured (the verdict stays deterministic).
@@ -110,21 +111,29 @@ export async function fulfillAttestation(params: {
     ? (process.env.NARRATOR_PRIMARY_MODEL ?? "mistral-small-latest").split(",")[0]?.trim() ||
       "mistral-small-latest"
     : fallbackModel;
-  const { observation, decision, trace, sources } = await computeDecisiveAttestation(
-    {
-      claimId,
-      asset,
-      spec,
-      assertedValueBps: assertedBps,
-      reconcileToleranceBps: 50,
-      verdictToleranceBps: 50,
-      requestedWindowDays: windowDays,
-    },
-    ds,
-    clock,
-    "reflector",
-    narrator ? { narrator, modelId } : undefined,
-  );
+  // The same deterministic reconciler, run once per attestor id. Each attestor
+  // independently re-derives the verdict over live data (single-model triple-run
+  // redundancy, not multi-model consensus): the verdict is always the reconciler's;
+  // the agentId only labels whose run produced this trace.
+  const runReconcile = (agentId: string) =>
+    computeDecisiveAttestation(
+      {
+        claimId,
+        asset,
+        spec,
+        assertedValueBps: assertedBps,
+        reconcileToleranceBps: 50,
+        verdictToleranceBps: 50,
+        requestedWindowDays: windowDays,
+      },
+      ds,
+      clock,
+      agentId,
+      narrator ? { narrator, modelId } : undefined,
+    );
+
+  const reflectorRes = await runReconcile("reflector");
+  const { observation, decision, trace, sources } = reflectorRes;
 
   // 2. Post the claim (posting key, OPERATOR_ROLE).
   const claimObj: Claim = {
@@ -156,37 +165,76 @@ export async function fulfillAttestation(params: {
   });
   await pub.waitForTransactionReceipt({ hash: postTx });
 
-  // 3. Attest (attestor key).
-  const reasoningHash = hashCanonical(trace);
-  const sorted = [...sources].sort((a, b) => {
-    const n = a.name.localeCompare(b.name);
-    return n !== 0 ? n : a.source.localeCompare(b.source);
-  });
-  const sourcesHash = hashCanonical(sorted);
-  const lock = decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
-  const traceURI = `${SITE}/api/trace/${claimId}/${attestor.address.toLowerCase()}`;
-  const attestTx = await attWallet.sendTransaction({
-    account: attestor,
-    to: ATTESTATION_ADDRESS,
-    data: encodeFunctionData({
-      abi: AgentAttestationAbi,
-      functionName: "attest",
-      args: [
-        toBytes32(claimId),
-        DECISION_ENUM[decision.verdict],
-        trace.final.confidenceBps,
-        sourcesHash,
-        reasoningHash,
-        traceURI,
-      ],
-    }),
-    value: lock,
-    chain,
-  });
-  await pub.waitForTransactionReceipt({ hash: attestTx });
+  // 3. Attest. Reflector is the primary (required) attestor; rotor and stator, when
+  //    their keys are present and funded, add corroborating attestations so a fresh
+  //    claim carries the triple-run redundancy by default. This layer NEVER funds a
+  //    key (the deployer/admin key is off-limits here): a missing or underfunded
+  //    extra attestor is skipped, leaving the reflector attestation intact.
+  const attestAndStore = async (
+    account: ReturnType<typeof privateKeyToAccount>,
+    res: Awaited<ReturnType<typeof runReconcile>>,
+  ): Promise<string> => {
+    const wallet = createWalletClient({ account, chain, transport: http(RPC_URL) });
+    const rHash = hashCanonical(res.trace);
+    const sorted = [...res.sources].sort((a, b) => {
+      const n = a.name.localeCompare(b.name);
+      return n !== 0 ? n : a.source.localeCompare(b.source);
+    });
+    const sHash = hashCanonical(sorted);
+    const lock = res.decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK;
+    const uri = `${SITE}/api/trace/${claimId}/${account.address.toLowerCase()}`;
+    const tx = await wallet.sendTransaction({
+      account,
+      to: ATTESTATION_ADDRESS,
+      data: encodeFunctionData({
+        abi: AgentAttestationAbi,
+        functionName: "attest",
+        args: [
+          toBytes32(claimId),
+          DECISION_ENUM[res.decision.verdict],
+          res.trace.final.confidenceBps,
+          sHash,
+          rHash,
+          uri,
+        ],
+      }),
+      value: lock,
+      chain,
+    });
+    await pub.waitForTransactionReceipt({ hash: tx });
+    await storeTrace(claimId, account.address, JSON.stringify(res.trace), rHash);
+    return tx;
+  };
 
-  // 4. Store the trace so the attestation is stranger-verifiable.
-  await storeTrace(claimId, attestor.address, JSON.stringify(trace), reasoningHash);
+  // Reflector attestation (required: this is the issuer's paid attestation).
+  const reasoningHash = hashCanonical(trace);
+  const attestTx = await attestAndStore(attestor, reflectorRes);
+
+  // Corroborating attestors (best-effort). AGENT_KEYS is reflector,rotor,stator;
+  // index 0 is the reflector primary above, so only rotor/stator run here. Each
+  // re-runs the reconciler over fresh live data, so all three traces verify.
+  const agentKeys = (process.env.AGENT_KEYS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const extras: { id: string; key: string }[] = [];
+  if (agentKeys[1]) extras.push({ id: "rotor", key: agentKeys[1] });
+  if (agentKeys[2]) extras.push({ id: "stator", key: agentKeys[2] });
+  const corroborators: string[] = [];
+  for (const ex of extras) {
+    try {
+      const acct = privateKeyToAccount(ex.key as `0x${string}`);
+      if (acct.address.toLowerCase() === attestor.address.toLowerCase()) continue;
+      // Never fund here; skip an underfunded extra rather than touch a funding key.
+      const bal = await pub.getBalance({ address: acct.address });
+      if (bal < ATTEST_LOCK + parseEther("0.1")) continue;
+      await attestAndStore(acct, await runReconcile(ex.id));
+      corroborators.push(ex.id);
+    } catch {
+      // Best-effort: the reflector attestation already stands; an extra attestor
+      // failing (RPC, balance, race) must not fail the issuer's paid request.
+    }
+  }
 
   return {
     claimId,
@@ -194,5 +242,6 @@ export async function fulfillAttestation(params: {
     reasoningHash,
     postTx,
     attestTx,
+    corroborators,
   };
 }

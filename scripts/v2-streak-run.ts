@@ -320,6 +320,82 @@ async function main(): Promise<void> {
           `[v2-streak]   ${asset}: trace store failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
         );
       }
+
+      // Corroborating attestors (rotor, stator) so the daily claim carries the
+      // single-model triple-run redundancy by default. Best-effort and never funds
+      // a key: an underfunded/missing extra is skipped, leaving reflector intact.
+      const extraKeys = (cfg("AGENT_KEYS") ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const streakExtras: { id: string; key: string }[] = [];
+      if (extraKeys[1]) streakExtras.push({ id: "rotor", key: extraKeys[1] });
+      if (extraKeys[2]) streakExtras.push({ id: "stator", key: extraKeys[2] });
+      for (const ex of streakExtras) {
+        try {
+          const acct = privateKeyToAccount(ex.key as `0x${string}`);
+          if (acct.address.toLowerCase() === live.attestor.address.toLowerCase()) continue;
+          const bal = await live.pub.getBalance({ address: acct.address });
+          if (bal < ATTEST_LOCK + parseEther("0.1")) {
+            console.log(`[v2-streak]   ${asset}: ${ex.id} skipped (low balance)`);
+            continue;
+          }
+          const exWallet = createWalletClient({
+            account: acct,
+            chain: live.chain,
+            transport: http(cfg("RPC_URL") as string),
+          });
+          const r = await computeDecisiveAttestation(
+            {
+              claimId,
+              asset,
+              assertedValueBps,
+              reconcileToleranceBps: 50,
+              verdictToleranceBps: 50,
+              requestedWindowDays: 30,
+            },
+            dataSource,
+            clock,
+            ex.id,
+            narrator ? { narrator, modelId } : undefined,
+          );
+          const exSorted = [...r.sources].sort((a, b) => {
+            const n = a.name.localeCompare(b.name);
+            return n !== 0 ? n : a.source.localeCompare(b.source);
+          });
+          const exTx = await exWallet.sendTransaction({
+            account: acct,
+            to: live.attAddr,
+            data: encodeFunctionData({
+              abi: AgentAttestationAbi,
+              functionName: "attest",
+              args: [
+                toBytes32(claimId),
+                DECISION_ENUM[r.decision.verdict],
+                r.trace.final.confidenceBps,
+                hashCanonical(exSorted),
+                hashCanonical(r.trace),
+                `${SITE}/api/trace/${claimId}/${acct.address.toLowerCase()}`,
+              ],
+            }),
+            value: r.decision.verdict === "ABSTAIN" ? 0n : ATTEST_LOCK,
+            chain: live.chain,
+          });
+          await live.pub.waitForTransactionReceipt({ hash: exTx });
+          console.log(`[v2-streak]   ${asset}: ${ex.id} ${r.decision.verdict} ${EXPLORER}/${exTx}`);
+          try {
+            await fetch(`${SITE}/api/v1/trace`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ claimId, attestor: acct.address, trace: r.trace }),
+            });
+          } catch {}
+        } catch (e) {
+          console.log(
+            `[v2-streak]   ${asset}: ${ex.id} attest failed (non-fatal): ${e instanceof Error ? e.message : String(e)}`,
+          );
+        }
+      }
     } else {
       console.log(`[v2-streak]   ${asset}: ${decision.verdict}${selfTest ? " (self-test)" : ""}`);
     }
