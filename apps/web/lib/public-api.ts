@@ -253,6 +253,44 @@ export async function lookup(q: string): Promise<LookupResult> {
         matchedAttestor: match.attestor,
       };
     }
+    // Not a reasoning hash — try to resolve it as an on-chain tx to the attestation contract.
+    try {
+      const tx = await client().getTransaction({ hash: query as `0x${string}` });
+      if (
+        tx.to &&
+        tx.to.toLowerCase() === ATTESTATION_ADDRESS.toLowerCase() &&
+        tx.input.length >= 74
+      ) {
+        // Decode the first bytes32 argument (after the 4-byte selector) as a UTF-8 claim ID.
+        const rawBytes32 = tx.input.slice(10, 74); // 32 bytes = 64 hex chars
+        const bytes = new Uint8Array(32);
+        for (let i = 0; i < 32; i++) {
+          bytes[i] = Number.parseInt(rawBytes32.slice(i * 2, i * 2 + 2), 16);
+        }
+        // Strip trailing zero bytes and decode as UTF-8.
+        const end = bytes.indexOf(0);
+        const claimIdStr = new TextDecoder().decode(end === -1 ? bytes : bytes.slice(0, end));
+        if (claimIdStr.length > 0) {
+          try {
+            const claim = await readClaim(claimIdStr);
+            if (claim.posted) {
+              return {
+                query,
+                kind: "txHash",
+                found: true,
+                claim,
+                matchedAttestor: tx.from,
+                explorerUrl: `${EXPLORER}/tx/${query}`,
+              };
+            }
+          } catch {
+            // Claim read failed — fall through to explorer-link fallback.
+          }
+        }
+      }
+    } catch {
+      // Could not fetch the transaction (RPC error, not a tx hash, etc.) — fall through.
+    }
     return {
       query,
       kind: "txHash",

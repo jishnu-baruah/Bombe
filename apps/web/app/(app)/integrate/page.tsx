@@ -170,7 +170,7 @@ export default function IntegratePage() {
               },
               {
                 t: "bombe_list_assets",
-                b: "The curated, verified RWA yields + the contract.",
+                b: "The curated, attestable RWA yields + the contract.",
               },
               {
                 t: "bombe_discover_assets",

@@ -83,10 +83,11 @@ marks partial or mock.
 - **The /live race view (A->D) is scripted.** It is an SSE replay of the §6.7 demo sequence
   (the four canonical claims, all five attestors including Plugboard and Human), not live
   events. It is the deterministic demo/fallback, clearly the showcase path, not live data.
-- **The five-attestor field (Rotor, Stator, Plugboard, Human) is demo-only.** Live claims have
-  only Reflector. Rotor/Stator are agent configs exercised in the demo/benchmark; Plugboard
-  (external runtime) and the Human queue are simulated in the demo. The contract-enforced
-  Tier-3 revert is real, but Plugboard's live participation is not.
+- **Attestor field, live status (updated 2026-06-15).** Reflector, Rotor, and Stator have all
+  attested live on-chain (for example mETH-REQ-01122a8fa5 carries 3 verified attestors). Plugboard,
+  an external Nous Hermes runtime Bombe did not write, has attested live and opened a real bonded
+  AgentSlashing dispute on-chain. The Human queue remains a manual/operator role, not autonomous.
+  The contract-enforced Tier-3 revert is real and was proven live by Plugboard.
 - **The agent ReAct loop + tool catalog (feeds/chain-compute/doc-history) read fixtures in
   tests.** The loop is a real LLM ReAct loop (benchmarked against a real model), but the live
   verdict path uses the deterministic `decideTier1` + the live data layer, not this loop. The

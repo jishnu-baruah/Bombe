@@ -7,6 +7,7 @@
  */
 
 import { GLOSSARY, Gloss } from "@/components/ui/Gloss";
+import { Mono } from "@/components/ui/Mono";
 import { type DisputeRow, listDisputes } from "@/lib/db";
 import { type LookupResult, explorerAddressUrl, lookup } from "@/lib/public-api";
 import Link from "next/link";
@@ -55,11 +56,17 @@ function ClaimProof({ result, disputes }: { result: LookupResult; disputes: Disp
       <div className="px-6 py-5 border-b border-white/[0.08] flex flex-wrap items-center gap-3 justify-between">
         <div>
           <p className="text-[12px] text-muted-foreground font-semibold tracking-[0.8px] uppercase mb-1">
-            {result.kind === "reasoningHash" ? "Reasoning hash matched" : "Claim"}
+            {result.kind === "reasoningHash"
+              ? "Reasoning hash matched"
+              : result.kind === "txHash"
+                ? "Transaction resolved to claim"
+                : "Claim"}
           </p>
-          <p className="text-[18px] font-semibold tracking-[-0.3px] font-mono break-all">
-            {claim.claimId}
-          </p>
+          <Mono
+            value={claim.claimId}
+            showCopy
+            className="text-[18px] font-semibold tracking-[-0.3px]"
+          />
         </div>
         <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
           <span className="px-2 py-0.5 rounded-full bg-[#0a0a0a] border border-white/[0.08]">
@@ -211,7 +218,7 @@ export default async function VerifyPage({
             </div>
           )}
 
-          {result?.found && result.kind === "txHash" && (
+          {result?.found && result.kind === "txHash" && !result.claim && (
             <div className="rounded-[16px] border border-white/[0.08] bg-[#16181a] px-6 py-5">
               <p className="text-[14px] text-muted-foreground mb-3">{result.message}</p>
               <a

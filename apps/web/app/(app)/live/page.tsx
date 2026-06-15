@@ -604,6 +604,16 @@ function renderValue(v: unknown): string {
   }
 }
 
+/** Extract the finalize decision from an AGENT_STEP action, if present. */
+function stepFinalizeDecision(action: unknown): string | null {
+  if (action === null || typeof action !== "object") return null;
+  const a = action as Record<string, unknown>;
+  if (!a.finalize || typeof a.finalize !== "object" || a.finalize === null) return null;
+  const f = a.finalize as Record<string, unknown>;
+  if (typeof f.decision === "string") return f.decision;
+  return null;
+}
+
 function TechnicalDetail({
   claim,
   agents,
@@ -654,31 +664,61 @@ function TechnicalDetail({
                 </p>
                 {a.steps.length > 0 && (
                   <ol className="flex flex-col gap-1.5 mb-3">
-                    {a.steps.map((s) => (
-                      <li
-                        key={`${s.agentAddr}-${s.step}`}
-                        className="text-[12px] text-muted-foreground"
-                      >
-                        <span className="text-[#9296f5] font-mono mr-1.5">#{s.step}</span>
-                        {s.thought}
-                      </li>
-                    ))}
+                    {a.steps.map((s) => {
+                      const proposedDecision = stepFinalizeDecision(s.action);
+                      const isOverriddenFinalize =
+                        proposedDecision !== null &&
+                        a.done !== null &&
+                        proposedDecision !== a.done.decision;
+                      return (
+                        <li
+                          key={`${s.agentAddr}-${s.step}`}
+                          className="text-[12px] text-muted-foreground"
+                        >
+                          <span className="text-[#9296f5] font-mono mr-1.5">#{s.step}</span>
+                          {isOverriddenFinalize ? (
+                            <span className="text-[#d4a017]">
+                              Model proposed {proposedDecision}, overridden by policy to{" "}
+                              {a.done?.decision} (stale single source)
+                            </span>
+                          ) : (
+                            s.thought
+                          )}
+                        </li>
+                      );
+                    })}
                   </ol>
                 )}
-                {a.done && (
-                  <div className="flex flex-col gap-1 text-[11px] font-mono text-muted-foreground/70">
-                    <span>
-                      decision: <span className="text-foreground">{a.done.decision}</span>
-                      {a.done.blockedByProtocol ? " (blocked by protocol)" : ""}
-                    </span>
-                    <span>confidence: {(a.done.confidenceBps / 100).toFixed(0)}%</span>
-                    <span className="break-all">reasoningHash: {a.done.reasoningHash}</span>
-                    <span>
-                      {a.done.latencyMs} ms ·{" "}
-                      {a.done.costUsd > 0 ? `$${a.done.costUsd.toFixed(4)}` : "no model cost"}
-                    </span>
-                  </div>
-                )}
+                {a.done &&
+                  (() => {
+                    // Detect if the model proposed a different decision than the policy finalized.
+                    const modelProposed =
+                      a.steps
+                        .map((s) => stepFinalizeDecision(s.action))
+                        .find((d) => d !== null && d !== a.done?.decision) ?? null;
+                    const isOverridden = modelProposed !== null;
+                    return (
+                      <div className="flex flex-col gap-1 text-[11px] font-mono text-muted-foreground/70">
+                        <span>
+                          decision: <span className="text-foreground">{a.done.decision}</span>
+                          {a.done.blockedByProtocol ? " (blocked by protocol)" : ""}
+                          {isOverridden ? (
+                            <span className="text-[#d4a017] ml-1">
+                              (policy override: stale single source)
+                            </span>
+                          ) : null}
+                        </span>
+                        {!isOverridden && (
+                          <span>confidence: {(a.done.confidenceBps / 100).toFixed(0)}%</span>
+                        )}
+                        <span className="break-all">reasoningHash: {a.done.reasoningHash}</span>
+                        <span>
+                          {a.done.latencyMs} ms ·{" "}
+                          {a.done.costUsd > 0 ? `$${a.done.costUsd.toFixed(4)}` : "no model cost"}
+                        </span>
+                      </div>
+                    );
+                  })()}
               </div>
             );
           })}
@@ -976,7 +1016,7 @@ export default function LivePage() {
                 Press <span className="text-foreground">Start the walkthrough</span> to watch the
                 panel judge the first claim.
               </p>
-              <p className="text-muted-foreground/70 text-[14px] mt-4 max-w-xl mx-auto leading-relaxed">
+              <p className="text-muted-foreground/70 text-[14px] mt-4 leading-relaxed">
                 You will see four claims judged in turn: a clean yes, a split panel, a rejection,
                 and a claim the contract refused to let anyone attest.
               </p>
