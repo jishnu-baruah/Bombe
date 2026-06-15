@@ -79,10 +79,13 @@ export function CtaSection() {
               <div className="scene-blend absolute inset-0">
                 <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="absolute inset-0" />
               </div>
-              <div
-                className="absolute bottom-2 right-2 z-20 w-[190px] h-[52px] rounded-lg bg-[#0a0a0a] pointer-events-none"
-                aria-hidden="true"
-              />
+              {/* Same box that was verified to fully cover the canvas-baked Spline
+                  badge, but rendered as an intentional Bombe brand chip (card style,
+                  on-brand) so it reads as deliberate scene branding, not a patch. */}
+              <div className="absolute bottom-2 right-2 z-20 flex h-[52px] w-[190px] items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-[#16181a] shadow-[0_8px_24px_rgba(0,0,0,0.45)] pointer-events-none">
+                <img src="/brand/bombe-monogram-gradient.svg" alt="" className="h-5 w-5" />
+                <img src="/brand/bombe-wordmark-gradient.svg" alt="" className="h-4 w-auto" />
+              </div>
             </div>
           </div>
         </div>
