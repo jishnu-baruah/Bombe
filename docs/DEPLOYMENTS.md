@@ -1,5 +1,15 @@
 # Deployments
 
+## Subgraph (Mantle hosted service), 2026-06-12
+
+The Bombe subgraph indexes AgentAttestation (claims + attestations) so `/explorer`
+reads an indexed feed instead of bounded getLogs. Source in `subgraph/`.
+
+- Query endpoint (set as `SUBGRAPH_URL` in the web app, prod): `https://subgraph-api.mantle.xyz/api/public/8b4d46b9-8160-48e2-92fa-9873a113621a/subgraphs/bombe/v0.0.1/gn`
+- Slug `bombe`, version `v0.0.1`, network `mantle-sepolia`, startBlock `39592000` (AgentAttestation creation block).
+- Redeploy: `cd subgraph && pnpm install --ignore-workspace && pnpm exec graph codegen && pnpm exec graph build && pnpm exec graph deploy bombe --node https://subgraph-api.mantle.xyz/deploy --ipfs https://subgraph-api.mantle.xyz/ipfs --deploy-key <key> --version-label vX.Y.Z` (deploy key is operator-held, not committed).
+- The explorer feed falls back to getLogs automatically if the subgraph is empty or unreachable.
+
 ## Mantle Sepolia (chain id 5003), 2026-06-06 (fee-model deployment)
 
 RPC: `https://rpc.sepolia.mantle.xyz` · Explorer: https://sepolia.mantlescan.xyz
