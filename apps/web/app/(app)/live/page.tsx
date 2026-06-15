@@ -678,7 +678,7 @@ function TechnicalDetail({
                           <span className="text-[#9296f5] font-mono mr-1.5">#{s.step}</span>
                           {isOverriddenFinalize ? (
                             <span className="text-[#d4a017]">
-                              Model proposed {proposedDecision} — overridden by policy to{" "}
+                              Model proposed {proposedDecision}, overridden by policy to{" "}
                               {a.done?.decision} (stale single source)
                             </span>
                           ) : (
@@ -704,7 +704,7 @@ function TechnicalDetail({
                           {a.done.blockedByProtocol ? " (blocked by protocol)" : ""}
                           {isOverridden ? (
                             <span className="text-[#d4a017] ml-1">
-                              — policy override (stale single source)
+                              (policy override: stale single source)
                             </span>
                           ) : null}
                         </span>
