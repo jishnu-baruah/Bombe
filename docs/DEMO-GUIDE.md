@@ -2,7 +2,7 @@
 
 A page-by-page script for recording a screen demo. Every input and expected
 output below was verified against the live site and API with real reads on
-2026-06-12. Live site: https://bombe-web.vercel.app. Mantle Sepolia (chain id
+2026-06-15. Live site: https://bombe-web.vercel.app. Mantle Sepolia (chain id
 5003). Attestation contract `0xf2473a0a55D997233C8fBF987c197e7d2180470A`.
 Explorer https://sepolia.mantlescan.xyz.
 
@@ -15,14 +15,14 @@ shows. NAV tolerance is 0.5 percent; document tolerance is 75 bps.
 
 | Field | Value |
 |-------|-------|
-| Working claim ids | `mETH-REQ-a9dbaf4521` (VALID + VALID), `mETH-REQ-9ae5173c06` (REJECTED + VALID), `mETH-REQ-01122a8fa5` (VALID) |
+| Working claim ids | `mETH-REQ-a9dbaf4521` (VALID + VALID), `mETH-REQ-9ae5173c06` (REJECTED + VALID, the disagreement), `mETH-REQ-01122a8fa5` (VALID x3: reflector + rotor + stator, triple-run redundancy) |
 | Reasoning-hash example | `0x63722285ad6144a34c5e2589ae9cc42178b6e70bf6dcfd4a6ba768287a034ebc` |
-| Attestation tx hashes | `0xa8e9c4ca7fb19aab177ed2bab5c45c351068d9d59654f6793842e387f83021a0`, `0xe87ff3caea31a72050063adcf32f559446506a612193c8f611c7b10ea881e031` |
+| Tx hash that resolves on /verify | `0x7f26e46914d8ae93bd41f0d546a600693b47aece27552d242288deb35353bd54` (paste it; resolves to claim USDY-2026-06-14) |
 | NAV check (sDAI, Ethereum) | vault `0x83F20F44975D03b1b09e64809B757c47f942BEeA`, assertedNav `1.1767`, tolerance `0.5` -> VALID |
 | Document check (USDY preset) | asset `USDY`, assertedBps `355`, toleranceBps `75` -> VALID (live around 369 bps) |
 | Request inputs | asset `mETH`, assertedBps `195`, windowDays `30`, price 0.02 MNT |
 | Payment receiving address | `0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83` |
-| Dispute target | claim `mETH-REQ-9ae5173c06`, accused `0x3BA08C723D41A98339D43Ffa01174791EaE813Fa` |
+| Dispute (file a new one) | claim `mETH-REQ-a9dbaf4521` (no existing dispute, so the button shows); `mETH-REQ-9ae5173c06` already shows a live on-chain dispute |
 
 ## 1. Landing (/)
 
@@ -40,12 +40,14 @@ Expect: the capabilities matrix renders the live schema from `/api/v1/schema`.
 
 ## 2. Verify (/verify)
 
-Say: "Paste any claim id. Bombe reads the on-chain attestations, then re-derives
-each attestor's reasoning hash from its public trace and shows the on-chain hash
-matches, proof the verdict was not edited."
+Say: "Paste a claim id, a reasoning hash, or even a transaction hash. Bombe reads
+the on-chain attestations, then re-derives each attestor's reasoning hash from
+its public trace and shows the on-chain hash matches, proof the verdict was not
+edited."
 
 Do: paste a claim id, submit, show the per-attestor verdict cards (decision,
-on-chain reasoningHash, recomputed hash, green match), click into the trace.
+on-chain reasoningHash, recomputed hash, green match), click into the trace. The
+claim id has a one-click copy button.
 
 Type (3 working claim ids):
 
@@ -57,30 +59,32 @@ mETH-REQ-01122a8fa5
 
 Expect:
 
-| Claim id | Attestor 0x3BA0...13Fa | Attestor 0x5882...957e | Hash |
-|----------|------------------------|------------------------|------|
-| mETH-REQ-a9dbaf4521 | VALID | VALID | both match:true |
-| mETH-REQ-9ae5173c06 | REJECTED | VALID (the two attestors disagree) | both match:true |
-| mETH-REQ-01122a8fa5 | VALID | (single attestor) | match:true |
+| Claim id | Attestors | Hash |
+|----------|-----------|------|
+| mETH-REQ-a9dbaf4521 | reflector VALID + plugboard VALID | both match:true |
+| mETH-REQ-9ae5173c06 | reflector REJECTED + plugboard VALID (the disagreement) | both match:true |
+| mETH-REQ-01122a8fa5 | reflector + rotor + stator, all VALID (triple-run redundancy) | all 3 match:true |
 
 Reasoning-hash to paste (shows a green match):
 `0x63722285ad6144a34c5e2589ae9cc42178b6e70bf6dcfd4a6ba768287a034ebc`
 
-Tx hash to paste (opens on the explorer):
-`0xa8e9c4ca7fb19aab177ed2bab5c45c351068d9d59654f6793842e387f83021a0`
+Tx hash to paste (now resolves to its claim, not just an explorer link):
+`0x7f26e46914d8ae93bd41f0d546a600693b47aece27552d242288deb35353bd54` (an attest
+tx; /verify decodes it to claim USDY-2026-06-14 and shows the verdict).
 
 ## 3. Explorer (/explorer)
 
 Say: "The explorer is the public ledger of every attested claim; each row links
 straight to its Mantle transaction."
 
-Do: show the claims table, click a tier or decision filter to narrow the rows,
-click a row's explorer link to open the Mantle tx.
+Do: show the claims table (it reads the indexed subgraph), click a tier or
+decision filter to narrow the rows, click a row's explorer link to open the
+Mantle tx. Each row's claim id and tx hash have a one-click copy button.
 
 Type: nothing (click filters).
 
-Expect: a table of claims across categories with real verdicts, attestor
-addresses, and working explorer tx links.
+Expect: a table of ~35 claims across categories with real verdicts, attestor
+addresses, and working explorer tx links; the header reads "N claims, indexed".
 
 ## 4. Issuers console (/issuers)
 
@@ -174,15 +178,21 @@ Say: "If you think a verdict is wrong you can dispute it, keylessly. Bombe
 confirms the attestation is real and disputable, records it under review, and an
 operator can carry it on-chain as a bonded slashing dispute."
 
-Do: on a claim with a non-abstain verdict, click "Dispute this verdict", enter a
-reason (10+ characters), submit.
+Do: on a claim with a non-abstain verdict that is not already disputed, click
+"Dispute this verdict", enter a reason (10+ characters), submit. Good target to
+FILE on: `mETH-REQ-a9dbaf4521` (a VALID attestor, no existing dispute, so the
+button shows).
 
 Type (a working reason): "The two computation paths disagree and the verdict
-looks wrong to me, please re-check." Good target: claim `mETH-REQ-9ae5173c06`,
-the REJECTED attestor `0x3BA08C723D41A98339D43Ffa01174791EaE813Fa`.
+looks wrong to me, please re-check."
 
-Expect: a success message, "Dispute recorded and under review." The claim then
-shows a "disputed, under review" chip on the attestor.
+Expect: a success message, "Dispute recorded and under review", then a
+"disputed, under review" chip on that attestor.
+
+To also SHOW a real on-chain dispute: open `/verify?q=mETH-REQ-9ae5173c06`, where
+the reflector REJECTED verdict already carries a live bonded `openDispute`. It
+renders a red "disputed on-chain" chip with a "View the on-chain dispute" link to
+the tx `0xca7fb2d9fac369d15cf36186cab10a8adcaadad6765511eab035362b4ea675a0`.
 
 Note for the recorder: everything except the paid request step is fully
 clickable with no wallet, and all of it was verified against the live API.
