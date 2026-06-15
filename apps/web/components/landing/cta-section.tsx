@@ -67,20 +67,24 @@ export function CtaSection() {
             </div>
 
             {/* Right: interactive 3D robot on its own stage (lg+ only).
-                .scene-blend masks the canvas so its edges (and corner badge)
-                dissolve into the card with no visible seam. */}
-            <div className="scene-blend relative hidden lg:block h-[520px]">
-              <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="absolute inset-0" />
+                The Spline free-tier "Built with Spline" badge is painted onto the
+                WebGL canvas itself (a runtime overlay pass at ~20px from the canvas
+                bottom-right), so no CSS/DOM rule can remove it. We cover it with an
+                opaque block pinned to the CANVAS corner (not the card corner): the
+                stage is vertically centered and shorter than the card, so a
+                card-anchored cover would miss the badge. The cover is a sibling of
+                .scene-blend (outside its mask) so it stays fully opaque, and it
+                matches the card background so there is no visible seam. */}
+            <div className="relative hidden lg:block h-[520px]">
+              <div className="scene-blend absolute inset-0">
+                <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="absolute inset-0" />
+              </div>
+              <div
+                className="absolute bottom-2 right-2 z-20 w-[190px] h-[52px] rounded-lg bg-[#0a0a0a] pointer-events-none"
+                aria-hidden="true"
+              />
             </div>
           </div>
-
-          {/* Cover the Spline free-tier "Built with Spline" badge (bottom-right of
-              the robot canvas). Sits outside the .scene-blend mask so it is not
-              faded; matches the card background. */}
-          <div
-            className="absolute bottom-2 right-2 z-20 hidden lg:block w-[172px] h-[44px] rounded-md bg-[#0a0a0a] pointer-events-none"
-            aria-hidden="true"
-          />
         </div>
       </Reveal>
     </section>
