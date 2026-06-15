@@ -152,7 +152,7 @@ export default function IssuersPage() {
             Sepolia, not a logo on a slide.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/request" className={BTN_PRIMARY}>
+            <Link href="#get-attestation" className={BTN_PRIMARY}>
               Request an attestation →
             </Link>
             <Link href="/integrate" className={BTN_OUTLINE}>
@@ -163,7 +163,10 @@ export default function IssuersPage() {
       </section>
 
       {/* Pay and get your attestation (embedded, non-custodial) */}
-      <section className="px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]">
+      <section
+        id="get-attestation"
+        className="scroll-mt-28 px-6 lg:px-12 py-20 lg:py-28 border-t border-white/[0.08]"
+      >
         <div className="max-w-[1200px] mx-auto">
           <span className="eyebrow block mb-6">Get your attestation</span>
           <h2 className="font-display balance text-4xl lg:text-5xl leading-[1.1] text-foreground mb-4">
@@ -254,10 +257,30 @@ export default function IssuersPage() {
                   i < ECONOMICS.length - 1 ? "border-b border-white/[0.06]" : ""
                 }`}
               >
-                <span className="text-foreground font-medium">{row.action}</span>
-                <span className="text-muted-foreground">{row.who}</span>
-                <span className="text-[#9296f5] font-mono text-[13px] tabular">{row.amount}</span>
-                <span className="text-muted-foreground/70">{row.purpose}</span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Action
+                  </span>
+                  <span className="text-foreground font-medium">{row.action}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Who
+                  </span>
+                  <span className="text-muted-foreground">{row.who}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Amount
+                  </span>
+                  <span className="text-[#9296f5] font-mono text-[13px] tabular">{row.amount}</span>
+                </span>
+                <span className="flex items-baseline gap-2 md:block">
+                  <span className="md:hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 w-16 shrink-0">
+                    Purpose
+                  </span>
+                  <span className="text-muted-foreground">{row.purpose}</span>
+                </span>
               </div>
             ))}
           </div>
@@ -278,7 +301,7 @@ export default function IssuersPage() {
                 not attest to a valuation or an opinion, because no honest agent can. On a judgment
                 claim every agent abstains, and the contract rejects any other answer.
               </p>
-              <p className="pretty text-base text-muted-foreground/70 leading-relaxed">
+              <p className="pretty text-base text-muted-foreground leading-relaxed">
                 That refusal is enforced at the contract layer: a Tier-3 non-abstain attestation
                 reverts, making the network&apos;s selectivity tamper-proof, not just aspirational.
               </p>
@@ -339,7 +362,7 @@ export default function IssuersPage() {
                     {c.live ? "Live" : "On request"}
                   </span>
                 </div>
-                <p className="text-[12.5px] text-muted-foreground/70 leading-relaxed">{c.eg}</p>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">{c.eg}</p>
               </div>
             ))}
           </div>

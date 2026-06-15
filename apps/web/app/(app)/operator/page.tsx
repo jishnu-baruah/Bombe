@@ -492,7 +492,7 @@ function KeyEntry({ onKey }: { onKey: (key: string) => void }) {
         <p className="text-muted-foreground text-[13px] font-mono mb-4 text-center">
           /operator, access control
         </p>
-        <h1 className="font-display text-[40px] leading-[1.2] text-center text-foreground mb-2">
+        <h1 className="font-display text-3xl sm:text-[40px] leading-[1.2] text-center text-foreground mb-2">
           Operator Console
         </h1>
         <p className="text-muted-foreground text-[16px] text-center mb-8">
@@ -571,7 +571,7 @@ export default function OperatorPage() {
         <div className="hero-ambient relative flex items-start justify-between mb-8 flex-wrap gap-4 -mt-6 pt-6">
           <div>
             <p className="text-muted-foreground text-[13px] font-mono mb-2">/operator</p>
-            <h1 className="font-display text-[48px] leading-[1.21] text-foreground">
+            <h1 className="font-display text-3xl sm:text-[48px] leading-[1.21] text-foreground">
               Operator Console
             </h1>
             <p className="text-muted-foreground mt-2 text-[16px]">

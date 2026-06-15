@@ -63,12 +63,12 @@ The same reads are served as a small public JSON API, CORS-open and keyless, at 
 
 | Endpoint | Returns |
 |----------|---------|
-| `GET /api/v1/assets` | the tracked assets (mETH, USDY) and the attestation address |
+| `GET /api/v1/assets` | the curated tracked assets and the attestation address |
 | `GET /api/v1/claims/{claimId}` | a claim and every on-chain attestation (decision, confidence, reasoning hash) |
 | `GET /api/v1/verify/{claimId}` | re-derives the reasoning hash from the published trace and reports `verified` / `mismatch` / `trace_unavailable` |
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/claims/mETH-REQ-a9dbaf4521
 # { "claimId": "...", "posted": true, "attestations": [ { "decision": "VALID", "reasoningHash": "0x...", ... } ] }
 ```
 
@@ -76,7 +76,7 @@ A zero-dependency consumer (no Bombe imports, just `fetch`) lives at `scripts/te
 
 ---
 
-## Architecture (work in progress)
+## Architecture
 
 The live flow, from an issuer paying a fee to anyone verifying the result. This diagram is descriptive of the current build and will keep evolving.
 
@@ -102,7 +102,7 @@ flowchart TD
 
 **Live today:** the read and verify paths (`/api/v1`, on-chain reads), the deterministic Tier-1 reconciler, on-chain `postClaim` + `attest`, the `reasoningHash` and self-authenticating trace storage, the live NAV and document checks, and the MCP server. The self-serve pay-then-post path verifies payment on-chain always; automatic posting runs when the operator enables it, otherwise the verified request is recorded for operator fulfilment.
 
-**Planned:** permissionless `postClaim` (today it is role-gated), broader claim types beyond `YIELD_BPS` in self-serve, and a global on-chain claim index (reads currently probe a bounded recent claim set).
+**Planned:** permissionless `postClaim` (today it is role-gated) and broader claim types beyond `YIELD_BPS` in self-serve. The `/explorer` reads a deployed Graph subgraph (Mantle hosted service) for a full indexed history, with an automatic getLogs fallback.
 
 Falsifiable claims only: Tier 1 is deterministic arithmetic (reconcile the evidence legs within a documented tolerance, then compare to the asserted value), Tier 2 is document-falsifiable, and Tier 3 (judgment) is refused at the contract layer. The verdict is never a model's opinion; models gather evidence and write the rationale, and consensus is over the evidence values.
 
@@ -117,14 +117,14 @@ Verified on Mantlescan; source readable at each address.
 | AgentSlashing | [`0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864`](https://sepolia.mantlescan.xyz/address/0xA8630BF1710F60e716b5Ab4ecbD12FD6C04eb864) | Tier-1 slashing + Tier-2 dispute resolution |
 | TuringLeaderboard | [`0xE5A157c349A6540C300D6CEcbe391A81EEEec018`](https://sepolia.mantlescan.xyz/address/0xE5A157c349A6540C300D6CEcbe391A81EEEec018) | Tier-1 settlement + per-agent trust score |
 
-Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALID/REJECTED attestation (0 for ABSTAIN). Details and the full deployment record: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) and [docs/gitbook/contracts.md](docs/gitbook/contracts.md).
+Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALID/REJECTED attestation (0 for ABSTAIN). Details and the full deployment record: [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md) and [docs/gitbook/contracts/README.md](docs/gitbook/contracts/README.md).
 
 ---
 
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-12_
+_Generated: 2026-06-15_
 
 ### Overall
 
@@ -155,7 +155,7 @@ _Generated: 2026-06-12_
 
 ### Operator Items
 
-10 open, 4 resolved (tracked in OPERATOR_TODO.md).
+7 open, 10 resolved (tracked in OPERATOR_TODO.md).
 <!-- PROGRESS:END -->
 
 Refresh the dashboard with `pnpm progress`.

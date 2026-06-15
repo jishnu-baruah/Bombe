@@ -1,7 +1,7 @@
 "use client";
 
+import { RequestAttestationForm } from "@/components/RequestAttestationForm";
 import { useEffect, useState } from "react";
-import { RequestAttestationForm } from "../request/RequestAttestationForm";
 
 // Fallback if the schema fetch fails; the live set comes from /api/v1/schema.navChains.
 const FALLBACK_NAV_CHAINS = ["Ethereum", "Mantle", "Base", "Arbitrum"];

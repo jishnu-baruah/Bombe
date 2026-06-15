@@ -92,51 +92,67 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
           </Link>
           <TierBadge tier={claim.tier} />
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60">
+        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground/80">
           {claim.source}
         </span>
       </div>
 
       {/* Claim type */}
-      <div className="text-muted-foreground text-[13px]">
-        {claim.claimType ? (
-          <span className="font-mono text-[12px]">{claim.claimType}</span>
-        ) : (
-          <span className="text-muted-foreground/50">·</span>
-        )}
-        {claim.asset ? (
-          <span className="block font-mono text-[11px] text-[#9296f5] mt-0.5">{claim.asset}</span>
-        ) : null}
+      <div className="flex items-baseline gap-2 md:block text-muted-foreground text-[13px]">
+        <span className="md:hidden text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60 w-20 shrink-0">
+          Type
+        </span>
+        <span>
+          {claim.claimType ? (
+            <span className="font-mono text-[12px] text-foreground">{claim.claimType}</span>
+          ) : (
+            <span className="text-muted-foreground/50">not yet typed</span>
+          )}
+          {claim.asset ? (
+            <span className="block font-mono text-[11px] text-[#9296f5] mt-0.5">{claim.asset}</span>
+          ) : null}
+        </span>
       </div>
 
       {/* Decision */}
-      <div>
+      <div className="flex items-center gap-2 md:block">
+        <span className="md:hidden text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60 w-20 shrink-0">
+          Verdict
+        </span>
         <DecisionChip decision={claim.decision} />
       </div>
 
       {/* Attestor */}
-      <div className="text-[13px]">
-        {attestor ? (
-          <a
-            href={explorerAddressUrl(attestor)}
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {shortAddr(attestor)}
-          </a>
-        ) : (
-          <span className="text-muted-foreground/50">·</span>
-        )}
-        {attestorCount > 1 ? (
-          <span className="block text-[11px] text-muted-foreground/60 mt-0.5">
-            +{attestorCount - 1} more
-          </span>
-        ) : null}
+      <div className="flex items-baseline gap-2 md:block text-[13px]">
+        <span className="md:hidden text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60 w-20 shrink-0">
+          Attestor
+        </span>
+        <span>
+          {attestor ? (
+            <a
+              href={explorerAddressUrl(attestor)}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-[12px] text-foreground/80 hover:text-foreground transition-colors"
+            >
+              {shortAddr(attestor)}
+            </a>
+          ) : (
+            <span className="text-muted-foreground/50">none yet</span>
+          )}
+          {attestorCount > 1 ? (
+            <span className="block text-[11px] text-muted-foreground mt-0.5">
+              +{attestorCount - 1} more
+            </span>
+          ) : null}
+        </span>
       </div>
 
       {/* On-chain tx */}
-      <div className="text-[13px]">
+      <div className="flex items-baseline gap-2 md:block text-[13px]">
+        <span className="md:hidden text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60 w-20 shrink-0">
+          Tx
+        </span>
         {headlineTx ? (
           <a
             href={explorerTxUrl(headlineTx)}
@@ -147,20 +163,20 @@ function ClaimRow({ claim }: { claim: ActivityClaim }) {
             {shortAddr(headlineTx)} ↗
           </a>
         ) : (
-          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground/50">pending</span>
         )}
       </div>
 
       {/* Time + verify/trace links */}
-      <div className="text-right md:text-left">
+      <div className="flex items-baseline justify-between gap-2 md:block md:text-left">
         <span className="block text-[12px] text-muted-foreground tabular">
           {relativeTime(claim.timestamp)}
         </span>
         <Link
           href={verifyHref}
-          className="inline-block text-[11px] text-muted-foreground/70 hover:text-[#9296f5] transition-colors mt-0.5"
+          className="inline-block text-[12px] text-[#9296f5] hover:text-white transition-colors mt-0.5 font-medium"
         >
-          Verify & trace →
+          Verify &amp; trace →
         </Link>
       </div>
     </div>
@@ -237,7 +253,7 @@ export default async function ExplorerPage({
                 <Link
                   key={f.label}
                   href={href}
-                  className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium border transition-colors ${
+                  className={`px-4 py-2 rounded-full text-[13px] font-medium border transition-colors ${
                     active
                       ? "bg-white text-black border-white"
                       : "border-white/[0.12] text-muted-foreground hover:text-foreground hover:border-white/30"

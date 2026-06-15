@@ -75,6 +75,13 @@ export default function IntegratePage() {
             run, no account to create. Here is the whole shape of it before you open the full guide.
           </p>
           <div className="flex flex-wrap gap-4">
+            <a
+              href="https://jishnus-organization-1.gitbook.io/bombe/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button variant="primary">Read the docs →</Button>
+            </a>
             <Link href="/issuers">
               <Button variant="outline-dark">Why issuers use Bombe →</Button>
             </Link>
@@ -207,9 +214,9 @@ export default function IntegratePage() {
             Each attestation carries a genuine, model-authored train of thought that reasons over
             the real fetched evidence and cites each source by link, so it is auditable. The verdict
             itself is not the model&apos;s opinion: it is a deterministic reconciliation you can
-            rerun, and the whole trace is hashed on-chain. Pay to attest your own supported yield at{" "}
-            <Link href="/request" className="text-[#9296f5] hover:text-white transition-colors">
-              /request
+            rerun, and the whole trace is hashed on-chain. Pay to attest your own supported yield on{" "}
+            <Link href="/issuers" className="text-[#9296f5] hover:text-white transition-colors">
+              the issuer console
             </Link>
             , then check any verdict at{" "}
             <Link href="/verify" className="text-[#9296f5] hover:text-white transition-colors">
@@ -227,9 +234,9 @@ export default function IntegratePage() {
             <span className="eyebrow block mb-3">Posting a claim</span>
             <p className="pretty text-base text-muted-foreground leading-relaxed">
               Reading and verifying are open to anyone. To get a new attestation you pay the fee
-              from your own wallet at{" "}
-              <Link href="/request" className="text-[#9296f5] hover:text-white transition-colors">
-                /request
+              from your own wallet on{" "}
+              <Link href="/issuers" className="text-[#9296f5] hover:text-white transition-colors">
+                the issuer console
               </Link>{" "}
               and the network posts the claim and attests it for you (the contract only accepts
               posts from an authorized role, so the protocol key does the posting; your funds are

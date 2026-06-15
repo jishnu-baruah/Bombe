@@ -96,11 +96,11 @@ export function deriveStatusLine(
 ): string {
   if (!demoReady) {
     if (failedSuites > 0) {
-      return `NOT READY — ${failedSuites} suite${failedSuites > 1 ? "s" : ""} failing`;
+      return `NOT READY: ${failedSuites} suite${failedSuites > 1 ? "s" : ""} failing`;
     }
-    return "NOT READY — no test reports found";
+    return "NOT READY: no test reports found";
   }
-  return `READY — ${mode.toUpperCase()} mode, Plugboard ${plugboardStatus.toUpperCase()}`;
+  return `READY: ${mode.toUpperCase()} mode, Plugboard ${plugboardStatus.toUpperCase()}`;
 }
 
 /**

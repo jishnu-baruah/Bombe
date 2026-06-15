@@ -122,7 +122,7 @@ export function CinematicHero({
     <div
       ref={containerRef}
       className={cn(
-        "relative w-screen h-screen overflow-hidden flex items-center justify-center bg-background text-foreground antialiased",
+        "relative w-full min-h-[100svh] overflow-hidden flex items-center justify-center bg-background text-foreground antialiased",
         className,
       )}
       style={{ perspective: "1500px" }}
@@ -136,7 +136,7 @@ export function CinematicHero({
         aria-hidden="true"
       />
 
-      <div className="hero-text-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 will-change-transform transform-style-3d">
+      <div className="hero-text-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-full px-4 will-change-transform transform-style-3d">
         <h1 className="text-track gsap-reveal text-3d-matte font-display text-5xl md:text-7xl lg:text-[6rem] leading-[1.12] tracking-tight mb-2 pb-[0.06em]">
           {tagline1}
         </h1>

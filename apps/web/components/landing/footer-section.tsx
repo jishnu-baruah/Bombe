@@ -9,6 +9,7 @@ const footerLinks: Record<
     { name: "Live Race", href: "/live" },
     { name: "Verify", href: "/verify" },
     { name: "Explorer", href: "/explorer" },
+    { name: "Capabilities", href: "/#capabilities" },
     { name: "For issuers", href: "/issuers" },
   ],
   Developers: [
@@ -19,7 +20,7 @@ const footerLinks: Record<
     },
     { name: "Integration guide", href: "/integrate" },
     { name: "API schema", href: "/api/v1/schema", external: true },
-    { name: "Request attestation", href: "/request" },
+    { name: "Request attestation", href: "/issuers#get-attestation" },
   ],
   Protocol: [
     { name: "Operator console", href: "/operator" },

@@ -27,40 +27,40 @@ single relayed read is **not** recomputation (see D25.1/D25.6).
 
 ## Council rulings (D25.1–D25.7), binding
 
-- **D25.1 — `PRICE` requires two sources or ABSTAIN.** A single oracle read is an
+- **D25.1, `PRICE` requires two sources or ABSTAIN.** A single oracle read is an
   oracle-of-an-oracle with zero value-add and violates the invariant above. Require two
   sources with *different manipulation profiles* (off-chain heartbeat oracle + on-chain
   DEX TWAP, or two distinct oracles), reconciled within a per-class tolerance. ABSTAIN
   reasons are explicit: `SOURCE_DISAGREEMENT`, `STALE_SOURCE`, `INSUFFICIENT_LIQUIDITY`.
   The guarantee is *divergence-forces-abstain*, not source purity; the TWAP leg is never
   claimed manipulation-proof.
-- **D25.2 — `BACKING_RATIO` is VALID only against a recognized third-party reserve
+- **D25.2, `BACKING_RATIO` is VALID only against a recognized third-party reserve
   attestor.** Issuer-controlled or `custom-http` reserves are graded-down or ABSTAIN,
   never a clean VALID. Reserve fraud is the failure mode that matters; a "does not audit
   the custodian" disclaimer does not survive a depeg headline.
-- **D25.3 — the `claimType → tier` mapping must live on-chain.** "The chain enforces
+- **D25.3, the `claimType → tier` mapping must live on-chain.** "The chain enforces
   abstain" is currently a convention: an agent could mislabel a Tier-3 valuation as Tier-1
   and the contract would not catch it. Add a governance-set on-chain
   `mapping(bytes32 => uint8) claimTypeTier` that `attest()` reads to enforce the
   judgment-tier abstain guard. This is a **v4 contract change in the 2026-07-11 batch**.
   **Until it ships, do not claim contract-enforced abstain for any claim type beyond the
   ones already hardcoded** (the existing Tier-3 `FAIR_VALUE` guard).
-- **D25.4 — `RULE_ADHERENCE` is Tier-2, default ABSTAIN.** Capped to a tiny DSL
+- **D25.4, `RULE_ADHERENCE` is Tier-2, default ABSTAIN.** Capped to a tiny DSL
   (comparison + action + window). A rule not expressible in the DSL is not falsifiable →
   ABSTAIN. Replay is archive-dependent and reorg/partial-fill/MEV-sensitive; VALID only
   for unambiguous trigger→event patterns, else ABSTAIN with a partial-scan summary.
-- **D25.5 — build order (corrected):** (1) `/schema` endpoint, (2) **current-NAV**
+- **D25.5, build order (corrected):** (1) `/schema` endpoint, (2) **current-NAV**
   `NAV_PER_SHARE` (single on-chain read, no archive, genuinely independent), (3) `PRICE`
   dual-source, (4) **historical-NAV / realized-yield** once an L1 archive RPC is
   provisioned, (5) `BACKING_RATIO`, (6) `RULE_ADHERENCE`.
-- **D25.6 — single-oracle assets are a SCOPE decision, not a silent grade.** Tokenized
+- **D25.6, single-oracle assets are a SCOPE decision, not a silent grade.** Tokenized
   stocks and commodities (no independent on-chain second source) are **out of scope** by
   default. They may be admitted later only if a paying integration explicitly wants
   oracle-echo attestations, and only at a visibly inferior grade labeled
   **"single-oracle echo, not independently cross-checked."** Coverage claims never count
   single-source relays alongside cross-checked verdicts (D10/S7). There is no
   "unlock the whole universe" metric.
-- **D25.7 — `/schema` endpoint is P0, cleared to build first.** It is the cheapest
+- **D25.7, `/schema` endpoint is P0, cleared to build first.** It is the cheapest
   high-leverage piece and the actual ecosystem-standard artifact. It publishes the intake
   shape, the capability matrix, the per-class tolerances, and the grade/ABSTAIN-reason
   definitions. **Tolerances are published and tamper-evident** (hashed; the hash is
@@ -140,7 +140,7 @@ deterministic.
 
 ## New check kinds, detailed (post-July-10, demand-gated)
 
-### NAV_PER_SHARE / ERC-4626 (`onchain-rate` scheme) — built first (current), archive later
+### NAV_PER_SHARE / ERC-4626 (`onchain-rate` scheme), built first (current), archive later
 - **Current NAV (first):** single on-chain `convertToAssets(1e18)` read at the latest
   block; compare to asserted. No archive, genuinely independent of any aggregator.
 - **Historical / realized yield (later):** read at the latest block and ~windowDays earlier,
@@ -148,7 +148,7 @@ deterministic.
   for Mantle vaults). Gated until that RPC is provisioned.
 - **Honesty:** attests the vault's on-chain share price / realized yield, never the strategy.
 
-### PRICE (dual-source) — D25.1
+### PRICE (dual-source), D25.1
 - **Sources (two, different profiles):** an `oracle` leg (Chainlink/Pyth/RedStone
   `latestRoundData`) + a `dex-twap` leg (on-chain time-weighted price), or two distinct
   oracles. Reconcile within a per-class tolerance.
@@ -156,15 +156,15 @@ deterministic.
   (heartbeat exceeded), `INSUFFICIENT_LIQUIDITY` (TWAP pool too thin to trust), or fewer
   than two qualifying sources. The guarantee is divergence-forces-abstain.
 
-### BACKING_RATIO — D25.2
+### BACKING_RATIO, D25.2
 - **Source:** a **recognized third-party reserve attestor** (allowlisted) + the token
   `contract` for on-chain `totalSupply`. Issuer-controlled or `custom-http` reserves never
-  yield a clean VALID — they are graded-down or ABSTAIN.
+  yield a clean VALID, they are graded-down or ABSTAIN.
 - **Check:** `reserves_usd / (totalSupply × unitPrice) ≥ 1`.
 - **Honesty:** "backed per the recognized attestor X as of T"; still does not audit the
   custodian's books, so the attestor allowlist is the actual trust anchor.
 
-### RULE_ADHERENCE (Tier-2, default ABSTAIN) — D25.4
+### RULE_ADHERENCE (Tier-2, default ABSTAIN), D25.4
 - **DSL only:** `{ trigger: <comparison>, action: <event>, withinBlocks: <n> }`. A rule
   outside the DSL is not falsifiable → ABSTAIN.
 - **Check:** over the window, find each time the trigger held on-chain and verify the action
@@ -183,7 +183,7 @@ deterministic.
 - An on-chain attestation (tx, stake) + a verify endpoint to re-derive it.
 - The honest label: independence, grade, windowDays, and the explicit "does not catch X".
 
-## `GET /api/v1/schema` — P0, the ecosystem-standard artifact (D25.7)
+## `GET /api/v1/schema`, P0, the ecosystem-standard artifact (D25.7)
 
 Publishes, machine + human readable:
 - the intake shape,
@@ -202,7 +202,7 @@ MCP exposes it as `bombe_get_schema`. This endpoint is built now; it documents w
 
 - **Built + live:** claim/tier taxonomy + the hardcoded Tier-3 `FAIR_VALUE` abstain guard;
   `YIELD_BPS`; `DOCUMENTED_NAV`/`CASHFLOW_MATCH` (the Tier-2 document step, live at
-  `/api/v1/document-check`, verified against the US Treasury rate — not fixture); scheme
+  `/api/v1/document-check`, verified against the US Treasury rate, not fixture); scheme
   registry; gates; provenance; non-custodial paid intake; **`/api/v1/schema` (this batch).**
 - **To build (post-2026-07-10, demand-gated):** the on-chain `claimTypeTier` mapping
   (D25.3, July-11 contract batch, blocking); `NAV_PER_SHARE` current then historical;

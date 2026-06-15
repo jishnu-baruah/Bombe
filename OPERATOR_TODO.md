@@ -21,42 +21,28 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 
 > **2026-06-07 env status.** OP-6 (Neon `DATABASE_URL`) and OP-7 (Upstash Redis) are RESOLVED, present in `.env.local` and Vercel prod. Wired (T-803): Neon (`@neondatabase/serverless`) persists paid-flow requests + payment dedupe durably; Redis (Upstash REST, no SDK dep) caches the on-chain read paths (`getNetworkStats`, `readClaim`) so the homepage and `/verify` fetch fast across serverless instances. The paid-flow payment address defaults to the deployer `0xe41532F6E917e3995Bbb1c7e87A65Ff7a7957a83` (operator decision, "for now"). **OP-5 (BLOB_RW_TOKEN) is no longer needed**: T-802 trace storage was built on Neon instead (a trace is small JSON, not a blob). Traces are stored via a self-authenticating endpoint (POST /api/v1/trace stores a trace only if its hash matches the on-chain reasoningHash) and read back by /verify + the trace route; v2-attest stores its trace after attesting. Existing attestations posted before this (the early headlines/streak) are hash-on-chain only and cannot be retro-stored, but every NEW attestation is stranger-verifiable. OP-5 can be closed.
 
-## OP-5, Blob storage token   [open]
+## OP-5, Blob storage token   [done]
 - Date: 2026-06-06
 - Blocks: T-802 live BlobSeam (real trace storage for the verify-hash artifact)
 - Need: `BLOB_RW_TOKEN` (e.g. Vercel Blob read-write token).
 - Half-done state: live BlobSeam coded; falls back to local filesystem in mock mode.
 - To resolve: provide `BLOB_RW_TOKEN` in `.env.local`, tell the agent "OP-5 ready".
 
-## OP-6, Neon Postgres URL   [open]
+## OP-6, Neon Postgres URL   [done]
 - Date: 2026-06-06
 - Blocks: T-803 live DB read-model (leaderboard/traces over live data)
 - Need: `DATABASE_URL` (Neon serverless Postgres connection string).
 - Half-done state: drizzle schema + live client skeleton ready; pglite used in mock and tests.
 - To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
 
-## OP-7, Upstash Redis   [open]
+## OP-7, Upstash Redis   [done]
 - Date: 2026-06-06
 - Blocks: live serverless SSE event fan-out (in-process bus won't survive Vercel functions), distributed tool-gateway rate limiting, caching
 - Need: `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (Upstash Redis REST API).
 - Half-done state: in-process EventEmitter bus works in development; needs Upstash for stateless Vercel functions at scale.
 - To resolve: create Upstash Redis instance, add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to `.env.local`, tell the agent "OP-7 ready".
 
-## OP-5, Blob storage token   [open]
-- Date: 2026-06-06
-- Blocks: T-802 live BlobSeam (real trace storage for the verify-hash artifact)
-- Need: `BLOB_RW_TOKEN` (e.g. Vercel Blob read-write token).
-- Half-done state: live BlobSeam coded; falls back to local filesystem in mock mode.
-- To resolve: provide `BLOB_RW_TOKEN` in `.env.local`, tell the agent "OP-5 ready".
-
-## OP-6, Neon Postgres URL   [open]
-- Date: 2026-06-06
-- Blocks: T-803 live DB read-model (leaderboard/traces over live data)
-- Need: `DATABASE_URL` (Neon serverless Postgres connection string).
-- Half-done state: drizzle schema + live client skeleton ready; pglite used in mock and tests.
-- To resolve: provide `DATABASE_URL` in `.env.local`, tell the agent "OP-6 ready".
-
-## OP-8, v2 run prerequisites (keys, env, confirmations)   [open]
+## OP-8, v2 run prerequisites (keys, env, confirmations)   [done]
 - Date: 2026-06-07
 - Blocks: every live-post gate in the v2 run. The build (DataSource seam, sources, reconciler, scheduler code) proceeds without these, but no real Sepolia attestation (Gate 1a/1b/2a/3) can be captured until they are set.
 - Need (from BOMBE-V2-PRD.md Sec 7):
@@ -70,7 +56,7 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - GATE 1A ACHIEVED (2026-06-07): the operator authorized using the deployer key, so the v2 live path is enabled and a REAL deterministic attestation over live DefiLlama mETH data is on-chain (VALID, observed 197.32 / asserted 197 bps; postClaim 0x3cfcc384..., attest 0xaf3191dd..., reasoningHash 0x363137413be8... on-chain == local). The deployer posts (OPERATOR_ROLE) and Reflector attests; Reflector was topped up 0.1 MNT from the deployer for gas. This relaxes the constitution's no-deployer-key rule per explicit operator instruction. To run the daily streak unattended, still set the GitHub secrets (POSTING_KEY can be the deployer key, ATTESTOR_KEY = AGENT_KEYS[0]) so .github/workflows/v2-streak.yml goes live; and enable the live post path in scripts/v2-streak-run.ts the same way v2-attest.ts now is.
 - v2 no-key build COMPLETE (2026-06-07): all of WS1-WS5 that does not need keys is built, tested, and merged (#51-#60). The decisive pipeline, consensus-over-evidence, the daily streak run with self-tests, the consumer quickstart, the compile-only mainnet stub, and the submission/demo/X-thread drafts are all done; `pnpm run ci` green (724 tests + the new data/scheduler/consensus suites). What remains is ONLY this OP-8 key setup plus operator-only actions. To flip live: (1) create the posting key (grant it OPERATOR_ROLE on AgentAttestation) and the attestor key(s), fund them, remove the deployer key from the agent env; (2) add POSTING_KEY, ATTESTOR_KEY, RPC_URL, ATTESTATION_ADDRESS, AI_GATEWAY_* as GitHub repo secrets so the daily `v2-streak` workflow goes from inert to live; (3) enable the live post path in scripts/v2-attest.ts and scripts/v2-streak-run.ts (currently they exit when MODE=live, pending these keys); (4) get a Mantlescan API key and verify the 4 contracts; (5) record the demo video (docs/DEMO-SCRIPT.md) and post the X thread (docs/X-THREAD.md); (6) submit the BUIDL on DoraHacks using docs/SUBMISSION.md.
 
-## OP-9, self-serve issuer flow: scope + payment rail + custodial authorization   [open]
+## OP-9, self-serve issuer flow: scope + payment rail + custodial authorization   [done]
 - Date: 2026-06-07
 - Blocks: T-611 (issuer request intake) and T-612 (custodial paid attestation flow)
 - Need three operator decisions:
@@ -106,17 +92,35 @@ The status toggles `[open]` → `[done]` once the operator resolves the entry; t
 - Half-done state: the scheme registry + discovery + grade system are built and DefiLlama-sourced; rwa.xyz is the one external data source that needs a credential to unlock the non-yield classes.
 - To resolve: provide the rwa.xyz Data API key (or confirm a free tier + base URL); the agent wires the `rwa-xyz` scheme and expands discovery to its asset classes.
 
-## OP-13, top up the Plugboard wallet (live Hermes attestor)   [open]
+## OP-13, top up the Plugboard wallet (live Hermes attestor)   [done]
 - Date: 2026-06-12
 - Blocks: continuous live attestation by the external Nous Hermes Plugboard agent. The on-chain attest bridge is proven (the Hermes host attested mETH-REQ-a9dbaf4521 VALID as Plugboard, tx 0xc8e08f70314e670c10269099b0c618e7976e2882b04c34e10eda748097d6dd23, status success; verify reports match). One attest consumed ~0.089 MNT (0.02 locked stake + heavy Mantle gas).
 - Half-done state: Plugboard wallet 0x58826a9FCb6956332D0833b9175CE40A7587957e is at ~0.0065 MNT, below the 0.1 MNT operational floor. Per the v2 constitution I did not improvise funding. The attest tool runs in --dry-run until funded.
 - To resolve: send MNT to the Plugboard wallet (suggest 0.5-1 MNT for a run of live attests) from an operator-authorized source. Then live attests resume with no code change.
+- RESOLVED 2026-06-12: operator funded Plugboard ~10 MNT. Proven from it: the Hermes one-shot attest (mETH-REQ-9ae5173c06) and the on-chain dispute openDispute (dispute 0, tx 0xca7fb2d9...). Wallet now well above the 0.1 MNT floor.
 
 ## OP-14, higher-tier model key for the Hermes agent loop   [open]
 - Date: 2026-06-12
 - Blocks: the autonomous Hermes read-decide-attest loop (the agent itself orchestrating, vs the attest tool being invoked directly). A single Hermes agent run makes several model calls (plan + tool use) and the current droplet model key returns HTTP 429 (rate limit exceeded) partway through.
 - Half-done state: Hermes v0.16.0 is installed and reasons (one-shot prompts work), recognizes the bombe-attestor skill (enabled), and the attest tool works standalone. The multi-call agent loop is throttled by the model key's rate limit.
 - To resolve: provide a higher-rate model key (or confirm a paid tier) for the host's ~/.hermes/config.yaml, or point it at the project AI gateway. Then the full agent loop runs end to end.
+
+## OP-15, dormant attestors rotor / stator / human   [open]
+- Date: 2026-06-12
+- Blocks: nothing functionally, but the "multi-agent" / five-attestor framing outruns the on-chain evidence. On-chain truth: only reflector (22 attestations) and the external Plugboard (4, incl. a real REJECTED/VALID disagreement) have ever attested. rotor, stator, and human are registered and funded but have made zero attestations and have no stored traces; each holds only ~0.077 MNT (below the 0.1 floor, so they cannot attest much without a top-up).
+- Decision needed (operator): either (a) fund + activate rotor/stator on a few live claims so the multi-attestor story is real, or (b) keep the copy honest as it stands (the site already labels mETH as "one ground truth, two computation paths", not "independent", and never claims active consensus). Do not relabel as "multi-model consensus" unless three genuinely different models are confirmed (v2 constitution).
+- Half-done state: the leaderboard/claim UI render whatever each agent actually did; dormant agents simply show no activity, which is honest. No code change pending.
+
+## OP-16, on-chain dispute escalation key + economics   [open]
+- Date: 2026-06-12
+- Blocks: the operator-triggered on-chain leg of the dispute flow on the live host. The public dispute intake (POST /api/dispute) and the verify-page button are live and keyless; the operator route POST /api/operator/dispute is wired to sign the real AgentSlashing.openDispute (0.05 MNT bond) but needs a registered challenger key in the Vercel env that is NOT the accused attestor. ATTESTOR_KEY is reflector, which is the accused on most claims, so set a distinct CHALLENGER_KEY (e.g. the Plugboard key, which is registered + funded) for prod escalation.
+- Note: openDispute locks a 0.05 MNT bond and can slash; resolveDispute has economic finality (tie -> agent right, D13). I did not auto-trigger a resolution while unattended. To demonstrate or run a real dispute, set CHALLENGER_KEY and call /api/operator/dispute with { disputeId } (or { claimId, accused }).
+- To resolve: add CHALLENGER_KEY (distinct registered, funded attestor) to the Vercel prod env.
+
+## OP-17, MCP package run/build + docstring   [open]
+- Date: 2026-06-12
+- Blocks: nothing (all 8 MCP tools work end-to-end against the live API, verified by a fresh-context test driving the server over stdio). Minor packaging: packages/mcp has no README, its `start` script and `bin` reference `tsx` which is not a dependency (a fresh machine without a global tsx cannot `pnpm start`), and src/index.ts header says "See SKILL.md" but no SKILL.md exists in the package. The server does run via `node --experimental-strip-types src/index.ts` on Node 24.
+- To resolve: either add `tsx` to the package devDependencies (via the package manager, not a hand-edited lockfile) or add a build step that emits JS for the bin; add a short README; fix the docstring to point at the repo-root SKILL.md.
 
 ## Resolved
 

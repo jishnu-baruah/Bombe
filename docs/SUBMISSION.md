@@ -13,7 +13,7 @@ staked and slashable, and the contract forbids attesting anything that cannot be
 
 Bombe is built to compete across several tracks; nominate for all of these.
 
-- **AI & RWA Track (primary).** Bombe fits both paths. As *RWA Infrastructure* it is AI-powered verification/pricing-attestation for tokenized yields (mETH, USDY). As an *RWA Application* the self-serve `/request` flow lets a new issuer connect a wallet, pay, and get a verifiable on-chain attestation, lowering the barrier to a real-asset trust primitive. Encouraged direction match: RWA yield attestation / compliance-style checks.
+- **AI & RWA Track (primary).** Bombe fits both paths. As *RWA Infrastructure* it is AI-powered verification/pricing-attestation for tokenized yields (mETH, USDY). As an *RWA Application* the self-serve request flow (in the issuer console) lets a new issuer connect a wallet, pay, and get a verifiable on-chain attestation, lowering the barrier to a real-asset trust primitive. Encouraged direction match: RWA yield attestation / compliance-style checks.
 - **Grand Champion (aspirational, cross-track).** Strong on all four dimensions: technical depth (AI gathers evidence, a deterministic reconciler decides, the trace is hashed on-chain), innovation (falsifiable-only attestation with contract-enforced refusal, proven by an external attestor), Mantle ecosystem contribution (live contracts + a daily on-chain attestation streak), product completeness (live site, public read API, verify-hash, self-serve paid flow).
 - **Alpha & Data Track (secondary, Path A Data & Analytics).** Bombe turns Mantle on-chain data into a verifiable signal: it reads the mETH exchange rate on-chain and cross-checks an aggregator, and every verdict is an on-chain record whose reasoning hash anyone can recompute. The leaderboard + daily streak + `/verify` are a Mantle RWA-yield data surface where the *insight is the verifiability itself*.
 - **Best UI/UX Award.** A polished, accessible frontend: left-aligned premium hero with live on-chain stats, a one-box `/verify` lookup, a `/turing` blind human-vs-AI mode, inline jargon glosses, and a connect-wallet-and-pay flow, all responsive to 380px.
@@ -151,7 +151,7 @@ attestation, including the daily streak, is verifiable this way.
   builder that hashes the trace and writes it on-chain. Seams keep every test deterministic.
 - **Web app (Next.js):** a live race view, a leaderboard, a per-claim trace viewer with a verify
   button, a public `/verify` lookup (paste a claim ID, reasoning hash, or tx), a self-serve
-  `/request` paid flow (connect your own wallet, pay non-custodially), a `/turing` blind
+  issuer-console paid flow (connect your own wallet, pay non-custodially), a `/turing` blind
   human-vs-AI mode, an operator console, the issuer/integration pages, and a keyless public read
   API (`/api/v1/*`). Reads are Redis-cached; paid requests and traces persist on Neon.
 

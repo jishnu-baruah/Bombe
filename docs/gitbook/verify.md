@@ -13,18 +13,18 @@ reasoningHash = keccak256(canonicalJson(trace))
 The API does the fetch-and-compare for you, per attestation.
 
 ```sh
-curl https://bombe-web.vercel.app/api/v1/verify/mETH-2026-06-07
+curl https://bombe-web.vercel.app/api/v1/verify/mETH-REQ-a9dbaf4521
 ```
 
 ```json
 {
-  "claimId": "mETH-2026-06-07",
+  "claimId": "mETH-REQ-a9dbaf4521",
   "results": [
     {
       "attestor": "0x3BA0...",
       "decision": "VALID",
-      "onChainReasoningHash": "0x363137...",
-      "recomputed": "0x363137...",
+      "onChainReasoningHash": "0x63722285ad6144a34c5e2589ae9cc42178b6e70bf6dcfd4a6ba768287a034ebc",
+      "recomputed": "0x63722285ad6144a34c5e2589ae9cc42178b6e70bf6dcfd4a6ba768287a034ebc",
       "match": true,
       "status": "verified"
     }
@@ -49,7 +49,7 @@ import { hashCanonical } from "@bombe/shared"; // keccak256 over canonical JSON
 
 // 1. Read the claim to get each attestation's traceURI + on-chain reasoningHash.
 const claim = await fetch(
-  "https://bombe-web.vercel.app/api/v1/claims/mETH-2026-06-07",
+  "https://bombe-web.vercel.app/api/v1/claims/mETH-REQ-a9dbaf4521",
 ).then((r) => r.json());
 
 for (const a of claim.attestations) {

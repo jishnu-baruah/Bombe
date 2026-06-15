@@ -158,8 +158,10 @@ export async function GET(req: NextRequest) {
 
         for (const event of events) {
           controller.enqueue(encoder.encode(encodeEvent(event)));
-          // Stagger events so client receives them as a real stream
-          await new Promise<void>((resolve) => setTimeout(resolve, 200));
+          // Stagger events so the panel visibly "thinks" rather than snapping to a
+          // finished state. 450ms keeps the heaviest claim (~17 events ~= 7.6s) well
+          // inside the client's 10s per-claim window so the verdict is never cut off.
+          await new Promise<void>((resolve) => setTimeout(resolve, 450));
         }
 
         // Gap between claims (only when streaming multiple claims without guided-demo)

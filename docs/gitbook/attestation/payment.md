@@ -12,7 +12,7 @@ curl https://bombe-web.vercel.app/api/v1/request
 {
   "service": "Bombe self-serve attestation request",
   "method": "POST",
-  "supportedAssets": ["mETH", "USDY"],
+  "supportedAssets": ["mETH", "USDT0", "GHO", "USDY", "LBTC", "WEETH", "..."],
   "claimType": "YIELD_BPS",
   "priceMnt": "0.02",
   "note": "Non-custodial: pay from your own wallet to the receiving address, then POST the payment tx hash ..."
@@ -21,7 +21,7 @@ curl https://bombe-web.vercel.app/api/v1/request
 
 ## 2. Pay the fee from your own wallet
 
-Send exactly the fee (or more) in MNT to the receiving address on Mantle Sepolia. In the browser the [request form](https://bombe-web.vercel.app/request) does this for you via your wallet; programmatically, send a plain transfer:
+Send exactly the fee (or more) in MNT to the receiving address on Mantle Sepolia. In the browser the [issuer console](https://bombe-web.vercel.app/issuers#get-attestation) does this for you via your wallet; programmatically, send a plain transfer:
 
 ```js
 import { createWalletClient, custom, parseEther } from "viem";

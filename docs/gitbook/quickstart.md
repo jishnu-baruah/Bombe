@@ -10,7 +10,7 @@ Base URL: `https://bombe-web.vercel.app/api/v1`
 curl https://bombe-web.vercel.app/api/v1/assets
 ```
 
-Returns the curated assets (mETH, USDY), the chain, and the `AgentAttestation` address. The full open universe is at `GET /api/v1/discover`.
+Returns the curated assets (mETH, USDY, and dozens more), the chain, and the `AgentAttestation` address. The full open universe is at `GET /api/v1/discover`.
 
 ## 2. Read a claim and its verdicts
 

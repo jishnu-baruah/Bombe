@@ -2,7 +2,7 @@
 
 /**
  * RequestAttestationForm — the self-serve pay-and-attest flow (T-611/T-612), as a
- * reusable client component so it can live on /request AND embedded on /issuers.
+ * reusable client component embedded in the issuer console on /issuers.
  *
  * The issuer composes a supported yield claim, connects their own wallet
  * (non-custodial), and pays the fee from it (direct MNT transfer). On a confirmed
@@ -73,7 +73,7 @@ export function RequestAttestationForm() {
         setAssets(
           j.assets.map((a) => ({
             id: a.symbol,
-            label: `${a.symbol} — ${a.name ?? a.symbol}${a.chain ? ` (${a.chain})` : ""}`,
+            label: `${a.symbol} · ${a.name ?? a.symbol}${a.chain ? ` (${a.chain})` : ""}`,
           })),
         );
       })
