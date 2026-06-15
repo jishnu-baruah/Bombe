@@ -73,6 +73,14 @@ export function CtaSection() {
               <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="absolute inset-0" />
             </div>
           </div>
+
+          {/* Cover the Spline free-tier "Built with Spline" badge (bottom-right of
+              the robot canvas). Sits outside the .scene-blend mask so it is not
+              faded; matches the card background. */}
+          <div
+            className="absolute bottom-2 right-2 z-20 hidden lg:block w-[172px] h-[44px] rounded-md bg-[#0a0a0a] pointer-events-none"
+            aria-hidden="true"
+          />
         </div>
       </Reveal>
     </section>

@@ -293,8 +293,11 @@ pre,
   -webkit-mask-image: radial-gradient(ellipse 72% 78% at 52% 44%, black 45%, transparent 90%);
 }
 
-/* Spline free-tier badge injected by the runtime */
-.landing a[href*="spline.design"] {
+/* Spline free-tier "Built with Spline" badge injected by the runtime. Hide it
+   wherever it appears (it is an anchor to spline.design). A corner cover in the
+   CTA section backs this up for runtime versions that paint it on the canvas. */
+a[href*="spline.design"],
+a[href*="app.spline.design"] {
   display: none !important;
 }
 
