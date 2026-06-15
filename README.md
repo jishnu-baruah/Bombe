@@ -124,7 +124,7 @@ Economics: `CLAIM_FEE` 0.01 MNT on `postClaim`, `ATTEST_LOCK` 0.02 MNT on a VALI
 ## Progress Dashboard
 
 <!-- PROGRESS:START -->
-_Generated: 2026-06-12_
+_Generated: 2026-06-15_
 
 ### Overall
 
